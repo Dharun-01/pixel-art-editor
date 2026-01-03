@@ -28,11 +28,20 @@
 
 			draw(pixels) {
 				let copy = this.pixels.slice();
+				let minX = Infinity,
+					minY = Infinity,
+					maxX = -Infinity,
+					maxY = -Infinity;
 				for (let { x, y, color } of pixels) {
 					copy[x + y * this.width] = color;
+					minX = Math.min(minX, x);
+					minY = Math.min(minY, y);
+					maxX = Math.max(maxX, x);
+					maxY = Math.max(maxY, y);
 				}
-
-				return new Picture(this.width, this.height, copy);
+				let newPicture = new Picture(this.width, this.height, copy);
+				newPicture.dirtyRect = { minX, minY, maxX, maxY };
+				return newPicture;
 			}
 		}
 
@@ -80,9 +89,19 @@
 				previous = null;
 			}
 			let cx = canvas.getContext('2d');
+			let startX = 0,
+				startY = 0,
+				endX = picture.width - 1,
+				endY = picture.height - 1;
+			if (picture.dirtyRect && previous != null) {
+				startX = Math.max(0, picture.dirtyRect.minX);
+				startY = Math.max(0, picture.dirtyRect.minY);
+				endX = Math.min(picture.width - 1, picture.dirtyRect.maxX);
+				endY = Math.min(picture.height - 1, picture.dirtyRect.maxY);
+			}
 			cx.beginPath();
-			for (let y = 0; y < picture.height; y++) {
-				for (let x = 0; x < picture.width; x++) {
+			for (let y = startY; y < endY; y++) {
+				for (let x = startX; x < endX; x++) {
 					let color = picture.pixel(x, y);
 					if (previous == null || previous.pixel(x, y) != color) {
 						cx.fillStyle = color;
