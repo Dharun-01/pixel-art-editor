@@ -100,8 +100,8 @@
 				endY = Math.min(picture.height - 1, picture.dirtyRect.maxY);
 			}
 			cx.beginPath();
-			for (let y = startY; y < endY; y++) {
-				for (let x = startX; x < endX; x++) {
+			for (let y = startY; y <= endY; y++) {
+				for (let x = startX; x <= endX; x++) {
 					let color = picture.pixel(x, y);
 					if (previous == null || previous.pixel(x, y) != color) {
 						cx.fillStyle = color;
@@ -286,18 +286,16 @@
 			} else {
 				if (state.tool === 'erase') brushSize = 20;
 			}
-
+			if (!brushSize) return points;
 			let result = [];
 			for (let p of points) {
-				for (let dx = 0; dx <= brushSize; dx++) {
+				for (let dx = 0; dx < brushSize; dx++) {
 					for (let dy = 0; dy < brushSize; dy++) {
 						result.push({ x: p.x + dx, y: p.y + dy, color: p.color });
 					}
 				}
 			}
-			if (brushSize) return result;
-
-			return points;
+			return result;
 		}
 
 		class ColorSelect {
