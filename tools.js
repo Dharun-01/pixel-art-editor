@@ -1,0 +1,260 @@
+import { drawLine, applyBrush, hexToRgb, elt } from './utils.js';
+import { Picture } from './picture.js';
+
+const offScreen = document.createElement('canvas');
+const offCtx = offScreen.getContext('2d', { willReadFrequently: true });
+const dpr = window.devicePixelRatio;
+export function drawPicture(picture, canvas, zoom, previous, ImageData, cx) {
+	const fullRedraw =
+		previous == null ||
+		previous.width != picture.width ||
+		previous.height != picture.height ||
+		canvas.zoom !== zoom;
+	if (fullRedraw) {
+		canvas.width = picture.width;
+		canvas.height = picture.height;
+		canvas.style.width = picture.width * zoom * dpr + 'px';
+		canvas.style.height = picture.height * zoom * dpr + 'px';
+		canvas.zoom = zoom;
+
+		offScreen.width = picture.width;
+		offScreen.height = picture.height;
+		console.log(dpr);
+	}
+
+	console.log(
+		canvas.width,
+		canvas.height,
+		canvas.getBoundingClientRect().width,
+		canvas.getBoundingClientRect().height
+	);
+
+	let startX = 0,
+		startY = 0,
+		endX = picture.width - 1,
+		endY = picture.height - 1;
+
+	let dirtyWidth = picture.width,
+		dirtyHeight = picture.height;
+
+	if (!fullRedraw && picture.dirtyRect) {
+		startX = Math.max(0, picture.dirtyRect.minX);
+		startY = Math.max(0, picture.dirtyRect.minY);
+		endX = Math.min(picture.width - 1, picture.dirtyRect.maxX);
+		endY = Math.min(picture.height - 1, picture.dirtyRect.maxY);
+		dirtyWidth = endX - startX + 1;
+		dirtyHeight = endY - startY + 1;
+	}
+
+	ImageData.data.set(picture.pixels);
+	offCtx.putImageData(ImageData, 0, 0);
+
+	/* let zoomedX = startX;
+	let zoomedY = startY;
+	let zoomedWidth = dirtyWidth;
+	let zoomedHeight = dirtyHeight; */
+
+	/* cx.clearRect(zoomedX, zoomedY, zoomedWidth, zoomedHeight); */
+	cx.setTransform(1, 0, 0, 1, 0, 0);
+	cx.imageSmoothingEnabled = false;
+	/* cx.clearRect(startX, startY, dirtyWidth, dirtyHeight); */
+
+	cx.drawImage(
+		offScreen,
+		startX,
+		startY,
+		dirtyWidth,
+		dirtyHeight,
+		startX,
+		startY,
+		dirtyWidth,
+		dirtyHeight
+	);
+}
+
+export function draw(pos, state, dispatch, getColor = () => state.color) {
+	function connect(newPos, state) {
+		let color = getColor();
+		console.log('Drawing at color: ' + color);
+		let line = drawLine(pos, newPos, color, state);
+		pos = newPos;
+
+		dispatch({ picture: state.picture.draw(applyBrush(line, state)) });
+	}
+	connect(pos, state);
+	return connect;
+}
+
+export function line(pos, state, dispatch) {
+	let base = state.picture;
+	return (end, state, isFinal) => {
+		let line = drawLine(pos, end, state.color);
+		if (!isFinal)
+			dispatch({
+				isPreview: true,
+				picture: base.draw(applyBrush(line, state)),
+			});
+		else
+			dispatch({
+				picture: base.draw(applyBrush(line, state)),
+				isPreview: false,
+			});
+	};
+}
+
+export function rectangle(start, state, dispatch) {
+	function drawRectangle(pos) {
+		let xStart = Math.min(start.x, pos.x);
+		let yStart = Math.min(start.y, pos.y);
+		let xEnd = Math.max(start.x, pos.x);
+		let yEnd = Math.max(start.y, pos.y);
+		let drawn = [];
+
+		for (let y = yStart; y <= yEnd; y++) {
+			for (let x = xStart; x <= xEnd; x++) {
+				drawn.push({ x, y, color: state.color });
+			}
+		}
+		dispatch({ picture: state.picture.draw(applyBrush(drawn, state)) });
+	}
+	drawRectangle(start);
+	return drawRectangle;
+}
+
+let around = [
+	{ dx: -1, dy: 0 },
+	{ dx: 1, dy: 0 },
+	{ dx: 0, dy: -1 },
+	{ dx: 0, dy: 1 },
+];
+
+export function fill({ x, y }, state, dispatch) {
+	let targetIndex1 = state.picture.pixel(x, y);
+	let targetIndex2 = targetIndex1 + 1;
+	let targetIndex3 = targetIndex1 + 2;
+	let targetIndex4 = targetIndex1 + 3;
+
+	let targetColor = new Uint8ClampedArray([
+		state.picture.pixels[targetIndex1],
+		state.picture.pixels[targetIndex2],
+		state.picture.pixels[targetIndex3],
+		state.picture.pixels[targetIndex4],
+	]);
+
+	let drawn = [{ x, y, color: state.color }];
+	let visited = new Set();
+	for (let done = 0; done < drawn.length; done++) {
+		for (let { dx, dy } of around) {
+			let x = drawn[done].x + dx,
+				y = drawn[done].y + dy;
+			let index = (x + y * state.picture.width) * 4;
+			let pixelColor = new Uint8ClampedArray([
+				state.picture.pixels[index],
+				state.picture.pixels[index + 1],
+				state.picture.pixels[index + 2],
+				state.picture.pixels[index + 3],
+			]);
+			if (
+				x >= 0 &&
+				x < state.picture.width &&
+				y >= 0 &&
+				y < state.picture.height &&
+				!visited.has(x + ',' + y) &&
+				pixelColor[0] == targetColor[0] &&
+				pixelColor[1] == targetColor[1] &&
+				pixelColor[2] == targetColor[2] &&
+				pixelColor[3] == targetColor[3]
+			) {
+				drawn.push({ x, y, color: state.color });
+				visited.add(x + ',' + y);
+			}
+		}
+	}
+	dispatch({ picture: state.picture.draw(drawn), tool: 'draw' });
+}
+
+export function circle(pos, state, dispatch) {
+	function drawCircle(to) {
+		let radius = Math.sqrt((to.x - pos.x) ** 2 + (to.y - pos.y) ** 2);
+		let radiusC = Math.ceil(radius);
+		let drawn = [];
+		for (let dy = -radiusC; dy <= radiusC; dy++) {
+			for (let dx = -radiusC; dx <= radiusC; dx++) {
+				let dist = Math.sqrt(dx ** 2 + dy ** 2);
+				if (dist > radius) continue;
+				let y = pos.y + dy,
+					x = pos.x + dx;
+				if (
+					y < 0 ||
+					y >= state.picture.height ||
+					x < 0 ||
+					x >= state.picture.width
+				)
+					continue;
+				drawn.push({ x, y, color: state.color });
+			}
+		}
+		dispatch({ picture: state.picture.draw(applyBrush(drawn, state)) });
+	}
+	drawCircle(pos);
+	return drawCircle;
+}
+
+export function erase(pos, state, dispatch) {
+	return draw(pos, state, dispatch, () => hexToRgb('#f0f0f0'));
+}
+
+export function pick(pos, state, dispatch) {
+	let index = state.picture.pixel(pos.x, pos.y);
+
+	dispatch({
+		color: new Uint8ClampedArray([
+			state.picture.pixels[index],
+			state.picture.pixels[index + 1],
+			state.picture.pixels[index + 2],
+			state.picture.pixels[index + 3],
+		]),
+	});
+}
+
+export function startLoad(dispatch) {
+	let input = elt('input', {
+		type: 'file',
+		onchange: () => finishLoad(input.files[0], dispatch),
+	});
+	document.body.appendChild(input);
+	input.click();
+	input.remove();
+}
+
+function finishLoad(file, dispatch) {
+	if (file == null) return;
+	let reader = new FileReader();
+	reader.addEventListener('load', () => {
+		let image = elt('img', {
+			onload: () =>
+				dispatch({
+					picture: pictureFromImage(image),
+				}),
+			src: reader.result,
+		});
+	});
+	reader.readAsDataURL(file);
+}
+
+function pictureFromImage(image) {
+	let maxWidth = 1000;
+	let maxHeight = 400;
+	/* let scaleX = Math.min(maxWidth / image.width, 1);
+	let scaleY = Math.min(maxHeight / image.height, 1);
+	let drawWidth = Math.round(image.width * scaleX);
+	let drawHeight = Math.round(image.height * scaleY); */
+
+	let canvas = elt('canvas', { width: maxWidth, maxHeight });
+	let cx = canvas.getContext('2d');
+	cx.imageSmoothingEnabled = true;
+	cx.drawImage(image, 0, 0, maxWidth, maxHeight);
+	let { data } = cx.getImageData(0, 0, maxWidth, maxHeight);
+	const pixels = new Uint8ClampedArray(data);
+	return new Picture(maxWidth, maxHeight, pixels);
+}
