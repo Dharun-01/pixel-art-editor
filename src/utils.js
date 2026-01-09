@@ -7,6 +7,28 @@ export function hexToRgb(hex) {
 	]);
 }
 
+export function drawGridOnZoom(cx, startX, startY, endX, endY) {
+	cx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+	cx.lineWidth = 1;
+	cx.imageSmoothingEnabled = false;
+
+	// Vertical line
+	for (let x = startX; x <= endX; x += 10) {
+		cx.beginPath();
+		cx.moveTo(x, startY);
+		cx.lineTo(x, endY + 1);
+		cx.stroke();
+	}
+
+	// Horizontal line
+	for (let y = startY; y <= endY; y += 10) {
+		cx.beginPath();
+		cx.moveTo(startX, y);
+		cx.lineTo(endX + 1, y);
+		cx.stroke();
+	}
+}
+
 export function rgbToHex([r, g, b]) {
 	return '#' + [r, g, b].map((n) => n.toString(16).padStart(2, '0')).join('');
 }
@@ -32,7 +54,13 @@ export function elt(type, props, ...children) {
 	}
 	return dom;
 }
-
+export function customName() {
+	let imageName = prompt('Save as');
+	if (!imageName) {
+		alert('Please Enter a Name');
+		link.remove();
+	} else return imageName;
+}
 export function applyBrush(points, state) {
 	let brushSize = null;
 	if (state.sketch == 'Marker') {

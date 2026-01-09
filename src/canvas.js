@@ -6,6 +6,7 @@ export class PictureCanvas {
 		this.dom = elt('canvas', {
 			onmousedown: (event) => this.mouse(event, pointerDown, state),
 			ontouchstart: (event) => this.touch(event, pointerDown, state),
+			class: 'rounded-lg z-1',
 		});
 		this.dom.width = picture.width;
 		this.dom.height = picture.height;

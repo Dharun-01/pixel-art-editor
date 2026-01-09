@@ -2,6 +2,7 @@ import { PictureCanvas } from './canvas.js';
 import { historyUpdateState } from './history.js';
 import { startState, baseTools, baseControls, baseSketches } from './config.js';
 import { elt } from './utils.js';
+import './input.css';
 
 export class PixelEditor {
 	constructor(state, config) {
@@ -89,3 +90,5 @@ export function startPixelEditor({
 	});
 	return app.dom;
 }
+const app = startPixelEditor({});
+document.getElementById('app').appendChild(app);

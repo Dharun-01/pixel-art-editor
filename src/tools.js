@@ -1,4 +1,10 @@
-import { drawLine, applyBrush, hexToRgb, elt } from './utils.js';
+import {
+	drawLine,
+	applyBrush,
+	hexToRgb,
+	elt,
+	drawGridOnZoom,
+} from './utils.js';
 import { Picture } from './picture.js';
 
 const offScreen = document.createElement('canvas');
@@ -70,6 +76,10 @@ export function drawPicture(picture, canvas, zoom, previous, ImageData, cx) {
 		dirtyWidth,
 		dirtyHeight
 	);
+
+	if (zoom > 2) {
+		drawGridOnZoom(cx, startX + 2, startY + 2, endX, endY);
+	}
 }
 
 export function draw(pos, state, dispatch, getColor = () => state.color) {
@@ -102,6 +112,35 @@ export function line(pos, state, dispatch) {
 	};
 }
 
+export function rhombus(pos, state, dispatch) {
+	function drawRhombus(to) {
+		let size = Math.max(Math.abs(to.x - pos.x), Math.abs(to.y - pos.y));
+
+		let drawn = [];
+
+		// A rhombus has 4 edges connecting 4 vertices
+		// Top vertex: (pos.x, pos.y - size)
+		// Right vertex: (pos.x + size, pos.y)
+		// Bottom vertex: (pos.x, pos.y + size)
+		// Left vertex: (pos.x - size, pos.y)
+
+		let top = { x: pos.x, y: pos.y - size };
+		let right = { x: pos.x + size, y: pos.y };
+		let bottom = { x: pos.x, y: pos.y + size };
+		let left = { x: pos.x - size, y: pos.y };
+
+		// Draw four edges
+		drawn.push(...drawLine(top, right, state.color, state));
+		drawn.push(...drawLine(right, bottom, state.color, state));
+		drawn.push(...drawLine(bottom, left, state.color, state));
+		drawn.push(...drawLine(left, top, state.color, state));
+
+		dispatch({ picture: state.picture.draw(applyBrush(drawn, state)) });
+	}
+	drawRhombus(pos);
+	return drawRhombus;
+}
+
 export function rectangle(start, state, dispatch) {
 	function drawRectangle(pos) {
 		let xStart = Math.min(start.x, pos.x);
@@ -110,11 +149,18 @@ export function rectangle(start, state, dispatch) {
 		let yEnd = Math.max(start.y, pos.y);
 		let drawn = [];
 
-		for (let y = yStart; y <= yEnd; y++) {
-			for (let x = xStart; x <= xEnd; x++) {
-				drawn.push({ x, y, color: state.color });
-			}
+		// Draw top and bottom edges
+		for (let x = xStart; x <= xEnd; x++) {
+			drawn.push({ x, y: yStart, color: state.color }); // Top edge
+			drawn.push({ x, y: yEnd, color: state.color }); // Bottom edge
 		}
+
+		// Draw left and right edges (excluding corners to avoid duplicates)
+		for (let y = yStart + 1; y < yEnd; y++) {
+			drawn.push({ x: xStart, y, color: state.color }); // Left edge
+			drawn.push({ x: xEnd, y, color: state.color }); // Right edge
+		}
+
 		dispatch({ picture: state.picture.draw(applyBrush(drawn, state)) });
 	}
 	drawRectangle(start);
@@ -178,10 +224,17 @@ export function circle(pos, state, dispatch) {
 		let radius = Math.sqrt((to.x - pos.x) ** 2 + (to.y - pos.y) ** 2);
 		let radiusC = Math.ceil(radius);
 		let drawn = [];
+
+		// Thickness of the circle outline (in pixels)
+		let thickness = 1;
+
 		for (let dy = -radiusC; dy <= radiusC; dy++) {
 			for (let dx = -radiusC; dx <= radiusC; dx++) {
 				let dist = Math.sqrt(dx ** 2 + dy ** 2);
-				if (dist > radius) continue;
+
+				// Only draw if distance is within the outline range
+				if (dist > radius + thickness || dist < radius - thickness) continue;
+
 				let y = pos.y + dy,
 					x = pos.x + dx;
 				if (

@@ -1,13 +1,14 @@
-import { elt, rgbToHex, hexToRgb } from './utils.js';
+import { elt, rgbToHex, hexToRgb, customName } from './utils.js';
 import { drawPicture, startLoad } from './tools.js';
 import { Picture } from './picture.js';
-
 export class ToolSelect {
 	constructor(state, { tools, dispatch }) {
 		this.select = elt(
 			'select',
 			{
 				onchange: () => dispatch({ tool: this.select.value }),
+				className:
+					'bg-gray-700 text-white rounded-lg px-3 py-2 ml-2 focus:ring-2 focus:ring-green-500',
 			},
 			...Object.keys(tools).map((name) =>
 				elt(
@@ -19,7 +20,12 @@ export class ToolSelect {
 				)
 			)
 		);
-		this.dom = elt('label', null, '🖌 Tool: ', this.select);
+		this.dom = elt(
+			'label',
+			{ className: 'p-1 text-white text-lg' },
+			'🖌 Tool: ',
+			this.select
+		);
 	}
 
 	syncState(state) {
@@ -33,8 +39,15 @@ export class ColorSelect {
 			type: 'color',
 			value: rgbToHex(state.color),
 			onchange: () => dispatch({ color: hexToRgb(this.input.value) }),
+			className:
+				'bg-gray-700 text-white rounded-lg px-3 py-2 ml-2 focus:ring-2 focus:ring-green-500',
 		});
-		this.dom = elt('label', null, '🎨 Color: ', this.input);
+		this.dom = elt(
+			'label',
+			{ className: ' p-1 text-lg text-white' },
+			'🎨 Color: ',
+			this.input
+		);
 	}
 
 	syncState(state) {
@@ -50,12 +63,19 @@ export class SketchSelect {
 				onchange: () => {
 					dispatch({ sketch: this.select.value });
 				},
+				className:
+					'bg-gray-700 text-white rounded-lg px-3 py-2 ml-2 focus:ring-2 focus:ring-green-500',
 			},
 			...Object.values(sketches).map((name) =>
 				elt('option', { selected: name == state.sketch }, name)
 			)
 		);
-		this.dom = elt('label', null, 'Sketch: ', this.select);
+		this.dom = elt(
+			'label',
+			{ className: 'p-1 text-lg text-white' },
+			'Sketch: ',
+			this.select
+		);
 	}
 
 	syncState(state) {
@@ -70,6 +90,8 @@ export class SaveButton {
 			'button',
 			{
 				onclick: () => this.save(),
+				className:
+					'bg-gray-700 text-white rounded-lg px-3 py-2 ml-2 focus:ring-2 focus:ring-green-500 hover:bg-gray-500',
 			},
 			'💾 Save'
 		);
@@ -82,12 +104,16 @@ export class SaveButton {
 			this.picture.height
 		);
 		drawPicture(this.picture, canvas, 1, null, this.ImageData, this.cx);
+
 		let link = elt('a', {
 			href: canvas.toDataURL(),
-			download: 'pixelart.png',
+			download: customName(),
 		});
+
 		document.body.appendChild(link);
+
 		link.click();
+		window.confirm();
 		link.remove();
 	}
 	syncState(state) {
@@ -101,7 +127,10 @@ export class LoadButton {
 			'button',
 			{
 				onclick: () => startLoad(dispatch),
+				className:
+					'bg-gray-700 text-white rounded-lg px-3 py-2 ml-2 focus:ring-2 focus:ring-green-500 hover:bg-gray-500',
 			},
+
 			'📁 Load'
 		);
 	}
@@ -115,6 +144,8 @@ export class UndoButton {
 			{
 				onclick: () => dispatch({ undo: true }),
 				disabled: state.done.length == 0,
+				className:
+					'bg-gray-700 text-white rounded-lg px-3 py-2 ml-2 focus:ring-2 focus:ring-green-500 hover:bg-gray-500',
 			},
 			'⮪ Undo'
 		);
@@ -133,6 +164,8 @@ export class RedoButton {
 					dispatch({ redo: true });
 				},
 				disabled: state.redone.length == 0,
+				className:
+					'bg-gray-700 text-white rounded-lg px-3 py-2 ml-2 focus:ring-2 focus:ring-green-500 hover:bg-gray-500',
 			},
 			'↪️ Redo'
 		);
@@ -153,7 +186,15 @@ export class EraseButton {
 			},
 		});
 
-		this.dom = elt('label', null, 'Erase', this.input);
+		this.dom = elt(
+			'label',
+			{
+				className:
+					' px-3 py-2 rounded-lg hover:bg-black hover:opacity-50 text-white text-lg',
+			},
+			'Erase',
+			this.input
+		);
 	}
 	syncState(state) {
 		if (state.tool === 'erase') this.input.checked = true;
@@ -169,6 +210,8 @@ export class EraseAllButton {
 				onclick: () => {
 					this.eraseAll(state, dispatch);
 				},
+				className:
+					'bg-gray-700 text-white rounded-lg px-3 py-2 ml-2 focus:ring-2 focus:ring-green-500 hover:bg-gray-500 mt-7',
 			},
 			'Erase All'
 		);
@@ -187,7 +230,7 @@ export class ZoomControls {
 		this.zoom = state.zoom;
 		this.dom = elt(
 			'div',
-			null,
+			{ className: 'inline p-5 ml-3 ' },
 			elt(
 				'button',
 				{
@@ -197,6 +240,8 @@ export class ZoomControls {
 							dispatch({ zoom: ZOOM[i] });
 						}
 					},
+					className:
+						'bg-gray-700 text-white rounded-lg px-3 py-2 ml-2 focus:ring-2 focus:ring-green-500 hover:bg-gray-500',
 				},
 				'🔍+'
 			),
@@ -209,6 +254,8 @@ export class ZoomControls {
 							dispatch({ zoom: ZOOM[i] });
 						}
 					},
+					className:
+						'bg-gray-700 text-white rounded-lg px-3 py-2 ml-2 focus:ring-2 focus:ring-green-500 hover:bg-gray-500',
 				},
 				'🔍-'
 			)

@@ -4,13 +4,13 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Pixel Art Editor</title>
+		<link rel="stylesheet" href="/src/input.css" />
 	</head>
 	<body>
-		<div></div>
+		<div
+			id="app"
+			class="bg-custom-blue p-7 z-2 overflow-auto max-h-fit max-w-fit"
+		></div>
+		<script type="module" src="/src/app.js"></script>
 	</body>
-
-	<script type="module">
-		import { startPixelEditor } from './app.js';
-		document.querySelector('div').appendChild(startPixelEditor({}));
-	</script>
 </html>

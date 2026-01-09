@@ -1,7 +1,16 @@
 import { Picture } from './picture.js';
 import { hexToRgb } from './utils.js';
+import {
+	draw,
+	fill,
+	rectangle,
+	pick,
+	line,
+	erase,
+	circle,
+	rhombus,
+} from './tools.js';
 
-import { draw, fill, rectangle, pick, line, erase, circle } from './tools.js';
 import {
 	ToolSelect,
 	ColorSelect,
@@ -26,7 +35,16 @@ export let startState = {
 	doneAt: 0,
 };
 
-export let baseTools = { draw, fill, rectangle, pick, circle, line, erase };
+export let baseTools = {
+	draw,
+	fill,
+	rectangle,
+	pick,
+	circle,
+	line,
+	erase,
+	rhombus,
+};
 export let baseSketches = { marker: 'Marker', pencil: 'Pencil' };
 export let baseControls = [
 	ToolSelect,

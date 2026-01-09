@@ -30,6 +30,7 @@ export class Picture {
 			minY = Infinity,
 			maxX = -Infinity,
 			maxY = -Infinity;
+
 		for (let { x, y, color } of pixels) {
 			let index = (x + y * this.width) * 4;
 			copy[index] = color[0];
@@ -41,6 +42,7 @@ export class Picture {
 			maxX = Math.max(maxX, x);
 			maxY = Math.max(maxY, y);
 		}
+
 		let newPicture = new Picture(this.width, this.height, copy);
 		newPicture.dirtyRect = { minX, minY, maxX, maxY };
 		return newPicture;
