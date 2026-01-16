@@ -323,10 +323,6 @@ element.addEventListener('mousedown', (event) => {
 
 ## Known Issues
 
-1. **Fill from corners:** Fill tool can crash from canvas edges - try/catch added
-2. **Large canvases:** Performance degrades above 2000x2000 pixels
-3. **Touch devices:** Limited testing on mobile
-
 ## Future Improvements
 
 See [TODO.md](TODO.md) for planned features.

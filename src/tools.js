@@ -5,6 +5,7 @@ import {
 	elt,
 	drawGridOnZoom,
 } from './utils.js';
+
 import { Picture } from './picture.js';
 
 const offScreen = document.createElement('canvas');
@@ -17,24 +18,27 @@ export function drawPicture(picture, canvas, zoom, previous, ImageData, cx) {
 		previous.height != picture.height ||
 		canvas.zoom !== zoom;
 	if (fullRedraw) {
-		canvas.width = picture.width;
-		canvas.height = picture.height;
-		canvas.style.width = picture.width * zoom * dpr + 'px';
-		canvas.style.height = picture.height * zoom * dpr + 'px';
+		canvas.width = picture.width * zoom * dpr;
+		canvas.height = picture.height * zoom * dpr;
+		canvas.style.width = picture.width * zoom + 'px';
+		canvas.style.height = picture.height * zoom + 'px';
 		canvas.zoom = zoom;
-
 		offScreen.width = picture.width;
 		offScreen.height = picture.height;
 		console.log(dpr);
 	}
 
-	console.log(
+	/* console.log(
 		canvas.width,
 		canvas.height,
 		canvas.getBoundingClientRect().width,
 		canvas.getBoundingClientRect().height
-	);
+	); */
 
+	console.log('Canvas dimensions:', canvas.width, canvas.height);
+	console.log('Canvas style:', canvas.style.width, canvas.style.height);
+	console.log('Picture size:', picture.width, picture.height);
+	console.log('Zoom:', zoom);
 	let startX = 0,
 		startY = 0,
 		endX = picture.width - 1,
@@ -62,6 +66,7 @@ export function drawPicture(picture, canvas, zoom, previous, ImageData, cx) {
 
 	/* cx.clearRect(zoomedX, zoomedY, zoomedWidth, zoomedHeight); */
 	cx.setTransform(1, 0, 0, 1, 0, 0);
+	cx.scale(zoom * dpr, zoom * dpr);
 	cx.imageSmoothingEnabled = false;
 	/* cx.clearRect(startX, startY, dirtyWidth, dirtyHeight); */
 

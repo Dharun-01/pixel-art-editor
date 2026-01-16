@@ -1,6 +1,7 @@
 import { elt, rgbToHex, hexToRgb, customName } from './utils.js';
 import { drawPicture, startLoad } from './tools.js';
 import { Picture } from './picture.js';
+
 export class ToolSelect {
 	constructor(state, { tools, dispatch }) {
 		this.select = elt(

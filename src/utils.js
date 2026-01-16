@@ -33,11 +33,19 @@ export function rgbToHex([r, g, b]) {
 	return '#' + [r, g, b].map((n) => n.toString(16).padStart(2, '0')).join('');
 }
 
-export function pointerPosition(pos, domNode, zoom) {
+export function pointerPosition(pos, domNode, state) {
 	let rect = domNode.getBoundingClientRect();
+	let zoom = domNode.zoom || 1;
+	let x = Math.floor((pos.clientX - rect.left) / zoom);
+	let y = Math.floor((pos.clientY - rect.top) / zoom);
+	console.log('Mouse click:', pos.clientX, pos.clientY);
+	console.log('Rect:', rect.left, rect.top, rect.width, rect.height);
+	console.log('Canvas size:', domNode.width, domNode.height);
+	console.log('Zoom:', state.zoom);
+	console.log('Calculated pos:', x, y);
 	return {
-		x: Math.floor((pos.clientX - rect.left) * (domNode.width / rect.width)),
-		y: Math.floor((pos.clientY - rect.top) * (domNode.width / rect.width)),
+		x,
+		y,
 	};
 }
 
@@ -54,6 +62,7 @@ export function elt(type, props, ...children) {
 	}
 	return dom;
 }
+
 export function customName() {
 	let imageName = prompt('Save as');
 	if (!imageName) {
@@ -61,8 +70,9 @@ export function customName() {
 		link.remove();
 	} else return imageName;
 }
+
 export function applyBrush(points, state) {
-	let brushSize = null;
+	let brushSize = 2;
 	if (state.sketch == 'Marker') {
 		if (state.tool === 'erase') {
 			brushSize = 30;
@@ -72,6 +82,7 @@ export function applyBrush(points, state) {
 	} else {
 		if (state.tool === 'erase') brushSize = 20;
 	}
+
 	if (!brushSize) return points;
 	let result = [];
 	for (let p of points) {

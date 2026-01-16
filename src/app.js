@@ -28,13 +28,18 @@ export class PixelEditor {
 			'div',
 			{
 				tabIndex: 0,
+				className: 'flex flex-column align-center',
 				onkeydown: (event) => {
 					this.keyDown(event, config);
 				},
 			},
-			this.canvas.dom,
+			elt(
+				'div',
+				{ className: 'fixed h-30 w-full bg-green-500 top-0 left-0' },
+				...this.controls.reduce((a, c) => a.concat(' ', c.dom), [])
+			),
 			elt('br'),
-			...this.controls.reduce((a, c) => a.concat(' ', c.dom), [])
+			this.canvas.dom
 		);
 	}
 
