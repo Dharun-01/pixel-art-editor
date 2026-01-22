@@ -1,3 +1,5 @@
+import { Picture } from './picture.js';
+
 export function hexToRgb(hex) {
 	let hexWithoutHash = hex.slice(1);
 	return new Uint8ClampedArray([
@@ -9,7 +11,7 @@ export function hexToRgb(hex) {
 
 export function drawGridOnZoom(cx, startX, startY, endX, endY) {
 	cx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
-	cx.lineWidth = 1;
+	cx.lineWidth = 0.1;
 	cx.imageSmoothingEnabled = false;
 
 	// Vertical line
@@ -38,11 +40,19 @@ export function pointerPosition(pos, domNode, state) {
 	let zoom = domNode.zoom || 1;
 	let x = Math.floor((pos.clientX - rect.left) / zoom);
 	let y = Math.floor((pos.clientY - rect.top) / zoom);
-	console.log('Mouse click:', pos.clientX, pos.clientY);
-	console.log('Rect:', rect.left, rect.top, rect.width, rect.height);
-	console.log('Canvas size:', domNode.width, domNode.height);
-	console.log('Zoom:', state.zoom);
-	console.log('Calculated pos:', x, y);
+	/* console.log('=== POINTER POSITION DEBUG ===');
+	console.log('Click clientX, clientY:', pos.clientX, pos.clientY);
+	console.log('Rect left, top:', rect.left, rect.top);
+	console.log('Rect width, height:', rect.width, rect.height);
+	console.log('domNode.zoom:', domNode.zoom);
+	console.log('Actual canvas width, height:', domNode.width, domNode.height);
+	console.log(
+		'Canvas style width, height:',
+		domNode.style.width,
+		domNode.style.height,
+	);
+	console.log('Calculated x, y:', x, y);
+	console.log('=============================='); */
 	return {
 		x,
 		y,
@@ -54,13 +64,34 @@ export function updateState(state, action) {
 }
 
 export function elt(type, props, ...children) {
-	let dom = document.createElement(type);
-	if (props) Object.assign(dom, props);
+	let dom;
+	let svgElements = ['svg', 'path'];
+	if (!svgElements.includes(type)) {
+		dom = document.createElement(type);
+		if (props) Object.assign(dom, props);
+	} else {
+		dom = document.createElementNS('http://www.w3.org/2000/svg', type);
+		for (let [key, value] of Object.entries(props)) {
+			dom.setAttribute(key, value);
+		}
+	}
+
 	for (let child of children) {
 		if (typeof child != 'string') dom.appendChild(child);
 		else dom.appendChild(document.createTextNode(child));
 	}
 	return dom;
+}
+
+export function iconDownloader(...iconProps) {
+	let svgProperties = {
+		xmlns: iconProps[0],
+		height: iconProps[1],
+		viewBox: iconProps[2],
+		width: iconProps[3],
+		fill: iconProps[4],
+	};
+	return svgProperties;
 }
 
 export function customName() {
@@ -93,6 +124,75 @@ export function applyBrush(points, state) {
 		}
 	}
 	return result;
+}
+
+export function rotateLeft(state) {
+	let { width, height, pixels } = state.picture;
+	let newWidth = height;
+	let newHeight = width;
+
+	let newPixels = new Uint8ClampedArray(newWidth * newHeight * 4);
+
+	for (let y = 0; y < height; y++) {
+		for (let x = 0; x < width; x++) {
+			let src = (y * width + x) * 4;
+			let newX = y;
+			let newY = width - 1 - x;
+			let dst = (newY * newWidth + newX) * 4;
+
+			newPixels[dst] = pixels[src];
+			newPixels[dst + 1] = pixels[src + 1];
+			newPixels[dst + 2] = pixels[src + 2];
+			newPixels[dst + 3] = pixels[src + 3];
+		}
+	}
+	return new Picture(newWidth, newHeight, newPixels);
+}
+
+export function rotateRight(state) {
+	let { width, height, pixels } = state.picture;
+	let newWidth = height;
+	let newHeight = width;
+
+	let newPixels = new Uint8ClampedArray(newWidth * newHeight * 4);
+
+	for (let y = 0; y < height; y++) {
+		for (let x = 0; x < width; x++) {
+			let src = (y * width + x) * 4;
+			let newX = height - 1 - y;
+			let newY = x;
+			let dst = (newY * newWidth + newX) * 4;
+
+			newPixels[dst] = pixels[src];
+			newPixels[dst + 1] = pixels[src + 1];
+			newPixels[dst + 2] = pixels[src + 2];
+			newPixels[dst + 3] = pixels[src + 3];
+		}
+	}
+	return new Picture(newWidth, newHeight, newPixels);
+}
+
+export function rotate180(state) {
+	let { width, height, pixels } = state.picture;
+	let newWidth = width;
+	let newHeight = height;
+
+	let newPixels = new Uint8ClampedArray(newWidth * newHeight * 4);
+
+	for (let y = 0; y < height; y++) {
+		for (let x = 0; x < width; x++) {
+			let src = (y * width + x) * 4;
+			let newX = width - 1 - x;
+			let newY = height - 1 - y;
+			let dst = (newY * newWidth + newX) * 4;
+
+			newPixels[dst] = pixels[src];
+			newPixels[dst + 1] = pixels[src + 1];
+			newPixels[dst + 2] = pixels[src + 2];
+			newPixels[dst + 3] = pixels[src + 3];
+		}
+	}
+	return new Picture(newWidth, newHeight, newPixels);
 }
 
 export function drawLine(from, to, color) {

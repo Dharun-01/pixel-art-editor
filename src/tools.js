@@ -4,6 +4,9 @@ import {
 	hexToRgb,
 	elt,
 	drawGridOnZoom,
+	rotateLeft,
+	rotateRight,
+	rotate180,
 } from './utils.js';
 
 import { Picture } from './picture.js';
@@ -25,6 +28,8 @@ export function drawPicture(picture, canvas, zoom, previous, ImageData, cx) {
 		canvas.zoom = zoom;
 		offScreen.width = picture.width;
 		offScreen.height = picture.height;
+		ImageData = offCtx.createImageData(picture.width, picture.height);
+		offCtx.imageSmoothingEnabled = false;
 		console.log(dpr);
 	}
 
@@ -39,6 +44,7 @@ export function drawPicture(picture, canvas, zoom, previous, ImageData, cx) {
 	console.log('Canvas style:', canvas.style.width, canvas.style.height);
 	console.log('Picture size:', picture.width, picture.height);
 	console.log('Zoom:', zoom);
+
 	let startX = 0,
 		startY = 0,
 		endX = picture.width - 1,
@@ -79,12 +85,18 @@ export function drawPicture(picture, canvas, zoom, previous, ImageData, cx) {
 		startX,
 		startY,
 		dirtyWidth,
-		dirtyHeight
+		dirtyHeight,
 	);
 
 	if (zoom > 2) {
 		drawGridOnZoom(cx, startX + 2, startY + 2, endX, endY);
 	}
+}
+
+export function rotatedPicture(state, rotateDir) {
+	if (rotateDir === 'left') return rotateLeft(state);
+	if (rotateDir === 'right') return rotateRight(state);
+	if (rotateDir === '180') return rotate180(state);
 }
 
 export function draw(pos, state, dispatch, getColor = () => state.color) {

@@ -12,6 +12,8 @@ import {
 } from './tools.js';
 
 import {
+	RotateSelect,
+	StatusBar,
 	ToolSelect,
 	ColorSelect,
 	SketchSelect,
@@ -23,13 +25,17 @@ import {
 	EraseAllButton,
 	ZoomControls,
 } from './controls.js';
+
 export let startState = {
 	tool: 'draw',
 	sketch: 'Pencil',
 	color: new Uint8ClampedArray([0, 0, 0, 255]),
+	cursor: null,
 	picture: Picture.empty(1000, 400, hexToRgb('#f0f0f0')),
 	previewPicture: null,
 	redone: [],
+	toggleRotate: false,
+	rotate: null,
 	done: [],
 	zoom: 1,
 	doneAt: 0,
@@ -47,6 +53,8 @@ export let baseTools = {
 };
 export let baseSketches = { marker: 'Marker', pencil: 'Pencil' };
 export let baseControls = [
+	RotateSelect,
+	StatusBar,
 	ToolSelect,
 	ColorSelect,
 	SketchSelect,

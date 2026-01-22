@@ -1,5 +1,26 @@
 @import 'tailwindcss';
 
 @theme {
-	--color-custom-blue: #010304;
+	--color-custom-black: #202020;
+	--color-custom-gray: #272727;
+	--color-custom-tooltip-gray: #2c2c2c;
+	--color-custom-slider: #2e2e2e;
+	--color-custom-input: #2d2d2d;
+	--color-custom-blue: #4da3ff;
+	--color-custom-glass-black: rgba(255, 255, 255, 0.08);
+}
+
+@layer utilities {
+	.tooltipVisible {
+		opacity: 1;
+		pointer-events: auto;
+		transition-duration: 0.3s;
+		transform: translateY(0);
+	}
+	.tooltipHidden {
+		opacity: 0;
+		pointer-events: none;
+		transition-duration: 0.3s;
+		transform: translateY(-4px);
+	}
 }

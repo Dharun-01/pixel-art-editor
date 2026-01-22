@@ -1,4 +1,17 @@
+import { rotatedPicture } from './tools.js';
+let rotateActions = ['left', 'right', '180'];
 export function historyUpdateState(state, action) {
+	if (action.toggleRotate) {
+		return { ...state, toggleRotate: !state.toggleRotate };
+	}
+
+	if (rotateActions.includes(action.rotate)) {
+		return {
+			...state,
+			picture: rotatedPicture(state, action.rotate),
+		};
+	}
+
 	if (action.isPreview) {
 		return { ...state, previewPicture: action.picture };
 	} else if (action.undo) {
