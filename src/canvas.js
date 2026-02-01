@@ -6,7 +6,7 @@ export class PictureCanvas {
 		this.dom = elt('canvas', {
 			onmousemove: (event) => this.hover(event, state, config),
 			onmousedown: (event) => this.mouse(event, pointerDown, state, config),
-			onmouseleave: () => config.dispatch({ cursor: null }),
+			onmouseleave: () => config.dispatch({ cursor: false }),
 			ontouchstart: (event) => this.touch(event, pointerDown, state, config),
 			className: ' mt-26 overflow-auto',
 		});
@@ -23,6 +23,7 @@ export class PictureCanvas {
 		if (this.picture == picture && this.zoom == state.zoom && !isPreview)
 			return;
 		drawPicture(
+			state,
 			picture,
 			this.dom,
 			state.zoom,
@@ -30,6 +31,7 @@ export class PictureCanvas {
 			this.ImageData,
 			this.cx,
 		);
+
 		this.picture = picture;
 		this.zoom = state.zoom;
 	}
@@ -64,7 +66,7 @@ PictureCanvas.prototype.mouse = function (downEvent, onDown, state, config) {
 					pos.y < 0 ||
 					pos.x >= this.picture.width ||
 					pos.y >= this.picture.height
-						? null
+						? false
 						: pos,
 			});
 			onMove(pos, state, false);
@@ -83,7 +85,7 @@ PictureCanvas.prototype.hover = function (hoverEvent, state, config) {
 			pos.y < 0 ||
 			pos.x >= this.picture.width ||
 			pos.y >= this.picture.height
-				? null
+				? false
 				: pos,
 	});
 };
@@ -103,7 +105,7 @@ PictureCanvas.prototype.touch = function (startEvent, onDown, state, config) {
 				pos.y < 0 ||
 				pos.x >= this.dom.width ||
 				pos.y >= this.dom.height
-					? null
+					? false
 					: pos,
 		});
 		onMove(newPos, state, false);

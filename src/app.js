@@ -1,6 +1,6 @@
 import { PictureCanvas } from './canvas.js';
 import { historyUpdateState } from './history.js';
-import { StatusBar } from './controls.js';
+import { StatusBar } from './statusbar.js';
 import { startState, baseTools, baseControls, baseSketches } from './config.js';
 import { elt, iconDownloader } from './utils.js';
 import './input.css';
@@ -10,7 +10,7 @@ export class PixelEditor {
 		let { tools, sketches, controls, dispatch } = config;
 		this.state = state;
 		this.sketch = sketches[this.state.sketch];
-		this.statusBar = new StatusBar(this.state, config);
+		this.statusBar = new StatusBar(this.state);
 		this.canvas = new PictureCanvas(
 			state.picture,
 			(pos) => {
@@ -52,7 +52,7 @@ export class PixelEditor {
 						'p',
 						{
 							className:
-								'text-md text-white hover:bg-custom-glass-black px-2 py-1 rounded-md',
+								'text-md text-white hover:bg-custom-glass-black px-2 py-1 rounded-sm',
 						},
 						'File',
 					),
@@ -60,7 +60,7 @@ export class PixelEditor {
 						'p',
 						{
 							className:
-								'text-md text-white hover:bg-custom-glass-black px-2 py-1 rounded-md',
+								'text-md text-white hover:bg-custom-glass-black px-2 py-1 rounded-sm',
 						},
 						'Edit',
 					),
@@ -68,13 +68,13 @@ export class PixelEditor {
 						'p',
 						{
 							className:
-								'text-md text-white hover:bg-custom-glass-black px-2 py-1 rounded-md',
+								'text-md text-white hover:bg-custom-glass-black px-2 py-1 rounded-sm',
 						},
 						'View',
 					),
 					elt(
 						'p',
-						{ className: 'hover:bg-custom-glass-black px-2 py-1 rounded-md' },
+						{ className: 'hover:bg-custom-glass-black px-2 py-1 rounded-sm' },
 						elt(
 							'svg',
 							iconDownloader(
@@ -82,7 +82,7 @@ export class PixelEditor {
 								'22px',
 								'0 -960 960 960',
 								'22px',
-								'#ffffff',
+								'#e3e3e3',
 							),
 							elt('path', {
 								d: 'M288-288h384v-72H288v72Zm192-120 144-144-51-51-57 57v-150h-72v150l-57-57-51 51 144 144Zm.28 312Q401-96 331-126t-122.5-82.5Q156-261 126-330.96t-30-149.5Q96-560 126-629.5q30-69.5 82.5-122T330.96-834q69.96-30 149.5-30t149.04 30q69.5 30 122 82.5T834-629.28q30 69.73 30 149Q864-401 834-331t-82.5 122.5Q699-156 629.28-126q-69.73 30-149 30Zm-.28-72q130 0 221-91t91-221q0-130-91-221t-221-91q-130 0-221 91t-91 221q0 130 91 221t221 91Zm0-312Z',
@@ -91,7 +91,7 @@ export class PixelEditor {
 					),
 					elt(
 						'p',
-						{ className: 'hover:bg-custom-glass-black px-2 py-1 rounded-md' },
+						{ className: 'hover:bg-custom-glass-black px-2 py-1 rounded-sm' },
 						elt(
 							'svg',
 							iconDownloader(
@@ -108,7 +108,7 @@ export class PixelEditor {
 					),
 					elt(
 						'p',
-						{ className: 'hover:bg-custom-glass-black px-2 py-1 rounded-md' },
+						{ className: 'hover:bg-custom-glass-black px-2 py-1 rounded-sm' },
 						elt(
 							'svg',
 							iconDownloader(
@@ -125,7 +125,7 @@ export class PixelEditor {
 					),
 					elt(
 						'p',
-						{ className: 'hover:bg-custom-glass-black px-2 py-1 rounded-md' },
+						{ className: 'hover:bg-custom-glass-black px-2 py-1 rounded-sm' },
 						elt(
 							'svg',
 							iconDownloader(
@@ -142,7 +142,7 @@ export class PixelEditor {
 					),
 					elt(
 						'p',
-						{ className: 'hover:bg-custom-glass-black px-2 py-1 rounded-md' },
+						{ className: 'hover:bg-custom-glass-black px-2 py-1 rounded-sm' },
 						elt(
 							'svg',
 							iconDownloader(
@@ -159,7 +159,7 @@ export class PixelEditor {
 					),
 					elt(
 						'p',
-						{ className: 'hover:bg-custom-glass-black px-2 py-1 rounded-md' },
+						{ className: 'hover:bg-custom-glass-black px-2 py-1 rounded-sm' },
 						elt(
 							'svg',
 							iconDownloader(
@@ -231,6 +231,7 @@ export class PixelEditor {
 		let pic = state.previewPicture ?? state.picture;
 		this.state = state;
 		this.canvas.syncState(pic, state);
+		this.statusBar.syncState(state);
 		for (let ctrl of this.controls) ctrl.syncState(this.state);
 	}
 }

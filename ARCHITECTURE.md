@@ -246,7 +246,7 @@ class MyControl {
 						/* action */
 					}),
 			},
-			'My Button'
+			'My Button',
 		);
 	}
 
@@ -320,8 +320,6 @@ element.addEventListener('mousedown', (event) => {
 	// Your code
 });
 ```
-
-## Known Issues
 
 ## Future Improvements
 

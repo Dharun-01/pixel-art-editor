@@ -4,28 +4,34 @@ import {
 	hexToRgb,
 	customName,
 	iconDownloader,
+	reflectSelect,
 } from './utils.js';
 import { drawPicture, startLoad } from './tools.js';
 import { Picture } from './picture.js';
 
 const iconBorderClasses = ['ring-1', 'ring-custom-blue', 'bg-custom-black'];
 
-export class RotateSelect {
+export class ImageSelect {
 	constructor(state, { _, dispatch }) {
-		this.image = elt('img', {
+		this.state = state;
+		this.rotateIcon = elt('img', {
 			src: '../assets/rotate_90_degrees_cw_16dp_4DA3FF_FILL0_wght400_GRAD0_opsz20.svg',
 			className: 'z-50 mt-1 p-2 rounded-sm',
 			onclick: (event) => {
 				event.stopPropagation();
-				dispatch({ toggleRotate: true });
+				dispatch({
+					toggleRotate: true,
+					toggleFlip: false,
+					toggleMirror: false,
+				});
 			},
 		});
 
-		this.options = elt(
+		this.rotateOptions = elt(
 			'div',
 			{
 				className:
-					'absolute shadow-sm shadow-gray-600 bg-custom-tooltip-gray p-1 top-12 rounded-md ',
+					'absolute shadow-sm shadow-gray-600 bg-custom-tooltip-gray p-1 top-12 left-3 rounded-md min-w-32',
 			},
 			elt(
 				'p',
@@ -59,135 +65,557 @@ export class RotateSelect {
 			),
 		);
 
-		this.dom = elt(
+		this.rotate = elt(
 			'div',
 			{
 				className:
 					'relative text-white flex flex-column justify-center align-middle',
 			},
-			this.image,
-			this.options,
+			this.rotateIcon,
+			this.rotateOptions,
+		);
+
+		this.flipIcon = elt('img', {
+			src: '../assets/flip_16dp_4DA3FF_FILL0_wght400_GRAD0_opsz20.svg',
+			className: 'z-50 mt-1 p-2 rounded-sm',
+			onclick: (event) => {
+				event.stopPropagation();
+				dispatch({
+					toggleFlip: true,
+					toggleRotate: false,
+					toggleMirror: false,
+				});
+			},
+		});
+
+		this.flipOptions = elt(
+			'div',
+			{
+				className:
+					'absolute shadow-sm shadow-gray-600 bg-custom-tooltip-gray p-1 min-w-32 top-12 rounded-md ',
+			},
+			elt(
+				'p',
+				{
+					className: 'hover:bg-custom-glass-black rounded-md p-1',
+					onclick: (event) => this.handleInsideClick(event),
+				},
+				'Flip Vertical',
+			),
+			elt(
+				'p',
+				{
+					className: 'hover:bg-custom-glass-black rounded-md p-1',
+					onclick: (event) => this.handleInsideClick(event),
+				},
+				'Flip Horizontal',
+			),
+		);
+
+		this.flip = elt(
+			'div',
+			{
+				className:
+					'relative flex flex-column align-middle text-white justify-center',
+			},
+			this.flipIcon,
+			this.flipOptions,
+		);
+
+		this.mirrorIcon = elt('img', {
+			src: '../assets/align_justify_center_16dp_4DA3FF_FILL0_wght400_GRAD0_opsz20.svg',
+			className: 'rounded-sm mt-1 p-2',
+			onclick: () => {
+				dispatch({
+					toggleMirror: true,
+					toggleRotate: false,
+					toggleFlip: false,
+				});
+			},
+		});
+
+		this.reflectVertical = reflectSelect('Reflect Vertical', dispatch);
+		this.reflectHorizontal = reflectSelect('Reflect Horizontal', dispatch);
+		this.reflectMainDiagonal = reflectSelect('Reflect MainDiagonal', dispatch);
+		this.reflectOffDiagonal = reflectSelect('Reflect OffDiagonal', dispatch);
+		this.reflectOptionVertical = this.reflectVertical.reflectOption;
+		this.reflectOptionHorizontal = this.reflectHorizontal.reflectOption;
+		this.reflectOptionMainDiagonal = this.reflectMainDiagonal.reflectOption;
+		this.reflectOptionOffDiagonal = this.reflectOffDiagonal.reflectOption;
+		this.reflectCheckboxVertical = this.reflectVertical.reflectCheckbox;
+		this.reflectCheckboxHorizontal = this.reflectHorizontal.reflectCheckbox;
+		this.reflectCheckboxMainDiagonal = this.reflectMainDiagonal.reflectCheckbox;
+		this.reflectCheckboxOffDiagonal = this.reflectOffDiagonal.reflectCheckbox;
+
+		this.mirrorOptions = elt(
+			'div',
+			{
+				className:
+					'absolute shadow-sm shadow-gray-600 min-w-36 bg-custom-tooltip-gray p-1 top-12 rounded-md',
+			},
+			this.reflectOptionVertical,
+			this.reflectOptionHorizontal,
+			this.reflectOptionMainDiagonal,
+			this.reflectOptionOffDiagonal,
+		);
+
+		this.mirror = elt(
+			'div',
+			{
+				className:
+					'relative flex flex-column align-middle text-white justify-center',
+			},
+			this.mirrorIcon,
+			this.mirrorOptions,
+		);
+
+		this.resizeIcon = elt('img', {
+			className: 'rounded-sm mt-1 p-2',
+			src: '../assets/resize_16dp_4DA3FF_FILL0_wght400_GRAD0_opsz20.svg',
+			onclick: (event) => {
+				event.stopPropagation();
+				dispatch({ toggleResize: true });
+			},
+		});
+
+		((this.linkSvg = elt(
+			'svg',
+			iconDownloader(
+				'http://www.w3.org/2000/svg',
+				'16px',
+				'0 -960 960 960',
+				'16px',
+				'#e3e3e3',
+			),
+			elt('path', {
+				d: 'M432-288H288q-79.68 0-135.84-56.23Q96-400.45 96-480.23 96-560 152.16-616q56.16-56 135.84-56h144v72H288q-50 0-85 35t-35 85q0 50 35 85t85 35h144v72Zm-96-156v-72h288v72H336Zm192 156v-72h144q50 0 85-35t35-85q0-50-35-85t-85-35H528v-72h144q79.68 0 135.84 56.23 56.16 56.22 56.16 136Q864-400 807.84-344 751.68-288 672-288H528Z',
+			}),
+		)),
+			((this.linkIcon = elt(
+				'p',
+				{
+					className: 'rounded-sm border border-white/10 p-1.5 mb-0.5',
+					onclick: (event) => {
+						event.stopPropagation();
+						dispatch({ toggleLinkIcon: true });
+					},
+				},
+				this.linkSvg,
+			)),
+			(this.widthInput = elt('input', {
+				type: 'text',
+				className:
+					'w-24 outline-none hover:bg-custom-glass-black focus:bg-custom-black  border-b-[#e3e3e3] border border-x-white/10 border-t-white/10 bg-white/10 rounded-sm p-1 ',
+				id: 'width',
+				maxLength: '5',
+				oninput: (event) => {
+					this.validateInput(this.state, event.target, 'width');
+					this.inputLinkCheck(event.target, this.state, 'width');
+				},
+			})),
+			(this.widthInputErrorMessage = elt(
+				'p',
+				{ className: 'absolute top-15 text-red-500 text-[10px] mt-1 hidden' },
+				'',
+			)),
+			(this.heightInput = elt('input', {
+				type: 'text',
+				className:
+					'w-24 outline-none hover:bg-custom-glass-black focus:bg-custom-black  border-b-[#e3e3e3] border border-x-white/10 border-t-white/10 bg-white/10 rounded-sm p-1',
+				id: 'height',
+				maxLength: '5',
+				oninput: (event) => {
+					this.validateInput(this.state, event.target, 'height');
+					this.inputLinkCheck(event.target, this.state, 'height');
+				},
+			})),
+			(this.heightInputErrorMessage = elt(
+				'p',
+				{
+					className: 'absolute top-15 text-red-500 text-[10px] mt-1 hidden',
+				},
+				'',
+			)),
+			(this.okButton = elt(
+				'button',
+				{
+					className:
+						' bg-gray-500 cursor-not-allowed px-2 py-1 min-w-32 border-none outline-none rounded-md',
+					onclick: () => {
+						dispatch({ toggleResize: true });
+						this.ok(dispatch);
+					},
+				},
+				'Ok',
+			)),
+			(this.cancelButton = elt(
+				'button',
+				{
+					className:
+						'bg-custom-glass-black hover:bg-white/10 border border-white/2 text-white min-w-32 px-2 py-1 outline-none rounded-md',
+					onclick: () => {
+						dispatch({ toggleResize: true });
+						this.cancel();
+					},
+				},
+				'Cancel',
+			)),
+			(this.percentageInput = elt('input', {
+				type: 'radio',
+				name: 'resize',
+				checked: true,
+				id: 'percentage',
+			})),
+			(this.resizeOptions = elt(
+				'div',
+				{
+					className:
+						'flex flex-col absolute shadow-sm gap-y-6 shadow-gray-600 min-w-36 min-h-32 bg-custom-tooltip-gray p-3 top-12 left-10 rounded-md',
+				},
+				elt(
+					'div',
+					{ className: 'flex flex-col gap-y-2' },
+					elt('p', { className: 'font-semibold text-[15px] ' }, 'Select Unit'),
+					elt(
+						'div',
+						{
+							className: 'flex flex-row items-center gap-x-17 justify-left',
+						},
+						elt(
+							'div',
+							{ className: 'flex flex-row gap-x-2' },
+							elt('label', { htmlFor: 'percentage' }, 'Percentage'),
+							this.percentageInput,
+						),
+						elt(
+							'div',
+							{ className: 'flex flex-row gap-x-2' },
+							elt('label', { htmlFor: 'pixels' }, 'Pixels'),
+							elt('input', { type: 'radio', name: 'resize', id: 'pixels' }),
+						),
+					),
+				),
+				elt(
+					'div',
+					{ className: 'flex flex-row items-end justify-between' },
+					elt(
+						'div',
+						{ className: 'relative flex flex-col gap-y-1' },
+						elt('label', { htmlFor: 'width' }, 'Width'),
+						this.widthInput,
+						this.widthInputErrorMessage,
+					),
+					this.linkIcon,
+					elt(
+						'div',
+						{ className: 'relative flex flex-col gap-y-1' },
+						elt('label', { htmlFor: 'height' }, 'Height'),
+						this.heightInput,
+						this.heightInputErrorMessage,
+					),
+				),
+				elt(
+					'div',
+					{
+						className:
+							'flex flex-row mt-6 gap-x-2 text-custom-black items-center justify-between',
+					},
+					this.okButton,
+					this.cancelButton,
+				),
+			))));
+
+		this.resize = elt(
+			'div',
+			{
+				className:
+					'relative flex flex-column align-middle text-white justify-center',
+			},
+			this.resizeIcon,
+			this.resizeOptions,
+		);
+
+		this.gridIcon = elt('img', {
+			src: '../assets/grid_3x3_16dp_4DA3FF_FILL0_wght400_GRAD0_opsz20.svg',
+			className: 'rounded-sm mt-1 p-2',
+			onclick: (event) => {
+				event.stopPropagation();
+				dispatch({ toggleGrid: true });
+			},
+		});
+
+		this.controlLabel = elt(
+			'p',
+			{ className: 'text-white/60 text-center text-sm' },
+			'Image',
+		);
+		this.features = elt(
+			'div',
+			{
+				className:
+					'flex flex-row flex-wrap gap-x-6 justify-around items-center',
+			},
+			this.rotate,
+			this.flip,
+			this.mirror,
+			this.resize,
+			this.gridIcon,
+			this.controlLabel,
+		);
+
+		this.dom = elt(
+			'div',
+			{ className: 'flex flex-col justify-between' },
+			this.features,
+			this.controlLabel,
 		);
 
 		this.handleInsideClick = (event) => {
-			if (event.target.textContent === 'Rotate right 90°')
-				dispatch({ rotate: 'right', toggleRotate: false });
-			else if (event.target.textContent === 'Rotate left 90°')
-				dispatch({ rotate: 'left', toggleRotate: false });
-			else dispatch({ rotate: '180', toggleRotate: false });
+			if (this.state.toggleRotate) {
+				if (event.target.textContent === 'Rotate right 90°')
+					dispatch({ rotate: 'right', toggleRotate: false });
+				else if (event.target.textContent === 'Rotate left 90°')
+					dispatch({ rotate: 'left', toggleRotate: false });
+				else dispatch({ rotate: '180', toggleRotate: false });
+			} else if (this.state.toggleFlip) {
+				if (event.target.textContent === 'Flip Vertical')
+					dispatch({ flip: 'vertical', toggleFlip: false });
+				else dispatch({ flip: 'horizontal', toggleFlip: false });
+			}
 		};
 
 		this.handleOutsideClick = (event) => {
-			if (!this.dom.contains(event.target)) dispatch({ toggleRotate: false });
+			if (!this.rotate.contains(event.target))
+				dispatch({ toggleRotate: false });
+			if (!this.flip.contains(event.target)) dispatch({ toggleFlip: false });
+			if (!this.mirror.contains(event.target))
+				dispatch({ toggleMirror: false });
+			if (!this.resize.contains(event.target))
+				dispatch({ toggleResize: false });
 		};
 
 		this.syncState(state);
 	}
 
+	inputLinkCheck(eventTarget, state, type) {
+		console.log(state.toggleLinkIcon);
+		const inputElementType = type == 'width' ? 'height' : 'width';
+		let inputElement = type === 'width' ? this.heightInput : this.widthInput;
+		inputElement.classList.toggle('border-b-custom-blue', state.toggleLinkIcon);
+		inputElement.classList.toggle('bg-custom-black', state.toggleLinkIcon);
+		if (state.toggleLinkIcon) {
+			inputElement.classList.remove('bg-white/10');
+			inputElement.value = eventTarget.value;
+			this.validateInput(state, eventTarget, type);
+			this.validateInput(state, inputElement, inputElementType);
+		} else {
+			inputElement.classList.add('bg-white/10');
+		}
+		return;
+	}
+
+	validateInput(state, input, type) {
+		const value = input.value.trim();
+		const errorElement =
+			type === 'width'
+				? this.widthInputErrorMessage
+				: this.heightInputErrorMessage;
+		let isValid = true;
+		let errorMessage = '';
+
+		if (value === '') {
+			errorMessage = 'This field cannot be empty.';
+			isValid = false;
+			if (state.toggleLinkIcon) {
+				input.classList.add('border-b-red-500');
+			}
+			input.classList.add('focus:border-b-red-500');
+			errorElement.classList.remove('hidden');
+			errorElement.textContent = errorMessage;
+		} else if (!/^\d+$/.test(value)) {
+			errorMessage = 'Please enter a valid positive integer.';
+			isValid = false;
+			if (state.toggleLinkIcon) {
+				input.classList.add('border-b-red-500');
+			}
+			input.classList.add('focus:border-b-red-500');
+			errorElement.classList.remove('hidden');
+			errorElement.textContent = errorMessage;
+		} else {
+			const intValue = parseInt(value, 10);
+			if (intValue <= 0 || intValue > 9999) {
+				errorMessage = 'Value must be between 1 and 9999.';
+				isValid = false;
+				if (state.toggleLinkIcon) {
+					input.classList.add('border-b-red-500');
+				}
+				input.classList.add('focus:border-b-red-500');
+				errorElement.classList.remove('hidden');
+				errorElement.textContent = errorMessage;
+			}
+		}
+
+		if (isValid) {
+			input.classList.remove('border-b-red-500');
+			input.classList.remove('focus:border-b-red-500');
+			input.classList.add('focus:border-b-custom-blue');
+			errorElement.textContent = '';
+		}
+		this.updateOkButtonState(isValid);
+	}
+
+	updateOkButtonState(isValid) {
+		if (
+			!isValid ||
+			this.widthInput.value == '' ||
+			this.heightInput.value == ''
+		) {
+			this.okButton.disabled = true;
+			this.okButton.classList.add('bg-gray-500', 'cursor-not-allowed');
+			this.okButton.classList.remove(
+				'bg-custom-blue',
+				'hover:bg-custom-blue/90',
+			);
+		} else {
+			this.okButton.disabled = false;
+			this.okButton.classList.remove('bg-gray-500', 'cursor-not-allowed');
+			this.okButton.classList.add('bg-custom-blue', 'hover:bg-custom-blue/90');
+		}
+	}
+
+	ok(dispatch) {
+		const width = parseInt(this.widthInput.value, 10);
+		const height = parseInt(this.heightInput.value, 10);
+		const isPercentage = this.percentageInput.checked;
+		console.log(width, height);
+		dispatch({
+			ok: {
+				inputWidth: width,
+				inputHeight: height,
+				unit: isPercentage ? 'percentage' : 'pixels',
+			},
+		});
+	}
+	cancel() {
+		this.widthInput.value = '';
+		console.log(this.widthInput.value);
+		this.heightInput.value = '';
+		this.percentageInput.checked = true;
+		return;
+	}
+
 	syncState(state) {
-		if (state.toggleRotate) {
+		this.state = state;
+		if (this.reflectCheckboxVertical)
+			this.reflectCheckboxVertical.checked = this.state.mirrorVertical;
+		if (this.reflectCheckboxHorizontal)
+			this.reflectCheckboxHorizontal.checked = this.state.mirrorHorizontal;
+		if (this.reflectCheckboxMainDiagonal)
+			this.reflectCheckboxMainDiagonal.checked = this.state.mirrorMainDiagonal;
+		if (this.reflectCheckboxOffDiagonal)
+			this.reflectCheckboxOffDiagonal.checked = this.state.mirrorOffDiagonal;
+
+		/* console.log(
+			this.reflectCheckboxVertical.checked,
+			this.reflectCheckboxHorizontal.checked,
+			this.reflectCheckboxMainDiagonal.checked,
+			this.reflectCheckboxOffDiagonal.checked,
+		); */
+
+		if (
+			this.state.toggleRotate ||
+			this.state.toggleFlip ||
+			this.state.toggleMirror ||
+			this.state.toggleResize
+		) {
 			document.addEventListener('click', this.handleOutsideClick);
 		} else {
 			document.removeEventListener('click', this.handleOutsideClick);
 		}
-
-		this.options.classList.toggle('tooltipHidden', !state.toggleRotate);
 		iconBorderClasses.forEach((cls) => {
-			this.image.classList.toggle(cls, state.toggleRotate);
+			this.rotateIcon.classList.toggle(cls, this.state.toggleRotate);
+			this.flipIcon.classList.toggle(cls, this.state.toggleFlip);
+			this.mirrorIcon.classList.toggle(cls, this.state.toggleMirror);
+			this.resizeIcon.classList.toggle(cls, this.state.toggleResize);
+			this.gridIcon.classList.toggle(cls, this.state.toggleGrid);
 		});
-		this.image.classList.toggle(
+
+		this.rotateOptions.classList.toggle(
+			'tooltipHidden',
+			!this.state.toggleRotate,
+		);
+		this.rotateOptions.classList.toggle(
+			'tooltipVisible',
+			this.state.toggleRotate,
+		);
+		this.rotateIcon.classList.toggle(
 			'hover:bg-custom-glass-black',
-			!state.toggleRotate,
+			!this.state.toggleRotate,
 		);
 
-		this.options.classList.toggle('tooltipVisible', state.toggleRotate);
-	}
-}
-
-export class StatusBar {
-	constructor(state, { tools, dispatch }) {
-		this.text = elt('p', { className: 'text-white text-[12px] w-20' });
-		this.pixelPosition = elt(
-			'div',
-			{
-				className:
-					' flex flex-row items-center w-32 h-5 justify-center gap-x-2',
-			},
-			elt(
-				'p',
-				{},
-				elt(
-					'svg',
-					iconDownloader(
-						'http://www.w3.org/2000/svg',
-						'20px',
-						'0 -960 960 960',
-						'20px',
-						'#ffffff',
-					),
-					elt('path', {
-						d: 'm312-397 85-107h169L312-712v315ZM537-96 399-391 240-192v-672l528 432H486l138 295-87 41ZM397-504Z',
-					}),
-				),
-			),
-			this.text,
+		this.flipOptions.classList.toggle('tooltipVisible', this.state.toggleFlip);
+		this.flipOptions.classList.toggle('tooltipHidden', !this.state.toggleFlip);
+		this.flipIcon.classList.toggle(
+			'hover:bg-custom-glass-black',
+			!this.state.toggleFlip,
 		);
-		this.canvasSizeText = elt(
-			'p',
-			{
-				className: 'text-white text-[12px]',
-			},
-			`${state.picture.width} x ${state.picture.height}px`,
+		this.mirrorOptions.classList.toggle(
+			'tooltipVisible',
+			this.state.toggleMirror,
 		);
-
-		this.canvasSize = elt(
-			'div',
-			{ className: 'flex flex-row items-center justify-between gap-x-2' },
-			elt(
-				'p',
-				{},
-				elt(
-					'svg',
-					iconDownloader(
-						'http://www.w3.org/2000/svg',
-						'20px',
-						'0 -960 960 960',
-						'20px',
-						'#ffffff',
-					),
-					elt('path', {
-						d: 'M552-312h192v-192h-72v120H552v72ZM216-456h72v-120h120v-72H216v192Zm-48 264q-29.7 0-50.85-21.16Q96-234.32 96-264.04v-432.24Q96-726 117.15-747T168-768h624q29.7 0 50.85 21.16Q864-725.68 864-695.96v432.24Q864-234 842.85-213T792-192H168Zm0-72h624v-432H168v432Zm0 0v-432 432Z',
-					}),
-				),
-			),
-			this.canvasSizeText,
+		this.mirrorOptions.classList.toggle(
+			'tooltipHidden',
+			!this.state.toggleMirror,
 		);
-		this.leftStatus = elt(
-			'div',
-			{ className: 'flex flex-row items-center gap-x-8 justify-around ' },
-			this.pixelPosition,
-			this.canvasSize,
+		this.resizeOptions.classList.toggle(
+			'tooltipHidden',
+			!this.state.toggleResize,
 		);
-		this.dom = elt(
-			'div',
-			{
-				className:
-					'fixed bottom-0 left-0 flex flex-row justify-between items-center h-10 w-screen bg-custom-gray text-gray-300',
-			},
-			this.leftStatus,
-			elt('div', {}, 'Hello'),
+		this.resizeOptions.classList.toggle(
+			'tooltipVisible',
+			this.state.toggleResize,
 		);
-		this.syncState(state);
-	}
-
-	syncState(state) {
-		this.canvasSizeText.textContent = `${state.picture.width} x ${state.picture.height}px`;
-		if (!state.cursor) {
-			this.text.textContent = '';
-		} else {
-			console.log(state.cursor.x, state.cursor.y);
-			this.text.textContent = `${state.cursor.x}, ${state.cursor.y}px`;
-		}
+		this.mirrorIcon.classList.toggle(
+			'ring-1',
+			(this.state.mirrorVertical ||
+				this.state.mirrorHorizontal ||
+				this.state.mirrorMainDiagonal ||
+				this.state.mirrorOffDiagonal) &&
+				!this.state.toggleMirror,
+		);
+		this.mirrorIcon.classList.toggle(
+			'ring-custom-blue',
+			(this.state.mirrorVertical ||
+				this.state.mirrorHorizontal ||
+				this.state.mirrorMainDiagonal ||
+				this.state.mirrorOffDiagonal) &&
+				!this.state.toggleMirror,
+		);
+		this.mirrorIcon.classList.toggle(
+			'hover:bg-custom-glass-black',
+			!this.state.toggleMirror,
+		);
+		this.resizeIcon.classList.toggle(
+			'hover:bg-custom-glass-black',
+			!this.state.toggleResize,
+		);
+		console.log(this.state.toggleLinkIcon);
+		this.linkIcon.classList.toggle('bg-custom-blue', this.state.toggleLinkIcon);
+		this.linkIcon.classList.toggle(
+			'bg-custom-glass-black',
+			!this.state.toggleLinkIcon,
+		);
+		this.linkIcon.classList.toggle(
+			'hover:bg-custom-glass-black/80',
+			!this.state.toggleLinkIcon,
+		);
+		console.log(this.state.toggleGrid);
+		this.gridIcon.classList.toggle(
+			'hover:bg-custom-glass-black',
+			!this.state.toggleGrid,
+		);
+		const fillColor = this.state.toggleLinkIcon ? '#202020' : '#e3e3e3';
+		this.linkSvg.setAttribute('fill', fillColor);
 	}
 }
 
@@ -303,7 +731,6 @@ export class SaveButton {
 		document.body.appendChild(link);
 
 		link.click();
-		window.confirm();
 		link.remove();
 	}
 	syncState(state) {

@@ -31,6 +31,42 @@ export function drawGridOnZoom(cx, startX, startY, endX, endY) {
 	}
 }
 
+export function drawAxisLines(cx, startX, startY, endX, endY, state) {
+	cx.strokeStyle = 'rgba(77, 163, 255, 1)';
+	cx.lineWidth = 1;
+	cx.imageSmoothingEnabled = false;
+	if (state.mirrorVertical) {
+		// Vertical axis line
+		let midX = (startX + endX) / 2;
+		cx.beginPath();
+		cx.moveTo(midX, startY + 1);
+		cx.lineTo(midX, endY + 1);
+		cx.stroke();
+	}
+	if (state.mirrorHorizontal) {
+		let midY = (startY + endY) / 2;
+		// Horizontal axis line
+		cx.beginPath();
+		cx.moveTo(startX, midY);
+		cx.lineTo(endX + 1, midY);
+		cx.stroke();
+	}
+
+	if (state.mirrorMainDiagonal) {
+		cx.beginPath();
+		cx.moveTo(startX, startY);
+		cx.lineTo(endX + 1, endY + 1);
+		cx.stroke();
+	}
+
+	if (state.mirrorOffDiagonal) {
+		cx.beginPath();
+		cx.moveTo(endX, startY);
+		cx.lineTo(startX, endY + 1);
+		cx.stroke();
+	}
+}
+
 export function rgbToHex([r, g, b]) {
 	return '#' + [r, g, b].map((n) => n.toString(16).padStart(2, '0')).join('');
 }
@@ -193,6 +229,178 @@ export function rotate180(state) {
 		}
 	}
 	return new Picture(newWidth, newHeight, newPixels);
+}
+
+export function flipVertical(state) {
+	let { width, height, pixels } = state.picture;
+	let newWidth = width;
+	let newHeight = height;
+	let newPixels = new Uint8ClampedArray(newWidth * newHeight * 4);
+	for (let y = 0; y < height; y++) {
+		for (let x = 0; x < width; x++) {
+			let src = (y * width + x) * 4;
+			let newX = width - 1 - x;
+			let newY = y;
+			let dst = (newY * newWidth + newX) * 4;
+			newPixels[dst] = pixels[src];
+			newPixels[dst + 1] = pixels[src + 1];
+			newPixels[dst + 2] = pixels[src + 2];
+			newPixels[dst + 3] = pixels[src + 3];
+		}
+	}
+	return new Picture(newWidth, newHeight, newPixels);
+}
+
+export function flipHorizontal(state) {
+	let { width, height, pixels } = state.picture;
+	let newWidth = width;
+	let newHeight = height;
+	let newPixels = new Uint8ClampedArray(newWidth * newHeight * 4);
+
+	for (let x = 0; x < width; x++) {
+		for (let y = 0; y < height; y++) {
+			let src = (y * width + x) * 4;
+			let newX = x;
+			let newY = height - 1 - y;
+			let dst = (newY * newWidth + newX) * 4;
+			newPixels[dst] = pixels[src];
+			newPixels[dst + 1] = pixels[src + 1];
+			newPixels[dst + 2] = pixels[src + 2];
+			newPixels[dst + 3] = pixels[src + 3];
+		}
+	}
+	return new Picture(newWidth, newHeight, newPixels);
+}
+
+export function reflectSelect(selectName, dispatch) {
+	const splitName = selectName.split(' ');
+	const reflectCheckbox = elt('input', {
+		type: 'checkbox',
+		id: selectName,
+		onclick: (event) => {
+			event.stopPropagation();
+			dispatch({
+				[`mirror${splitName[1]}`]: event.target.checked,
+				toggleMirror: false,
+			});
+		},
+	});
+
+	const reflectOption = elt(
+		'label',
+		{ htmlFor: selectName },
+		elt(
+			'p',
+			{
+				className: 'p-1 min-w-52 hover:bg-custom-glass-black rounded-md',
+			},
+			elt(
+				'div',
+				{
+					className: 'flex flex-row items-center justify-between',
+				},
+				selectName,
+				elt(
+					'label',
+					{
+						className: 'switch ',
+					},
+					reflectCheckbox,
+					elt('span', { className: 'slider round' }),
+				),
+			),
+		),
+	);
+
+	return { reflectCheckbox, reflectOption };
+}
+
+export function applyMirror(points, state) {
+	let result = [];
+	result = [...points];
+	if (
+		!state.mirrorVertical &&
+		!state.mirrorHorizontal &&
+		!state.mirrorMainDiagonal &&
+		!state.mirrorOffDiagonal
+	) {
+		return result;
+	}
+
+	function mirroredPoint(p, mirrorType) {
+		if (mirrorType === 'vertical') {
+			let mirroredX = state.picture.width - 1 - p.x;
+			return { x: mirroredX, y: p.y, color: p.color };
+		}
+
+		if (mirrorType === 'horizontal') {
+			let mirroredY = state.picture.height - 1 - p.y;
+			return { x: p.x, y: mirroredY, color: p.color };
+		}
+
+		if (mirrorType === 'mainDiagonal') {
+			let normalizedX = p.x / state.picture.width;
+			let normalizedY = p.y / state.picture.height;
+			let mirroredX = Math.round(normalizedY * state.picture.width);
+			let mirroredY = Math.round(normalizedX * state.picture.height);
+
+			mirroredX = Math.max(0, Math.min(state.picture.width - 1, mirroredX));
+			mirroredY = Math.max(0, Math.min(state.picture.height - 1, mirroredY));
+			return { x: mirroredX, y: mirroredY, color: p.color };
+		}
+
+		if (mirrorType === 'offDiagonal') {
+			let normalizedX = p.x / state.picture.width;
+			let normalizedY = p.y / state.picture.height;
+			let mirroredX = Math.round((1 - normalizedY) * state.picture.width);
+			let mirroredY = Math.round((1 - normalizedX) * state.picture.height);
+			mirroredX = Math.max(0, Math.min(state.picture.width, mirroredX));
+			mirroredY = Math.max(0, Math.min(state.picture.height, mirroredY));
+			return { x: mirroredX, y: mirroredY, color: p.color };
+		}
+	}
+
+	const mirrorTypes = [];
+	if (state.mirrorVertical) mirrorTypes.push('vertical');
+	if (state.mirrorHorizontal) mirrorTypes.push('horizontal');
+	if (state.mirrorMainDiagonal) mirrorTypes.push('mainDiagonal');
+	if (state.mirrorOffDiagonal) mirrorTypes.push('offDiagonal');
+
+	for (let mirrorType of mirrorTypes) {
+		//collect mirrored points for current mirror type
+		let mirroredPoints = points.map((p) => mirroredPoint(p, mirrorType));
+		// add first point directly to result to avoid line drawing from last point of previous segment
+		if (mirroredPoints.length > 0) {
+			result.push(mirroredPoints[0]);
+		}
+		// draw lines between consecutive mirrored points
+		for (let i = 1; i < mirroredPoints.length; i++) {
+			let from = mirroredPoints[i - 1];
+			let to = mirroredPoints[i];
+			let linePoints = drawLine(from, to, from.color);
+			result.push(...linePoints);
+		}
+	}
+	return result;
+}
+
+export function resizePicture(state, newWidth, newHeight) {
+	let newPicture = Picture.empty(newWidth, newHeight, hexToRgb('#f0f0f0'));
+	let minWidth = Math.min(state.picture.width, newWidth);
+	let minHeight = Math.min(state.picture.height, newHeight);
+	for (let y = 0; y < minHeight; y++) {
+		for (let x = 0; x < minWidth; x++) {
+			let src = (y * state.picture.width + x) * 4;
+			let dst = (y * newWidth + x) * 4;
+
+			newPicture.pixels[dst] = state.picture.pixels[src];
+			newPicture.pixels[dst + 1] = state.picture.pixels[src + 1];
+			newPicture.pixels[dst + 2] = state.picture.pixels[src + 2];
+			newPicture.pixels[dst + 3] = state.picture.pixels[src + 3];
+		}
+	}
+
+	return newPicture;
 }
 
 export function drawLine(from, to, color) {

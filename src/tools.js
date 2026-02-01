@@ -1,12 +1,16 @@
 import {
 	drawLine,
 	applyBrush,
+	applyMirror,
 	hexToRgb,
 	elt,
 	drawGridOnZoom,
+	drawAxisLines,
 	rotateLeft,
 	rotateRight,
 	rotate180,
+	flipVertical,
+	flipHorizontal,
 } from './utils.js';
 
 import { Picture } from './picture.js';
@@ -14,7 +18,15 @@ import { Picture } from './picture.js';
 const offScreen = document.createElement('canvas');
 const offCtx = offScreen.getContext('2d', { willReadFrequently: true });
 const dpr = window.devicePixelRatio;
-export function drawPicture(picture, canvas, zoom, previous, ImageData, cx) {
+export function drawPicture(
+	state,
+	picture,
+	canvas,
+	zoom,
+	previous,
+	ImageData,
+	cx,
+) {
 	const fullRedraw =
 		previous == null ||
 		previous.width != picture.width ||
@@ -88,8 +100,17 @@ export function drawPicture(picture, canvas, zoom, previous, ImageData, cx) {
 		dirtyHeight,
 	);
 
-	if (zoom > 2) {
+	if (state.toggleGrid) {
 		drawGridOnZoom(cx, startX + 2, startY + 2, endX, endY);
+	}
+
+	if (
+		state.mirrorVertical ||
+		state.mirrorHorizontal ||
+		state.mirrorMainDiagonal ||
+		state.mirrorOffDiagonal
+	) {
+		drawAxisLines(cx, 0, 0, picture.width - 1, picture.height - 1, state);
 	}
 }
 
@@ -98,15 +119,22 @@ export function rotatedPicture(state, rotateDir) {
 	if (rotateDir === 'right') return rotateRight(state);
 	if (rotateDir === '180') return rotate180(state);
 }
+export function flippedPicture(state, flipDir) {
+	if (flipDir === 'vertical') return flipVertical(state);
+	if (flipDir === 'horizontal') return flipHorizontal(state);
+}
 
 export function draw(pos, state, dispatch, getColor = () => state.color) {
 	function connect(newPos, state) {
+		let brushedPoints, mirroredPoints;
 		let color = getColor();
 		console.log('Drawing at color: ' + color);
 		let line = drawLine(pos, newPos, color, state);
+		brushedPoints = applyBrush(line, state);
+		mirroredPoints = applyMirror(brushedPoints, state);
 		pos = newPos;
 
-		dispatch({ picture: state.picture.draw(applyBrush(line, state)) });
+		dispatch({ picture: state.picture.draw(mirroredPoints) });
 	}
 	connect(pos, state);
 	return connect;

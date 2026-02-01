@@ -1,14 +1,165 @@
-import { rotatedPicture } from './tools.js';
+import { rotatedPicture, flippedPicture } from './tools.js';
+import { resizePicture } from './utils.js';
 let rotateActions = ['left', 'right', '180'];
+let flipActions = ['vertical', 'horizontal'];
 export function historyUpdateState(state, action) {
 	if (action.toggleRotate) {
-		return { ...state, toggleRotate: !state.toggleRotate };
+		return {
+			...state,
+			toggleRotate: !state.toggleRotate,
+			toggleFlip: false,
+			toggleMirror: false,
+			toggleResize: false,
+		};
+	}
+
+	if (action.toggleFlip) {
+		return {
+			...state,
+			toggleFlip: !state.toggleFlip,
+			toggleRotate: false,
+			toggleMirror: false,
+			toggleResize: false,
+		};
+	}
+
+	if (action.toggleMirror) {
+		return {
+			...state,
+			toggleMirror: !state.toggleMirror,
+			toggleRotate: false,
+			toggleFlip: false,
+			toggleResize: false,
+		};
 	}
 
 	if (rotateActions.includes(action.rotate)) {
 		return {
 			...state,
 			picture: rotatedPicture(state, action.rotate),
+		};
+	}
+
+	if (flipActions.includes(action.flip)) {
+		return { ...state, picture: flippedPicture(state, action.flip) };
+	}
+
+	if (action.mirrorVertical) {
+		if (state.mirrorHorizontal) {
+			return {
+				...state,
+				mirrorVertical: action.mirrorVertical,
+				mirrorMainDiagonal: false,
+				mirrorOffDiagonal: false,
+				toggleMirror: false,
+			};
+		}
+
+		return {
+			...state,
+			mirrorVertical: action.mirrorVertical,
+			mirrorMainDiagonal: false,
+			mirrorOffDiagonal: false,
+		};
+	}
+
+	if (action.mirrorHorizontal) {
+		if (state.mirrorVertical) {
+			return {
+				...state,
+				mirrorHorizontal: action.mirrorHorizontal,
+				mirrorMainDiagonal: false,
+				mirrorOffDiagonal: false,
+				toggleMirror: false,
+			};
+		}
+
+		return {
+			...state,
+			mirrorHorizontal: action.mirrorHorizontal,
+			mirrorMainDiagonal: false,
+			mirrorOffDiagonal: false,
+		};
+	}
+
+	if (action.mirrorMainDiagonal) {
+		if (state.mirrorOffDiagonal) {
+			return {
+				...state,
+				mirrorMainDiagonal: action.mirrorMainDiagonal,
+				mirrorVertical: false,
+				mirrorHorizontal: false,
+				toggleMirror: false,
+			};
+		}
+
+		return {
+			...state,
+			mirrorMainDiagonal: action.mirrorMainDiagonal,
+			mirrorVertical: false,
+			mirrorHorizontal: false,
+		};
+	}
+
+	if (action.mirrorOffDiagonal) {
+		if (state.mirrorMainDiagonal) {
+			return {
+				...state,
+				mirrorOffDiagonal: action.mirrorOffDiagonal,
+				mirrorVertical: false,
+				mirrorHorizontal: false,
+				toggleMirror: false,
+			};
+		}
+
+		return {
+			...state,
+			mirrorOffDiagonal: action.mirrorOffDiagonal,
+			mirrorVertical: false,
+			mirrorHorizontal: false,
+		};
+	}
+	if (action.toggleResize) {
+		return {
+			...state,
+			toggleResize: !state.toggleResize,
+			toggleFlip: false,
+			toggleRotate: false,
+			toggleMirror: false,
+		};
+	}
+
+	if (action.toggleLinkIcon) {
+		return { ...state, toggleLinkIcon: !state.toggleLinkIcon };
+	}
+
+	if (action.cursor !== undefined) {
+		return { ...state, cursor: action.cursor };
+	}
+	if (action.ok) {
+		let { inputWidth, inputHeight, unit } = action.ok;
+		let newWidth, newHeight;
+
+		if (unit === 'percentage') {
+			newWidth = Math.floor(inputWidth * state.picture.width) / 100;
+			newHeight = Math.floor(inputHeight * state.picture.height) / 100;
+		} else {
+			newWidth = inputWidth;
+			newHeight = inputHeight;
+		}
+		console.log(inputWidth, inputHeight);
+		return { ...state, picture: resizePicture(state, newWidth, newHeight) };
+	}
+
+	if (action.toggleGrid) {
+		return {
+			...state,
+			toggleGrid: !state.toggleGrid,
+			toggleFlip: false,
+			toggleLinkIcon: false,
+			toggleMirror: false,
+			toggleResize: false,
+			toggleRotate: false,
 		};
 	}
 

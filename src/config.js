@@ -12,8 +12,7 @@ import {
 } from './tools.js';
 
 import {
-	RotateSelect,
-	StatusBar,
+	ImageSelect,
 	ToolSelect,
 	ColorSelect,
 	SketchSelect,
@@ -30,12 +29,22 @@ export let startState = {
 	tool: 'draw',
 	sketch: 'Pencil',
 	color: new Uint8ClampedArray([0, 0, 0, 255]),
-	cursor: null,
+	cursor: false,
 	picture: Picture.empty(1000, 400, hexToRgb('#f0f0f0')),
 	previewPicture: null,
 	redone: [],
 	toggleRotate: false,
+	toggleFlip: false,
+	toggleMirror: false,
+	toggleResize: false,
+	toggleLinkIcon: false,
+	toggleGrid: false,
 	rotate: null,
+	flip: null,
+	mirrorVertical: false,
+	mirrorHorizontal: false,
+	mirrorMainDiagonal: false,
+	mirrorOffDiagonal: false,
 	done: [],
 	zoom: 1,
 	doneAt: 0,
@@ -53,8 +62,7 @@ export let baseTools = {
 };
 export let baseSketches = { marker: 'Marker', pencil: 'Pencil' };
 export let baseControls = [
-	RotateSelect,
-	StatusBar,
+	ImageSelect,
 	ToolSelect,
 	ColorSelect,
 	SketchSelect,
