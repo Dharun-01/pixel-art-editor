@@ -10,7 +10,7 @@ export class PixelEditor {
 		let { tools, sketches, controls, dispatch } = config;
 		this.state = state;
 		this.sketch = sketches[this.state.sketch];
-		this.statusBar = new StatusBar(this.state);
+		this.statusBar = new StatusBar(this.state, dispatch);
 		this.canvas = new PictureCanvas(
 			state.picture,
 			(pos) => {
@@ -25,8 +25,11 @@ export class PixelEditor {
 			},
 			this.state,
 			config,
+			this.statusBar,
 		);
-		this.controls = controls.map((Control) => new Control(state, config));
+		this.controls = controls.map((Control) => {
+			return new Control(state, config);
+		});
 		/* console.log(this.controls); */
 		this.dom = elt(
 			'div',
@@ -188,7 +191,11 @@ export class PixelEditor {
 					{ className: 'text-gray-300 h-25 w-full outline' },
 					this.controls[0].dom,
 				),
-				elt('div', { className: 'text-gray-300 h-25 w-full outline' }, 'Hello'),
+				elt(
+					'div',
+					{ className: 'text-gray-300 h-25 w-full outline' },
+					this.controls[1].dom,
+				),
 				elt('div', { className: 'text-gray-300 h-25 w-full outline' }, 'Hello'),
 				elt('div', { className: 'text-gray-300 h-25 w-full outline' }, 'Hello'),
 				elt('div', { className: 'text-gray-300 h-25 w-full outline' }, 'Hello'),
@@ -230,8 +237,8 @@ export class PixelEditor {
 	syncState(state) {
 		let pic = state.previewPicture ?? state.picture;
 		this.state = state;
-		this.canvas.syncState(pic, state);
-		this.statusBar.syncState(state);
+		this.canvas.syncState(pic, this.state);
+		this.statusBar.syncState(this.state);
 		for (let ctrl of this.controls) ctrl.syncState(this.state);
 	}
 }

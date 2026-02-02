@@ -3,6 +3,7 @@ import { resizePicture } from './utils.js';
 let rotateActions = ['left', 'right', '180'];
 let flipActions = ['vertical', 'horizontal'];
 export function historyUpdateState(state, action) {
+	console.log(action.zoom);
 	if (action.toggleRotate) {
 		return {
 			...state,
@@ -157,12 +158,128 @@ export function historyUpdateState(state, action) {
 			toggleGrid: !state.toggleGrid,
 			toggleFlip: false,
 			toggleLinkIcon: false,
-			toggleMirror: false,
 			toggleResize: false,
 			toggleRotate: false,
 		};
 	}
 
+	if (action.toggleErase !== undefined) {
+		return {
+			...state,
+			toggleErase: action.toggleErase,
+			toggleFlip: false,
+			toggleZoomPlus: false,
+			toggleLinkIcon: false,
+			toggleMirror: false,
+			toggleResize: false,
+			toggleRotate: false,
+			togglePencil: false,
+			toggleFill: false,
+			toggleColorPicker: false,
+			tool: action.toggleErase ? 'erase' : 'draw',
+		};
+	}
+
+	if (action.togglePencil !== undefined) {
+		return {
+			...state,
+			togglePencil: action.togglePencil,
+			toggleZoomPlus: false,
+			toggleFlip: false,
+			toggleFill: false,
+			toggleLinkIcon: false,
+			toggleMirror: false,
+			toggleResize: false,
+			toggleRotate: false,
+			toggleErase: false,
+			toggleColorPicker: false,
+			tool: action.togglePencil ? 'line' : 'draw',
+		};
+	}
+
+	if (action.toggleFill !== undefined) {
+		return {
+			...state,
+			toggleFill: action.toggleFill,
+			toggleZoomPlus: false,
+			togglePencil: false,
+			toggleFlip: false,
+			toggleLinkIcon: false,
+			toggleMirror: false,
+			toggleResize: false,
+			toggleRotate: false,
+			toggleErase: false,
+			toggleColorPicker: false,
+			tool: action.toggleFill ? 'fill' : 'draw',
+		};
+	}
+
+	if (action.toggleColorPicker !== undefined) {
+		return {
+			...state,
+			toggleColorPicker: action.toggleColorPicker,
+			toggleFill: false,
+			toggleZoomPlus: false,
+			togglePencil: false,
+			toggleFlip: false,
+			toggleLinkIcon: false,
+			toggleMirror: false,
+			toggleResize: false,
+			toggleRotate: false,
+			toggleErase: false,
+			tool: action.toggleColorPicker ? 'pick' : 'draw',
+		};
+	}
+	if (action.toggleZoomPlus !== undefined) {
+		return {
+			...state,
+			toggleZoomPlus: action.toggleZoomPlus,
+			toggleColorPicker: false,
+			toggleFill: false,
+			togglePencil: false,
+			toggleFlip: false,
+			toggleLinkIcon: false,
+			toggleMirror: false,
+			toggleResize: false,
+			toggleRotate: false,
+			toggleErase: false,
+		};
+	}
+
+	if (action.toggleZoomSelect !== undefined) {
+		return {
+			...state,
+			toggleZoomSelect: action.toggleZoomSelect,
+			toggleZoomPlus: false,
+			toggleColorPicker: false,
+			toggleFill: false,
+			togglePencil: false,
+			toggleFlip: false,
+			toggleLinkIcon: false,
+			toggleMirror: false,
+			toggleResize: false,
+			toggleRotate: false,
+			toggleErase: false,
+		};
+	}
+
+	if (action.toggleZoomSelectDownArrow !== undefined) {
+		return {
+			...state,
+			toggleZoomSelectDownArrow: action.toggleZoomSelectDownArrow,
+			toggleZoomSelect: false,
+			toggleZoomPlus: false,
+			toggleColorPicker: false,
+			toggleFill: false,
+			togglePencil: false,
+			toggleFlip: false,
+			toggleLinkIcon: false,
+			toggleMirror: false,
+			toggleResize: false,
+			toggleRotate: false,
+			toggleErase: false,
+		};
+	}
 	if (action.isPreview) {
 		return { ...state, previewPicture: action.picture };
 	} else if (action.undo) {

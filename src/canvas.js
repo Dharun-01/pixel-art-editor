@@ -2,13 +2,26 @@ import { elt, pointerPosition } from './utils.js';
 import { drawPicture } from './tools.js';
 
 export class PictureCanvas {
-	constructor(picture, pointerDown, state, config) {
+	constructor(picture, pointerDown, state, config, statusBar) {
+		this.statusBar = statusBar;
+		this.state = state;
 		this.dom = elt('canvas', {
 			onmousemove: (event) => this.hover(event, state, config),
 			onmousedown: (event) => this.mouse(event, pointerDown, state, config),
 			onmouseleave: () => config.dispatch({ cursor: false }),
 			ontouchstart: (event) => this.touch(event, pointerDown, state, config),
-			className: ' mt-26 overflow-auto',
+			onclick: () => {
+				if (this.state.toggleZoomPlus) {
+					this.statusBar.zoomRange.value =
+						parseInt(this.statusBar.zoomRange.value, 10) + 10;
+					this.statusBar.zoomSelectInput.value = `${this.statusBar.zoomRange.value}%`;
+					console.log(this.statusBar.zoomRange.value);
+					this.statusBar.updateSliderColor();
+					config.dispatch({ zoom: (1 * this.statusBar.zoomRange.value) / 100 });
+				}
+				return;
+			},
+			className: ' mt-26 transition-all duration-300 ease-out overflow-auto',
 		});
 		this.dom.width = picture.width;
 		this.dom.height = picture.height;
@@ -19,6 +32,7 @@ export class PictureCanvas {
 	}
 
 	syncState(picture, state) {
+		this.state = state;
 		const isPreview = state.previewPicture != null;
 		if (this.picture == picture && this.zoom == state.zoom && !isPreview)
 			return;

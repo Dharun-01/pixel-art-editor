@@ -22,7 +22,6 @@ import {
 	RedoButton,
 	EraseButton,
 	EraseAllButton,
-	ZoomControls,
 } from './controls.js';
 
 export let startState = {
@@ -39,6 +38,13 @@ export let startState = {
 	toggleResize: false,
 	toggleLinkIcon: false,
 	toggleGrid: false,
+	togglePencil: false,
+	toggleFill: false,
+	toggleErase: false,
+	toggleColorPicker: false,
+	toggleZoomPlus: false,
+	toggleZoomSelect: false,
+	toggleZoomSelectDownArrow: false,
 	rotate: null,
 	flip: null,
 	mirrorVertical: false,
@@ -72,5 +78,4 @@ export let baseControls = [
 	RedoButton,
 	EraseButton,
 	EraseAllButton,
-	ZoomControls,
 ];

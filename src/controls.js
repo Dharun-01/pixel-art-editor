@@ -6,6 +6,7 @@ import {
 	iconDownloader,
 	reflectSelect,
 } from './utils.js';
+import { StatusBar } from './statusbar.js';
 import { drawPicture, startLoad } from './tools.js';
 import { Picture } from './picture.js';
 
@@ -599,7 +600,7 @@ export class ImageSelect {
 			'hover:bg-custom-glass-black',
 			!this.state.toggleResize,
 		);
-		console.log(this.state.toggleLinkIcon);
+
 		this.linkIcon.classList.toggle('bg-custom-blue', this.state.toggleLinkIcon);
 		this.linkIcon.classList.toggle(
 			'bg-custom-glass-black',
@@ -609,7 +610,7 @@ export class ImageSelect {
 			'hover:bg-custom-glass-black/80',
 			!this.state.toggleLinkIcon,
 		);
-		console.log(this.state.toggleGrid);
+
 		this.gridIcon.classList.toggle(
 			'hover:bg-custom-glass-black',
 			!this.state.toggleGrid,
@@ -621,7 +622,64 @@ export class ImageSelect {
 
 export class ToolSelect {
 	constructor(state, { tools, dispatch }) {
-		this.select = elt(
+		this.state = state;
+		this.pencilIcon = elt('img', {
+			src: '../assets/stylus_16dp_4DA3FF_FILL0_wght400_GRAD0_opsz20.svg',
+			className: 'rounded-sm mt-1 p-2',
+			onclick: (event) => {
+				event.stopPropagation();
+				dispatch({ togglePencil: !this.state.togglePencil });
+			},
+		});
+		this.fillIcon = elt('img', {
+			className: 'rounded-sm mt-1 p-2',
+			src: '../assets/format_color_fill_16dp_4DA3FF_FILL0_wght400_GRAD0_opsz20.svg',
+			onclick: (event) => {
+				event.stopPropagation();
+				dispatch({ toggleFill: !this.state.toggleFill });
+			},
+		});
+		this.eraseIcon = elt('img', {
+			src: '../assets/ink_eraser_16dp_4DA3FF_FILL0_wght400_GRAD0_opsz20.svg',
+			className: 'rounded-sm mt-1 p-2',
+			onclick: (event) => {
+				event.stopPropagation();
+				dispatch({ toggleErase: !this.state.toggleErase });
+			},
+		});
+
+		this.colorPickerIcon = elt('img', {
+			src: '../assets/colorize_16dp_4DA3FF_FILL0_wght400_GRAD0_opsz20.svg',
+			className: 'rounded-sm mt-1 p-2',
+			onclick: (event) => {
+				event.stopPropagation();
+				dispatch({ toggleColorPicker: !this.state.toggleColorPicker });
+			},
+		});
+
+		this.zoomPlusIcon = elt('img', {
+			src: '../assets/zoom_in_16dp_4DA3FF_FILL0_wght400_GRAD0_opsz20.svg',
+			className: 'rounded-sm mt-1 p-2',
+			onclick: (event) => {
+				event.stopPropagation();
+				dispatch({ toggleZoomPlus: !this.state.toggleZoomPlus });
+			},
+		});
+
+		this.features = elt(
+			'div',
+			{
+				className:
+					'flex flex-row flex-wrap gap-x-6 justify-around items-center',
+			},
+			this.pencilIcon,
+			this.fillIcon,
+			this.eraseIcon,
+			this.colorPickerIcon,
+			this.zoomPlusIcon,
+		);
+
+		/* this.select = elt(
 			'select',
 			{
 				onchange: () => dispatch({ tool: this.select.value }),
@@ -637,17 +695,52 @@ export class ToolSelect {
 					name,
 				),
 			),
+		); */
+		this.controlLabel = elt(
+			'p',
+			{ className: 'text-center text-white/60 text-sm' },
+			'Tools',
 		);
 		this.dom = elt(
-			'label',
-			{ className: 'p-1 text-white text-lg' },
-			'🖌 Tool: ',
-			this.select,
+			'div',
+			{ className: 'flex flex-col justify-between' },
+			this.features,
+			this.controlLabel,
 		);
+		this.syncState(state);
 	}
 
 	syncState(state) {
-		this.select.value = state.tool;
+		this.state = state;
+
+		iconBorderClasses.forEach((cls) => {
+			this.eraseIcon.classList.toggle(cls, this.state.toggleErase);
+			this.pencilIcon.classList.toggle(cls, this.state.togglePencil);
+			this.fillIcon.classList.toggle(cls, this.state.toggleFill);
+			this.colorPickerIcon.classList.toggle(cls, this.state.toggleColorPicker);
+			this.zoomPlusIcon.classList.toggle(cls, this.state.toggleZoomPlus);
+		});
+		this.pencilIcon.classList.toggle(
+			'hover:bg-custom-glass-black',
+			!this.state.togglePencil,
+		);
+		this.eraseIcon.classList.toggle(
+			'hover:bg-custom-glass-black',
+			!this.state.toggleErase,
+		);
+		this.fillIcon.classList.toggle(
+			'hover:bg-custom-glass-black',
+			!this.state.toggleFill,
+		);
+		this.colorPickerIcon.classList.toggle(
+			'hover:bg-custom-glass-black',
+			!this.state.toggleColorPicker,
+		);
+		this.zoomPlusIcon.classList.toggle(
+			'hover:bg-custom-glass-black',
+			!this.state.toggleZoomPlus,
+		);
+		/* this.select.value = state.tool; */
 	}
 }
 
@@ -841,7 +934,7 @@ export class EraseAllButton {
 	syncState() {}
 }
 
-const ZOOM = [1, 1.5, 3, 6, 12, 24];
+/* const ZOOM = [1, 1.5, 3, 6, 12, 24];
 let i = 0;
 export class ZoomControls {
 	constructor(state, { dispatch }) {
@@ -884,3 +977,4 @@ export class ZoomControls {
 		this.zoom = state.zoom;
 	}
 }
+ */
