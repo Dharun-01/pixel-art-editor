@@ -1,5 +1,5 @@
 import { Picture } from './picture.js';
-
+import { STAMP } from './stamps.js';
 export function hexToRgb(hex) {
 	let hexWithoutHash = hex.slice(1);
 	return new Uint8ClampedArray([
@@ -138,8 +138,8 @@ export function customName() {
 	} else return imageName;
 }
 
-export function applyBrush(points, state) {
-	let brushSize = 2;
+export function applySize(points, state) {
+	/* 	let brushSize = 2;
 	if (state.sketch == 'Marker') {
 		if (state.tool === 'erase') {
 			brushSize = 30;
@@ -148,18 +148,148 @@ export function applyBrush(points, state) {
 		}
 	} else {
 		if (state.tool === 'erase') brushSize = 20;
-	}
+	} */
 
-	if (!brushSize) return points;
+	if (!state.brushSize) return points;
 	let result = [];
 	for (let p of points) {
-		for (let dx = 0; dx < brushSize; dx++) {
-			for (let dy = 0; dy < brushSize; dy++) {
-				result.push({ x: p.x + dx, y: p.y + dy, color: p.color });
+		for (let dx = 0; dx < state.brushSize; dx++) {
+			for (let dy = 0; dy < state.brushSize; dy++) {
+				result.push({
+					x: p.x + dx,
+					y: p.y + dy,
+					color: p.color,
+					opacity: p.opacity,
+				});
 			}
 		}
 	}
 	return result;
+}
+export function calculateStampSpacing(state) {
+	const brushType = state.selectedBrush || 'Brush';
+
+	const spacingMap = {
+		Pencil: 0.15,
+		Brush: 0.25,
+		'Calligraphy brush': 0.005,
+		'Calligraphy pen': 0.005,
+		Airbrush: 0.1,
+		'Oil brush': 0.4,
+		Crayon: 0.5,
+		Marker: 0.1,
+		'Natural pencil': 0.3,
+		'Watercolor brush': 0.15,
+	};
+	const spacingRatio = spacingMap[brushType] || 0.15;
+	return Math.max(1, state.brushSize * spacingRatio);
+}
+
+export function interpolateStampPosition(from, to, spacing) {
+	const positions = [];
+	const dx = to.x - from.x;
+	const dy = to.y - from.y;
+
+	const dist = Math.sqrt(dx ** 2 + dy ** 2);
+
+	// if dist is too small stamp once at the end
+	if (dist < spacing / 2) return [to];
+
+	// calculate no of stamps
+	const numStamps = Math.ceil(dist / spacing);
+	for (let i = 0; i <= numStamps; i++) {
+		const t = i / numStamps;
+		positions.push({
+			x: Math.round(from.x + dx * t),
+			y: Math.round(from.y + dy * t),
+		});
+	}
+	return positions;
+}
+
+export function applyStampAtPosition(stampPos, stamp, color, opacity, state) {
+	const stampedPoints = [];
+	const finalOpacity = opacity / 100 || 1.0;
+	for (const { dx, dy, opacity: stampOpacity } of stamp) {
+		let x = Math.round(stampPos.x + dx);
+		let y = Math.round(stampPos.y + dy);
+
+		if (
+			x < 0 ||
+			x >= state.picture.width ||
+			y < 0 ||
+			y >= state.picture.height
+		) {
+			continue;
+		}
+		stampedPoints.push({ x, y, color, opacity: finalOpacity * stampOpacity });
+	}
+
+	return stampedPoints;
+}
+
+export function getPencilStamp(state) {
+	const size = state.brushSize || 3;
+	return STAMP.pencil(size);
+}
+
+export function getBrushStamp(state) {
+	let stamp;
+	const brushType = state.selectedBrush || 'Brush';
+	const size = state.brushSize || 3;
+	const opacity = state.opacity / 100;
+	const calligraphyBrushAngle = -45;
+	const calligraphyPenAngle = 45;
+	switch (brushType) {
+		case 'Brush':
+			stamp = STAMP.circle(size);
+			break;
+		case 'Calligraphy brush':
+			stamp = STAMP.calligraphyBrush(size, calligraphyBrushAngle);
+			break;
+		case 'Calligraphy pen':
+			stamp = STAMP.calligraphyPen(size, calligraphyPenAngle);
+			break;
+		case 'Airbrush':
+			stamp = STAMP.airbrush(size);
+			break;
+		case 'Oil brush':
+			stamp = STAMP.oilBrush(size);
+			break;
+		case 'Crayon':
+			stamp = STAMP.crayon(size);
+			break;
+		case 'Marker':
+			stamp = STAMP.marker(size);
+			break;
+		case 'Natural pencil':
+			stamp = STAMP.naturalPencil(size);
+			break;
+		case 'Watercolor brush':
+			stamp = STAMP.watercolorBrush(size);
+			break;
+
+		default:
+			stamp = STAMP.circle(size, 1.0);
+	}
+	return stamp;
+}
+
+export function getStampedPoints(brushedPoints, stamp, state) {
+	let stampedPoints = [];
+	for (let point of brushedPoints) {
+		for (let { dx, dy, opacity } of stamp) {
+			let x = point.x + dx;
+			let y = point.y + dy;
+			stampedPoints.push({
+				x: x,
+				y: y,
+				color: point.color,
+				opacity: state.opacity / 100 || opacity,
+			});
+		}
+	}
+	return stampedPoints;
 }
 
 export function rotateLeft(state) {
@@ -330,12 +460,12 @@ export function applyMirror(points, state) {
 	function mirroredPoint(p, mirrorType) {
 		if (mirrorType === 'vertical') {
 			let mirroredX = state.picture.width - 1 - p.x;
-			return { x: mirroredX, y: p.y, color: p.color };
+			return { x: mirroredX, y: p.y, color: p.color, opacity: p.opacity };
 		}
 
 		if (mirrorType === 'horizontal') {
 			let mirroredY = state.picture.height - 1 - p.y;
-			return { x: p.x, y: mirroredY, color: p.color };
+			return { x: p.x, y: mirroredY, color: p.color, opacity: p.opacity };
 		}
 
 		if (mirrorType === 'mainDiagonal') {
@@ -346,7 +476,7 @@ export function applyMirror(points, state) {
 
 			mirroredX = Math.max(0, Math.min(state.picture.width - 1, mirroredX));
 			mirroredY = Math.max(0, Math.min(state.picture.height - 1, mirroredY));
-			return { x: mirroredX, y: mirroredY, color: p.color };
+			return { x: mirroredX, y: mirroredY, color: p.color, opacity: p.opacity };
 		}
 
 		if (mirrorType === 'offDiagonal') {
@@ -356,7 +486,7 @@ export function applyMirror(points, state) {
 			let mirroredY = Math.round((1 - normalizedX) * state.picture.height);
 			mirroredX = Math.max(0, Math.min(state.picture.width, mirroredX));
 			mirroredY = Math.max(0, Math.min(state.picture.height, mirroredY));
-			return { x: mirroredX, y: mirroredY, color: p.color };
+			return { x: mirroredX, y: mirroredY, color: p.color, opacity: p.opacity };
 		}
 	}
 
@@ -377,7 +507,7 @@ export function applyMirror(points, state) {
 		for (let i = 1; i < mirroredPoints.length; i++) {
 			let from = mirroredPoints[i - 1];
 			let to = mirroredPoints[i];
-			let linePoints = drawLine(from, to, from.color);
+			let linePoints = drawLine(from, to, from.color, from.opacity);
 			result.push(...linePoints);
 		}
 	}
@@ -403,21 +533,21 @@ export function resizePicture(state, newWidth, newHeight) {
 	return newPicture;
 }
 
-export function drawLine(from, to, color) {
+export function drawLine(from, to, color, opacity) {
 	let points = [];
 
 	if (Math.abs(from.x - to.x) > Math.abs(from.y - to.y)) {
 		if (from.x > to.x) [from, to] = [to, from];
 		let slope = (to.y - from.y) / (to.x - from.x);
 		for (let { x, y } = from; x <= to.x; x++) {
-			points.push({ x, y: Math.round(y), color });
+			points.push({ x, y: Math.round(y), color, opacity });
 			y += slope;
 		}
 	} else {
 		if (from.y > to.y) [from, to] = [to, from];
 		let slope = (to.x - from.x) / (to.y - from.y);
 		for (let { x, y } = from; y <= to.y; y++) {
-			points.push({ x: Math.round(x), y, color });
+			points.push({ x: Math.round(x), y, color, opacity });
 			x += slope;
 		}
 	}

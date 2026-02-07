@@ -1,7 +1,8 @@
 import { Picture } from './picture.js';
 import { hexToRgb } from './utils.js';
 import {
-	draw,
+	pencil,
+	brush,
 	fill,
 	rectangle,
 	pick,
@@ -14,6 +15,7 @@ import {
 import {
 	ImageSelect,
 	ToolSelect,
+	BrushSelect,
 	ColorSelect,
 	SketchSelect,
 	SaveButton,
@@ -25,11 +27,12 @@ import {
 } from './controls.js';
 
 export let startState = {
-	tool: 'draw',
+	tool: 'brush',
 	sketch: 'Pencil',
+	opacity: 100,
 	color: new Uint8ClampedArray([0, 0, 0, 255]),
 	cursor: false,
-	picture: Picture.empty(1000, 400, hexToRgb('#f0f0f0')),
+	picture: Picture.empty(1000, 400, hexToRgb('#f0f0f0'), 255),
 	previewPicture: null,
 	redone: [],
 	toggleRotate: false,
@@ -45,6 +48,9 @@ export let startState = {
 	toggleZoomPlus: false,
 	toggleZoomSelect: false,
 	toggleZoomSelectDownArrow: false,
+	toggleBrush: false,
+	selectedBrush: 'Brush',
+	brushSize: 3,
 	rotate: null,
 	flip: null,
 	mirrorVertical: false,
@@ -57,7 +63,8 @@ export let startState = {
 };
 
 export let baseTools = {
-	draw,
+	pencil,
+	brush,
 	fill,
 	rectangle,
 	pick,
@@ -70,6 +77,7 @@ export let baseSketches = { marker: 'Marker', pencil: 'Pencil' };
 export let baseControls = [
 	ImageSelect,
 	ToolSelect,
+	BrushSelect,
 	ColorSelect,
 	SketchSelect,
 	SaveButton,

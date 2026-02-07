@@ -6,12 +6,21 @@ import {
 	iconDownloader,
 	reflectSelect,
 } from './utils.js';
-import { StatusBar } from './statusbar.js';
 import { drawPicture, startLoad } from './tools.js';
 import { Picture } from './picture.js';
 
 const iconBorderClasses = ['ring-1', 'ring-custom-blue', 'bg-custom-black'];
-
+const brushOptions = [
+	'Brush',
+	'Calligraphy brush',
+	'Calligraphy pen',
+	'Airbrush',
+	'Oil brush',
+	'Crayon',
+	'Marker',
+	'Natural pencil',
+	'Watercolor brush',
+];
 export class ImageSelect {
 	constructor(state, { _, dispatch }) {
 		this.state = state;
@@ -679,23 +688,6 @@ export class ToolSelect {
 			this.zoomPlusIcon,
 		);
 
-		/* this.select = elt(
-			'select',
-			{
-				onchange: () => dispatch({ tool: this.select.value }),
-				className:
-					'bg-gray-700 text-white rounded-lg px-3 py-2 ml-2 focus:ring-2 focus:ring-green-500',
-			},
-			...Object.keys(tools).map((name) =>
-				elt(
-					'option',
-					{
-						selected: name == state.tool,
-					},
-					name,
-				),
-			),
-		); */
 		this.controlLabel = elt(
 			'p',
 			{ className: 'text-center text-white/60 text-sm' },
@@ -740,7 +732,6 @@ export class ToolSelect {
 			'hover:bg-custom-glass-black',
 			!this.state.toggleZoomPlus,
 		);
-		/* this.select.value = state.tool; */
 	}
 }
 
@@ -791,6 +782,154 @@ export class SketchSelect {
 
 	syncState(state) {
 		this.select.value = state.sketch;
+	}
+}
+
+export class BrushSelect {
+	constructor(state, { tools, dispatch }) {
+		this.state = state;
+		this.brushIcon = elt('img', {
+			src: '../assets/brush_16dp_4DA3FF_FILL0_wght400_GRAD0_opsz20.svg',
+			className: 'rounded-t-sm p-2',
+		});
+
+		this.arrowDownIcon = elt(
+			'svg',
+			{
+				...iconDownloader(
+					'http://www.w3.org/2000/svg',
+					'25px',
+					'0 -960 960 960',
+					'25px',
+					'#e3e3e3',
+				),
+				class: 'h-5 w-[34px] transition-all duration-150 rounded-b-sm',
+			},
+			elt('path', { d: 'M480-384 288-576h384L480-384Z' }),
+		);
+
+		this.arrowDown = elt(
+			'p',
+			{ className: 'rounded-b-sm border-t border-t-custom-gray' },
+			this.arrowDownIcon,
+		);
+		this.brushOptions = elt(
+			'div',
+			{
+				className:
+					'flex flex-col hover:text-white gap-y-1 p-1 w-48 top-15 left-5 overflow-auto h-80 custom-scroll-bar absolute bg-custom-tooltip-gray rounded-md shadow shadow-custom-gray z-100',
+			},
+			...this.createBrushOptions(dispatch),
+		);
+		this.brushControl = elt(
+			'div',
+			{
+				className:
+					'relative rounded-sm flex flex-col justify-center items-center h-14',
+				onclick: (event) => {
+					event.stopPropagation();
+					dispatch({ toggleBrush: !this.state.toggleBrush });
+				},
+			},
+			this.brushIcon,
+			this.arrowDown,
+			this.brushOptions,
+		);
+		this.controlLabel = elt(
+			'p',
+			{ className: 'text-sm text-white/60' },
+			'Brushes',
+		);
+
+		this.dom = elt(
+			'div',
+			{
+				className:
+					'relative flex flex-col h-25 justify-around items-center mt-3',
+			},
+			this.brushControl,
+			this.controlLabel,
+		);
+
+		this.handleOutsideClick = (event) => {
+			if (!this.brushControl.contains(event.target))
+				dispatch({ toggleBrush: false });
+		};
+		this.syncState(state);
+	}
+
+	createBrushOptions(dispatch) {
+		return brushOptions.map((option) => {
+			const optionElement = elt(
+				'div',
+				{
+					className:
+						'relative hover:bg-white/10 transition-all duration-150 items-center flex flex-row rounded-md overflow-hidden ',
+					onclick: (event) => {
+						event.stopPropagation();
+
+						dispatch({
+							selectedBrush: option,
+						});
+					},
+				},
+				elt('div', {
+					className:
+						'indicator transition-opacity opacity-0 absolute top-2 left-0 bottom-2 w-[2px] bg-custom-blue rounded-md',
+				}),
+				elt(
+					'p',
+					{
+						className: 'p-2 hover:text-white transition-all duration-150',
+					},
+					option,
+				),
+			);
+			optionElement.indicator = optionElement.querySelector('.indicator');
+			optionElement.brushName = option;
+			return optionElement;
+		});
+	}
+
+	syncState(state) {
+		this.state = state;
+		if (this.state.toggleBrush) {
+			document.addEventListener('click', this.handleOutsideClick);
+		} else {
+			document.removeEventListener('click', this.handleOutsideClick);
+		}
+		this.brushIcon.classList.toggle(
+			'hover:bg-custom-glass-black',
+			!this.state.toggleBrush,
+		);
+		this.brushOptions.classList.toggle(
+			'tooltipVisible',
+			this.state.toggleBrush,
+		);
+		this.brushOptions.classList.toggle(
+			'tooltipHidden',
+			!this.state.toggleBrush,
+		);
+		iconBorderClasses.forEach((cls) => {
+			this.brushControl.classList.toggle(
+				cls,
+				this.state.toggleBrush || this.state.selectedBrush !== null,
+			);
+		});
+		this.brushControl.classList.toggle('bg-white/10', !this.state.toggleBrush);
+		this.arrowDown.classList.toggle(
+			'hover:bg-custom-glass-black',
+			!this.state.toggleBrush,
+		);
+		this.arrowDownIcon.classList.toggle('rotate-180', this.state.toggleBrush);
+
+		Array.from(this.brushOptions.children).forEach((optionElement) => {
+			const isSelected = optionElement.brushName === this.state.selectedBrush;
+			if (optionElement.indicator) {
+				optionElement.indicator.style.opacity = isSelected ? '1' : '0';
+				optionElement.classList.toggle('bg-custom-glass-black', isSelected);
+			}
+		});
 	}
 }
 

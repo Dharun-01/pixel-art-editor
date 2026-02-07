@@ -3,7 +3,6 @@ import { resizePicture } from './utils.js';
 let rotateActions = ['left', 'right', '180'];
 let flipActions = ['vertical', 'horizontal'];
 export function historyUpdateState(state, action) {
-	console.log(action.zoom);
 	if (action.toggleRotate) {
 		return {
 			...state,
@@ -167,6 +166,7 @@ export function historyUpdateState(state, action) {
 		return {
 			...state,
 			toggleErase: action.toggleErase,
+			selectedBrush: null,
 			toggleFlip: false,
 			toggleZoomPlus: false,
 			toggleLinkIcon: false,
@@ -176,7 +176,7 @@ export function historyUpdateState(state, action) {
 			togglePencil: false,
 			toggleFill: false,
 			toggleColorPicker: false,
-			tool: action.toggleErase ? 'erase' : 'draw',
+			tool: action.toggleErase ? 'erase' : 'pencil',
 		};
 	}
 
@@ -184,6 +184,7 @@ export function historyUpdateState(state, action) {
 		return {
 			...state,
 			togglePencil: action.togglePencil,
+			selectedBrush: null,
 			toggleZoomPlus: false,
 			toggleFlip: false,
 			toggleFill: false,
@@ -193,7 +194,7 @@ export function historyUpdateState(state, action) {
 			toggleRotate: false,
 			toggleErase: false,
 			toggleColorPicker: false,
-			tool: action.togglePencil ? 'line' : 'draw',
+			tool: action.togglePencil ? 'pencil' : 'line',
 		};
 	}
 
@@ -210,7 +211,7 @@ export function historyUpdateState(state, action) {
 			toggleRotate: false,
 			toggleErase: false,
 			toggleColorPicker: false,
-			tool: action.toggleFill ? 'fill' : 'draw',
+			tool: action.toggleFill ? 'fill' : 'pencil',
 		};
 	}
 
@@ -218,6 +219,7 @@ export function historyUpdateState(state, action) {
 		return {
 			...state,
 			toggleColorPicker: action.toggleColorPicker,
+			selectedBrush: null,
 			toggleFill: false,
 			toggleZoomPlus: false,
 			togglePencil: false,
@@ -227,7 +229,7 @@ export function historyUpdateState(state, action) {
 			toggleResize: false,
 			toggleRotate: false,
 			toggleErase: false,
-			tool: action.toggleColorPicker ? 'pick' : 'draw',
+			tool: action.toggleColorPicker ? 'pick' : 'pencil',
 		};
 	}
 	if (action.toggleZoomPlus !== undefined) {
@@ -280,6 +282,35 @@ export function historyUpdateState(state, action) {
 			toggleErase: false,
 		};
 	}
+
+	if (action.toggleBrush !== undefined) {
+		return {
+			...state,
+			toggleBrush: action.toggleBrush,
+			toggleZoomSelectDownArrow: false,
+			toggleZoomSelect: false,
+			toggleZoomPlus: false,
+			toggleColorPicker: false,
+			toggleFill: false,
+			togglePencil: false,
+			toggleFlip: false,
+			toggleLinkIcon: false,
+			toggleMirror: false,
+			toggleResize: false,
+			toggleRotate: false,
+			toggleErase: false,
+		};
+	}
+
+	if (action.selectedBrush !== undefined) {
+		return {
+			...state,
+			selectedBrush: action.selectedBrush,
+			toggleBrush: false,
+			tool: 'brush',
+		};
+	}
+
 	if (action.isPreview) {
 		return { ...state, previewPicture: action.picture };
 	} else if (action.undo) {

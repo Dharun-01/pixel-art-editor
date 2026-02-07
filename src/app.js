@@ -1,6 +1,7 @@
 import { PictureCanvas } from './canvas.js';
 import { historyUpdateState } from './history.js';
 import { StatusBar } from './statusbar.js';
+import { SideControls } from './sidecontrols.js';
 import { startState, baseTools, baseControls, baseSketches } from './config.js';
 import { elt, iconDownloader } from './utils.js';
 import './input.css';
@@ -11,6 +12,7 @@ export class PixelEditor {
 		this.state = state;
 		this.sketch = sketches[this.state.sketch];
 		this.statusBar = new StatusBar(this.state, dispatch);
+		this.sideControls = new SideControls(this.state, dispatch);
 		this.canvas = new PictureCanvas(
 			state.picture,
 			(pos) => {
@@ -196,12 +198,20 @@ export class PixelEditor {
 					{ className: 'text-gray-300 h-25 w-full outline' },
 					this.controls[1].dom,
 				),
-				elt('div', { className: 'text-gray-300 h-25 w-full outline' }, 'Hello'),
+				elt(
+					'div',
+					{
+						className:
+							'text-gray-200 text-sm flex flex-row justify-center items-center h-25 min-w-18 outline',
+					},
+					this.controls[2].dom,
+				),
 				elt('div', { className: 'text-gray-300 h-25 w-full outline' }, 'Hello'),
 				elt('div', { className: 'text-gray-300 h-25 w-full outline' }, 'Hello'),
 				elt('div', { className: 'text-gray-300 h-25 w-full outline' }, 'Hello'),
 				/* ...this.controls.reduce((a, c) => a.concat(' ', c.dom), []), */
 			),
+			this.sideControls.dom,
 			this.canvas.dom,
 			this.statusBar.dom,
 		);
@@ -239,6 +249,7 @@ export class PixelEditor {
 		this.state = state;
 		this.canvas.syncState(pic, this.state);
 		this.statusBar.syncState(this.state);
+		this.sideControls.syncState(this.state);
 		for (let ctrl of this.controls) ctrl.syncState(this.state);
 	}
 }

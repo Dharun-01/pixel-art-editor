@@ -1,7 +1,13 @@
 import {
 	drawLine,
-	applyBrush,
+	applySize,
 	applyMirror,
+	getBrushStamp,
+	getPencilStamp,
+	getStampedPoints,
+	calculateStampSpacing,
+	interpolateStampPosition,
+	applyStampAtPosition,
 	hexToRgb,
 	elt,
 	drawGridOnZoom,
@@ -12,7 +18,6 @@ import {
 	flipVertical,
 	flipHorizontal,
 } from './utils.js';
-
 import { Picture } from './picture.js';
 
 const offScreen = document.createElement('canvas');
@@ -42,6 +47,7 @@ export function drawPicture(
 		offScreen.height = picture.height;
 		ImageData = offCtx.createImageData(picture.width, picture.height);
 		offCtx.imageSmoothingEnabled = false;
+		ImageData.data.set(picture.pixels);
 		console.log(dpr);
 	}
 
@@ -70,12 +76,17 @@ export function drawPicture(
 		startY = Math.max(0, picture.dirtyRect.minY);
 		endX = Math.min(picture.width - 1, picture.dirtyRect.maxX);
 		endY = Math.min(picture.height - 1, picture.dirtyRect.maxY);
+
+		for (let y = startY; y <= endY; y++) {
+			const rowStart = (y * picture.width + startX) * 4;
+			const rowEnd = (y * picture.width + endX + 1) * 4;
+			ImageData.data.set(picture.pixels.subarray(rowStart, rowEnd), rowStart);
+		}
 		dirtyWidth = endX - startX + 1;
 		dirtyHeight = endY - startY + 1;
 	}
 
-	ImageData.data.set(picture.pixels);
-	offCtx.putImageData(ImageData, 0, 0);
+	offCtx.putImageData(ImageData, 0, 0, startX, startY, dirtyWidth, dirtyHeight);
 
 	/* let zoomedX = startX;
 	let zoomedY = startY;
@@ -124,18 +135,122 @@ export function flippedPicture(state, flipDir) {
 	if (flipDir === 'horizontal') return flipHorizontal(state);
 }
 
-export function draw(pos, state, dispatch, getColor = () => state.color) {
-	function connect(newPos, state) {
-		let brushedPoints, mirroredPoints;
-		let color = getColor();
-		console.log('Drawing at color: ' + color);
-		let line = drawLine(pos, newPos, color, state);
-		brushedPoints = applyBrush(line, state);
-		mirroredPoints = applyMirror(brushedPoints, state);
-		pos = newPos;
-
-		dispatch({ picture: state.picture.draw(mirroredPoints) });
+export function pencil(
+	pos,
+	state,
+	dispatch,
+	getColor = () => state.color,
+	getOpacity = () => state.opacity,
+) {
+	let color = getColor();
+	let opacity = getOpacity();
+	let stampCache = null;
+	let lastStampPos = null;
+	if (!stampCache || state.brushSize !== stampCache.size) {
+		stampCache = {
+			stamp: getPencilStamp(state),
+			size: state.brushSize,
+		};
 	}
+	let stamp = stampCache.stamp;
+	const spacing = calculateStampSpacing(state);
+	function connect(newPos, state) {
+		const allStampedPoints = [];
+		let startPos = lastStampPos || pos;
+		const path = interpolateStampPosition(startPos, newPos, spacing);
+		const mirroredPath = applyMirror(path, state);
+
+		for (const stampPos of path) {
+			const stampedPoints = applyStampAtPosition(
+				stampPos,
+				stamp,
+				color,
+				opacity,
+				state,
+			);
+			allStampedPoints.push(...stampedPoints);
+		}
+		for (const mirroredStampPos of mirroredPath) {
+			const mirroredStampedPoints = applyStampAtPosition(
+				mirroredStampPos,
+				stamp,
+				color,
+				opacity,
+				state,
+			);
+
+			allStampedPoints.push(...mirroredStampedPoints);
+		}
+
+		dispatch({ picture: state.picture.draw(allStampedPoints) });
+		lastStampPos = path[path.length - 1] || newPos;
+		pos = newPos;
+	}
+	lastStampPos = null;
+	connect(pos, state);
+	return connect;
+}
+
+let stampCache = null;
+let lastStampPos = null;
+export function brush(
+	pos,
+	state,
+	dispatch,
+	getColor = () => state.color,
+	getOpacity = () => state.opacity,
+) {
+	if (
+		!stampCache ||
+		state.brushSize !== stampCache.size ||
+		state.selectedBrush !== stampCache.shape
+	) {
+		stampCache = {
+			stamp: getBrushStamp(state),
+			size: state.brushSize,
+			shape: state.selectedBrush,
+		};
+	}
+
+	const stamp = stampCache.stamp;
+	const spacing = calculateStampSpacing(state);
+
+	function connect(newPos, state) {
+		const allStampedPoints = [];
+		console.log(spacing);
+		let color = getColor();
+		let opacity = getOpacity();
+		const startPos = lastStampPos || pos;
+
+		const path = interpolateStampPosition(startPos, newPos, spacing);
+		const mirroredPath = applyMirror(path, state);
+
+		for (const stampPos of path) {
+			const stampedPoints = applyStampAtPosition(
+				stampPos,
+				stamp,
+				color,
+				opacity,
+				state,
+			);
+			allStampedPoints.push(...stampedPoints);
+		}
+
+		for (let mirroredStampPos of mirroredPath) {
+			const mirroredStampedPoints = applyStampAtPosition(
+				mirroredStampPos,
+				stamp,
+				color,
+				opacity,
+				state,
+			);
+			allStampedPoints.push(...mirroredStampedPoints);
+		}
+		dispatch({ picture: state.picture.draw(allStampedPoints) });
+		lastStampPos = path[path.length - 1] || newPos;
+		pos = newPos;
+	}
+	lastStampPos = null;
 	connect(pos, state);
 	return connect;
 }
@@ -143,21 +258,25 @@ export function draw(pos, state, dispatch, getColor = () => state.color) {
 export function line(pos, state, dispatch) {
 	let base = state.picture;
 	return (end, state, isFinal) => {
-		let line = drawLine(pos, end, state.color);
+		let brushedPoints, mirroredPoints;
+		let line = drawLine(pos, end, state.color, state.opacity);
+		brushedPoints = applySize(line, state);
+		mirroredPoints = applyMirror(brushedPoints, state);
 		if (!isFinal)
 			dispatch({
 				isPreview: true,
-				picture: base.draw(applyBrush(line, state)),
+				picture: base.draw(mirroredPoints),
 			});
 		else
 			dispatch({
-				picture: base.draw(applyBrush(line, state)),
+				picture: base.draw(mirroredPoints),
 				isPreview: false,
 			});
 	};
 }
 
 export function rhombus(pos, state, dispatch) {
+	let brushedPoints, mirroredPoints;
 	function drawRhombus(to) {
 		let size = Math.max(Math.abs(to.x - pos.x), Math.abs(to.y - pos.y));
 
@@ -175,18 +294,20 @@ export function rhombus(pos, state, dispatch) {
 		let left = { x: pos.x - size, y: pos.y };
 
 		// Draw four edges
-		drawn.push(...drawLine(top, right, state.color, state));
-		drawn.push(...drawLine(right, bottom, state.color, state));
-		drawn.push(...drawLine(bottom, left, state.color, state));
-		drawn.push(...drawLine(left, top, state.color, state));
-
-		dispatch({ picture: state.picture.draw(applyBrush(drawn, state)) });
+		drawn.push(...drawLine(top, right, state.color, state.opacity, state));
+		drawn.push(...drawLine(right, bottom, state.color, state.opacity, state));
+		drawn.push(...drawLine(bottom, left, state.color, state.opacity, state));
+		drawn.push(...drawLine(left, top, state.color, state.opacity, state));
+		brushedPoints = applySize(drawn, state);
+		mirroredPoints = applyMirror(brushedPoints, state);
+		dispatch({ picture: state.picture.draw(mirroredPoints) });
 	}
 	drawRhombus(pos);
 	return drawRhombus;
 }
 
 export function rectangle(start, state, dispatch) {
+	let brushedPoints, mirroredPoints;
 	function drawRectangle(pos) {
 		let xStart = Math.min(start.x, pos.x);
 		let yStart = Math.min(start.y, pos.y);
@@ -196,17 +317,18 @@ export function rectangle(start, state, dispatch) {
 
 		// Draw top and bottom edges
 		for (let x = xStart; x <= xEnd; x++) {
-			drawn.push({ x, y: yStart, color: state.color }); // Top edge
-			drawn.push({ x, y: yEnd, color: state.color }); // Bottom edge
+			drawn.push({ x, y: yStart, color: state.color, opacity: state.opacity }); // Top edge
+			drawn.push({ x, y: yEnd, color: state.color, opacity: state.opacity }); // Bottom edge
 		}
 
 		// Draw left and right edges (excluding corners to avoid duplicates)
 		for (let y = yStart + 1; y < yEnd; y++) {
-			drawn.push({ x: xStart, y, color: state.color }); // Left edge
-			drawn.push({ x: xEnd, y, color: state.color }); // Right edge
+			drawn.push({ x: xStart, y, color: state.color, opacity: state.opacity }); // Left edge
+			drawn.push({ x: xEnd, y, color: state.color, opacity: state.opacity }); // Right edge
 		}
-
-		dispatch({ picture: state.picture.draw(applyBrush(drawn, state)) });
+		brushedPoints = applySize(drawn, state);
+		mirroredPoints = applyMirror(brushedPoints, state);
+		dispatch({ picture: state.picture.draw(mirroredPoints) });
 	}
 	drawRectangle(start);
 	return drawRectangle;
@@ -232,7 +354,7 @@ export function fill({ x, y }, state, dispatch) {
 		state.picture.pixels[targetIndex4],
 	]);
 
-	let drawn = [{ x, y, color: state.color }];
+	let drawn = [{ x, y, color: state.color, opacity: state.opacity }];
 	let visited = new Set();
 	for (let done = 0; done < drawn.length; done++) {
 		for (let { dx, dy } of around) {
@@ -256,15 +378,16 @@ export function fill({ x, y }, state, dispatch) {
 				pixelColor[2] == targetColor[2] &&
 				pixelColor[3] == targetColor[3]
 			) {
-				drawn.push({ x, y, color: state.color });
+				drawn.push({ x, y, color: state.color, opacity: state.opacity });
 				visited.add(x + ',' + y);
 			}
 		}
 	}
-	dispatch({ picture: state.picture.draw(drawn), tool: 'draw' });
+	dispatch({ picture: state.picture.draw(drawn), tool: 'pencil' });
 }
 
 export function circle(pos, state, dispatch) {
+	let brushedPoints, mirroredPoints;
 	function drawCircle(to) {
 		let radius = Math.sqrt((to.x - pos.x) ** 2 + (to.y - pos.y) ** 2);
 		let radiusC = Math.ceil(radius);
@@ -289,17 +412,19 @@ export function circle(pos, state, dispatch) {
 					x >= state.picture.width
 				)
 					continue;
-				drawn.push({ x, y, color: state.color });
+				drawn.push({ x, y, color: state.color, opacity: state.opacity });
 			}
 		}
-		dispatch({ picture: state.picture.draw(applyBrush(drawn, state)) });
+		brushedPoints = applySize(drawn, state);
+		mirroredPoints = applyMirror(brushedPoints, state);
+		dispatch({ picture: state.picture.draw(mirroredPoints) });
 	}
 	drawCircle(pos);
 	return drawCircle;
 }
 
 export function erase(pos, state, dispatch) {
-	return draw(pos, state, dispatch, () => hexToRgb('#f0f0f0'));
+	return pencil(pos, state, dispatch, () => hexToRgb('#f0f0f0'));
 }
 
 export function pick(pos, state, dispatch) {
