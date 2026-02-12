@@ -318,37 +318,206 @@ export const STAMP = {
 		const stamp = [];
 		const radius = size / 2;
 
+		// === PARAMETERS ===
+
+		// Paper texture (fine grain)
+		const fineGrainSize = 1.5; // Microscopic paper fibers
+		const mediumGrainSize = 3.5; // Larger paper texture
+		const coarseGrainSize = 7; // Overall paper roughness
+
+		// Graphite properties
+		const baseOpacity = 0.65; // Natural graphite darkness
+		const maxOpacity = 0.85; // Darkest graphite can get
+		const minOpacity = 0.1; // Lightest visible graphite
+
+		// Stroke direction (random for this stamp instance)
+		const strokeAngle = Math.random() * Math.PI * 2;
+		const strokeCos = Math.cos(strokeAngle);
+		const strokeSin = Math.sin(strokeAngle);
+
+		// Pressure center (where you're pressing hardest)
+		const pressureCenterX = (Math.random() - 0.5) * radius * 0.3;
+		const pressureCenterY = (Math.random() - 0.5) * radius * 0.3;
+
+		// === NOISE FUNCTIONS ===
+
+		// Deterministic pseudo-random function
+		const hash = (x, y, seed = 0) => {
+			const h = ((x * 374761393) ^ (y * 668265263) ^ (seed * 1911520717)) >>> 0;
+			return (Math.abs(Math.sin(h)) * 43758.5453) % 1;
+		};
+
+		// Smooth interpolated noise
+		const smoothNoise = (x, y, scale, seed = 0) => {
+			const xScaled = x / scale;
+			const yScaled = y / scale;
+
+			const x0 = Math.floor(xScaled);
+			const y0 = Math.floor(yScaled);
+			const x1 = x0 + 1;
+			const y1 = y0 + 1;
+
+			const fx = xScaled - x0;
+			const fy = yScaled - y0;
+
+			// Smooth interpolation (smoothstep)
+			const sx = fx * fx * (3 - 2 * fx);
+			const sy = fy * fy * (3 - 2 * fy);
+
+			// Get corner values
+			const n00 = hash(x0, y0, seed);
+			const n10 = hash(x1, y0, seed);
+			const n01 = hash(x0, y1, seed);
+			const n11 = hash(x1, y1, seed);
+
+			// Bilinear interpolation
+			const nx0 = n00 * (1 - sx) + n10 * sx;
+			const nx1 = n01 * (1 - sx) + n11 * sx;
+
+			return nx0 * (1 - sy) + nx1 * sy;
+		};
+
+		// === STAMP GENERATION ===
+
 		for (let dy = -radius; dy <= radius; dy++) {
 			for (let dx = -radius; dx <= radius; dx++) {
-				// Slightly irregular radius (broken edge)
-				const jitter = (Math.random() - 0.5) * 0.8;
-				const dist = Math.sqrt(dx * dx + dy * dy) + jitter;
+				const distance = Math.sqrt(dx * dx + dy * dy);
 
-				if (dist > radius) continue;
+				// Skip if outside pencil mark
+				if (distance > radius) continue;
 
-				// Core pressure falloff
-				let opacity = 1 - dist / radius;
+				// === 1. PRESSURE SIMULATION ===
 
-				// Graphite grain (very important)
-				opacity *= 0.35 + Math.random() * 0.45;
+				const pressureDist = Math.sqrt(
+					(dx - pressureCenterX) ** 2 + (dy - pressureCenterY) ** 2,
+				);
 
-				// Random pixel drop (paper gaps)
-				if (Math.random() < 0.15) continue;
+				// Pressure is highest at center, falls off with distance
+				const rawPressure = 1.0 - pressureDist / radius;
+				// Non-linear pressure (more realistic)
+				const pressure = Math.pow(rawPressure, 0.7) * 0.9 + 0.1;
 
-				// Clamp
-				opacity = Math.max(0.05, Math.min(0.6, opacity));
+				// === 2. MULTI-SCALE PAPER TEXTURE ===
 
-				stamp.push({
-					dx: Math.round(dx),
-					dy: Math.round(dy),
-					opacity,
-				});
+				// Fine grain (paper fibers)
+				const fineNoise = smoothNoise(dx, dy, fineGrainSize, 1);
+
+				// Medium grain (paper tooth)
+				const mediumNoise = smoothNoise(dx, dy, mediumGrainSize, 2);
+
+				// Coarse grain (overall paper roughness)
+				const coarseNoise = smoothNoise(dx, dy, coarseGrainSize, 3);
+
+				// Combine scales (weighted)
+				const paperTexture =
+					fineNoise * 0.5 + // 50% fine detail
+					mediumNoise * 0.3 + // 30% medium texture
+					coarseNoise * 0.2; // 20% large variation
+
+				// === 3. DIRECTIONAL STRIATIONS ===
+
+				// Project position onto stroke direction
+				const alongStroke = dx * strokeCos + dy * strokeSin;
+				const perpStroke = -dx * strokeSin + dy * strokeCos;
+
+				// Pencil creates parallel micro-grooves
+				const striationNoise = smoothNoise(
+					perpStroke,
+					alongStroke * 0.3,
+					2.5,
+					4,
+				);
+
+				// Directional emphasis
+				const directionalFactor = 0.8 + striationNoise * 0.4;
+
+				// === 4. GRAPHITE PARTICLE SIMULATION ===
+
+				// Individual graphite particles (very fine)
+				const particleNoise = hash(Math.floor(dx * 2), Math.floor(dy * 2), 5);
+
+				// Some areas have denser particle clusters
+				const clusterNoise = smoothNoise(dx, dy, 4, 6);
+				const particleDensity = 0.7 + clusterNoise * 0.3;
+
+				// === 5. DEPOSITION PROBABILITY ===
+
+				// Does graphite deposit at this point?
+				// Depends on: paper height, pressure, particle presence
+
+				// Paper "height" (peaks get graphite, valleys don't)
+				const paperHeight = paperTexture;
+
+				// Higher pressure = graphite reaches lower valleys
+				const heightThreshold = 0.3 - pressure * 0.25;
+
+				// Must pass paper height test
+				if (paperHeight < heightThreshold) continue;
+
+				// Must have graphite particle present
+				if (particleNoise > particleDensity) continue;
+
+				// === 6. OPACITY CALCULATION ===
+
+				// Base opacity from paper height and pressure
+				let opacity = (paperHeight - heightThreshold) * pressure;
+
+				// Apply directional factor
+				opacity *= directionalFactor;
+
+				// Particle contribution (some particles darker)
+				const particleVariation = 0.85 + particleNoise * 0.3;
+				opacity *= particleVariation;
+
+				// === 7. RADIAL FALLOFF ===
+
+				// Pencil mark is darkest in center, lighter at edges
+				const radialFalloff = 1.0 - Math.pow(distance / radius, 1.5) * 0.4;
+				opacity *= radialFalloff;
+
+				// === 8. SOFT EDGES ===
+
+				// Very gradual edge softening (pencil doesn't have hard edges)
+				if (distance > radius * 0.75) {
+					const edgeZone = (distance - radius * 0.75) / (radius * 0.25);
+					const edgeFade = 1.0 - Math.pow(edgeZone, 1.5);
+					opacity *= edgeFade;
+				}
+
+				// === 9. GRAPHITE SHEEN VARIATION ===
+
+				// Some graphite particles catch light differently
+				const sheenNoise = hash(Math.floor(dx * 1.5), Math.floor(dy * 1.5), 7);
+
+				if (sheenNoise > 0.9) {
+					// Slightly lighter (reflective particle)
+					opacity *= 0.85;
+				} else if (sheenNoise < 0.1) {
+					// Slightly darker (matte particle)
+					opacity *= 1.15;
+				}
+
+				// === 10. FINAL OPACITY CLAMPING ===
+
+				// Scale to realistic graphite range
+				opacity = opacity * baseOpacity;
+
+				// Clamp to valid range
+				opacity = Math.max(minOpacity, Math.min(maxOpacity, opacity));
+
+				// Only include visible pixels
+				if (opacity > 0.12) {
+					stamp.push({
+						dx: Math.round(dx),
+						dy: Math.round(dy),
+						opacity: opacity,
+					});
+				}
 			}
 		}
 
 		return stamp;
 	},
-
 	watercolorBrush: (size) => {
 		const stamp = [];
 		const radius = size / 2;

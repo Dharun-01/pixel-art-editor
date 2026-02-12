@@ -184,7 +184,7 @@ export function historyUpdateState(state, action) {
 		return {
 			...state,
 			togglePencil: action.togglePencil,
-			selectedBrush: null,
+			selectedBrush: action.togglePencil ? undefined : 'Brush',
 			toggleZoomPlus: false,
 			toggleFlip: false,
 			toggleFill: false,
@@ -194,7 +194,7 @@ export function historyUpdateState(state, action) {
 			toggleRotate: false,
 			toggleErase: false,
 			toggleColorPicker: false,
-			tool: action.togglePencil ? 'pencil' : 'line',
+			tool: action.togglePencil ? 'pencil' : 'brush',
 		};
 	}
 
@@ -302,10 +302,20 @@ export function historyUpdateState(state, action) {
 		};
 	}
 
+	if (action.selectedShapeBrush !== undefined) {
+		return {
+			...state,
+			selectedShapeBrush: action.selectedShapeBrush,
+			selectedBrush: undefined,
+			toggleShapeBrushes: false,
+		};
+	}
+
 	if (action.selectedBrush !== undefined) {
 		return {
 			...state,
 			selectedBrush: action.selectedBrush,
+			selectedShapeBrush: null,
 			toggleBrush: false,
 			tool: 'brush',
 		};

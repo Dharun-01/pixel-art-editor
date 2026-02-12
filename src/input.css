@@ -126,4 +126,9 @@
 		scrollbar-width: auto;
 		scrollbar-color: rgb(255, 255, 255, 0.5) transparent;
 	}
+
+	.disabled-ui {
+		pointer-events: none;
+		opacity: 0.4;
+	}
 }

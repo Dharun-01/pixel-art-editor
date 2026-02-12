@@ -206,10 +206,14 @@ export class PixelEditor {
 					},
 					this.controls[2].dom,
 				),
+				elt(
+					'div',
+					{ className: 'text-gray-300 h-25 w-full outline' },
+					this.controls[3].dom,
+				),
 				elt('div', { className: 'text-gray-300 h-25 w-full outline' }, 'Hello'),
 				elt('div', { className: 'text-gray-300 h-25 w-full outline' }, 'Hello'),
-				elt('div', { className: 'text-gray-300 h-25 w-full outline' }, 'Hello'),
-				/* ...this.controls.reduce((a, c) => a.concat(' ', c.dom), []), */
+				/* 	...this.controls.reduce((a, c) => a.concat(' ', c.dom), []), */
 			),
 			this.sideControls.dom,
 			this.canvas.dom,

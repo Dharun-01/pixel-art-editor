@@ -76,19 +76,6 @@ export function pointerPosition(pos, domNode, state) {
 	let zoom = domNode.zoom || 1;
 	let x = Math.floor((pos.clientX - rect.left) / zoom);
 	let y = Math.floor((pos.clientY - rect.top) / zoom);
-	/* console.log('=== POINTER POSITION DEBUG ===');
-	console.log('Click clientX, clientY:', pos.clientX, pos.clientY);
-	console.log('Rect left, top:', rect.left, rect.top);
-	console.log('Rect width, height:', rect.width, rect.height);
-	console.log('domNode.zoom:', domNode.zoom);
-	console.log('Actual canvas width, height:', domNode.width, domNode.height);
-	console.log(
-		'Canvas style width, height:',
-		domNode.style.width,
-		domNode.style.height,
-	);
-	console.log('Calculated x, y:', x, y);
-	console.log('=============================='); */
 	return {
 		x,
 		y,
@@ -117,6 +104,111 @@ export function elt(type, props, ...children) {
 		else dom.appendChild(document.createTextNode(child));
 	}
 	return dom;
+}
+
+export function drawBrushStamps(
+	state,
+	lastStampPos,
+	pos,
+	newPos,
+	spacing,
+	stamp,
+	color,
+	opacity,
+) {
+	const allStampedPoints = [];
+	console.log(spacing);
+	const startPos = lastStampPos || pos;
+
+	const path = interpolateStampPosition(startPos, newPos, spacing);
+	const mirroredPath = applyMirror(path, state);
+
+	for (const stampPos of path) {
+		const stampedPoints = applyStampAtPosition(
+			stampPos,
+			stamp,
+			color,
+			opacity,
+			state,
+		);
+		allStampedPoints.push(...stampedPoints);
+	}
+
+	for (const mirroredStampPos of mirroredPath) {
+		const mirroredStampedPoints = applyStampAtPosition(
+			mirroredStampPos,
+			stamp,
+			color,
+			opacity,
+			state,
+		);
+		allStampedPoints.push(...mirroredStampedPoints);
+	}
+	return {
+		allPoints: allStampedPoints,
+		lastPos: path[path.length - 1] || newPos,
+	};
+}
+
+export function drawShapeStamps(
+	state,
+	stamp,
+	spacing,
+	lastStampPos,
+	pos,
+	end,
+	color,
+	opacity,
+	shape,
+) {
+	let allStampedPoints = [];
+	let startPos = lastStampPos || pos;
+	let path;
+	if (shape === 'circle')
+		path = interpolateCircleStampPosition(startPos, end, spacing);
+	else path = interpolateStampPosition(startPos, end, spacing);
+	let mirroredPath = applyMirror(path, state);
+
+	for (let stampPos of path) {
+		let stampedPoints = applyStampAtPosition(
+			stampPos,
+			stamp,
+			color,
+			opacity,
+			state,
+		);
+		allStampedPoints.push(...stampedPoints);
+	}
+
+	for (let mirroredStampPos of mirroredPath) {
+		let mirroredStampedPoints = applyStampAtPosition(
+			mirroredStampPos,
+			stamp,
+			color,
+			opacity,
+			state,
+		);
+		allStampedPoints.push(...mirroredStampedPoints);
+	}
+
+	return allStampedPoints;
+}
+
+export function interpolateCircleStampPosition(center, end, spacing) {
+	let radius = Math.sqrt((end.x - center.x) ** 2 + (end.y - center.y) ** 2);
+	let radiusC = Math.ceil(radius);
+	let circumference = 2 * Math.PI * radiusC;
+	let numPoints = Math.max(8, Math.ceil(circumference / spacing));
+	let angleStep = (2 * Math.PI) / numPoints;
+	const circlePositions = [];
+	for (let i = 0; i < numPoints; i++) {
+		let angle = i * angleStep;
+		const x = center.x + Math.cos(angle) * radiusC;
+		const y = center.y + Math.sin(angle) * radiusC;
+		circlePositions.push({ x: Math.round(x), y: Math.round(y) });
+	}
+
+	return circlePositions;
 }
 
 export function iconDownloader(...iconProps) {
@@ -166,8 +258,9 @@ export function applySize(points, state) {
 	}
 	return result;
 }
+
 export function calculateStampSpacing(state) {
-	const brushType = state.selectedBrush || 'Brush';
+	const brushType = state.selectedBrush || state.selectedShapeBrush || 'Brush';
 
 	const spacingMap = {
 		Pencil: 0.15,
@@ -177,7 +270,7 @@ export function calculateStampSpacing(state) {
 		Airbrush: 0.1,
 		'Oil brush': 0.4,
 		Crayon: 0.5,
-		Marker: 0.1,
+		Marker: 0.005,
 		'Natural pencil': 0.3,
 		'Watercolor brush': 0.15,
 	};
@@ -235,7 +328,7 @@ export function getPencilStamp(state) {
 
 export function getBrushStamp(state) {
 	let stamp;
-	const brushType = state.selectedBrush || 'Brush';
+	const brushType = state.selectedBrush || state.selectedShapeBrush || 'Brush';
 	const size = state.brushSize || 3;
 	const opacity = state.opacity / 100;
 	const calligraphyBrushAngle = -45;

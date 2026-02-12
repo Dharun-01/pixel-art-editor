@@ -10,12 +10,20 @@ import { drawPicture, startLoad } from './tools.js';
 import { Picture } from './picture.js';
 
 const iconBorderClasses = ['ring-1', 'ring-custom-blue', 'bg-custom-black'];
+
 const brushOptions = [
 	'Brush',
 	'Calligraphy brush',
 	'Calligraphy pen',
 	'Airbrush',
 	'Oil brush',
+	'Crayon',
+	'Marker',
+	'Natural pencil',
+	'Watercolor brush',
+];
+const shapeBrushOptions = [
+	'Brush',
 	'Crayon',
 	'Marker',
 	'Natural pencil',
@@ -735,6 +743,517 @@ export class ToolSelect {
 	}
 }
 
+export class ShapeSelect {
+	constructor(state, { dispatch }) {
+		this.state = state;
+
+		//shapes
+		this.line = elt(
+			'p',
+			{
+				className: 'hover:bg-custom-glass-black',
+				onclick: (event) => {
+					event.stopPropagation();
+					console.log('Hello');
+					dispatch({ tool: 'line', selectedBrush: undefined });
+				},
+			},
+			elt(
+				'svg',
+				iconDownloader(
+					'http://www.w3.org/2000/svg',
+					'20px',
+					'0 -960 960 960',
+					'20px',
+					'#e3e3e3',
+				),
+				elt('path', {
+					d: 'M247-247q-7-7-7-17t7-17l432-432q7-7 17-7t17 7q7 7 7 17t-7 17L281-247q-8 8-18 8t-16-8Z',
+				}),
+			),
+		);
+		this.circle = elt(
+			'p',
+			{
+				className: '',
+				onclick: (event) => {
+					event.stopPropagation();
+					dispatch({ tool: 'circle', selectedBrush: undefined });
+				},
+			},
+			elt(
+				'svg',
+				{
+					...iconDownloader(
+						'http://www.w3.org/2000/svg',
+						'13px',
+						'0 0 24 24',
+						'13px',
+						'#e3e3e3',
+					),
+					'enable-background': 'new 0 0 24 24',
+				},
+				elt('path', {
+					d: 'M12,2C6.47,2,2,6.47,2,12c0,5.53,4.47,10,10,10s10-4.47,10-10C22,6.47,17.53,2,12,2z M12,20c-4.42,0-8-3.58-8-8 c0-4.42,3.58-8,8-8s8,3.58,8,8C20,16.42,16.42,20,12,20z',
+				}),
+			),
+		);
+
+		this.rectangle = elt(
+			'p',
+			{
+				className: 'hover:bg-custom-glass-black',
+				onclick: (event) => {
+					event.stopPropagation();
+					dispatch({ tool: 'rectangle', selectedBrush: undefined });
+				},
+			},
+			elt(
+				'svg',
+				{
+					...iconDownloader(
+						'http://www.w3.org/2000/svg',
+						'15px',
+						'0 0 20 20',
+						'15px',
+						'#e3e3e3',
+					),
+					'enable-background': 'new 0 0 20 20',
+				},
+				elt('path', {
+					d: 'M2,4v12h16V4H2z M16.5,14.5h-13v-9h13V14.5z',
+				}),
+			),
+		);
+
+		this.square = elt(
+			'p',
+			{
+				className: '',
+				onclick: (event) => {
+					event.stopPropagation();
+					dispatch({ tool: 'square', selectedBrush: undefined });
+				},
+			},
+			elt(
+				'svg',
+				{
+					...iconDownloader(
+						'http://www.w3.org/2000/svg',
+						'15px',
+						'0 0 20 20',
+						'15px',
+						'#e3e3e3',
+					),
+					'enable-background': 'new 0 0 20 20',
+				},
+				elt('path', {
+					d: 'M3,3v14h14V3H3z M15.5,15.5h-11v-11h11V15.5z',
+				}),
+			),
+		);
+
+		this.rhombus = elt(
+			'p',
+			{
+				className: '',
+				onclick: (event) => {
+					event.stopPropagation();
+					dispatch({ tool: 'rhombus', selectedBrush: undefined });
+				},
+			},
+			elt(
+				'svg',
+				{
+					...iconDownloader(
+						'http://www.w3.org/2000/svg',
+						'15px',
+						'0 -960 960 960',
+						'15px',
+						'#e3e3e3',
+					),
+				},
+				elt('path', {
+					d: 'M480-120 120-480 480-840 840-480 480-120Z',
+					fill: 'none',
+					stroke: '#e3e3e3',
+					'stroke-width': '60',
+				}),
+			),
+		);
+
+		this.pentagon = elt(
+			'p',
+			{
+				className: '',
+				onclick: (event) => {
+					event.stopPropagation();
+					dispatch({ tool: 'pentagon', selectedBrush: undefined });
+				},
+			},
+			elt(
+				'svg',
+				{
+					...iconDownloader(
+						'http://www.w3.org/2000/svg',
+						'15px',
+						'0 0 20 20',
+						'15px',
+						'#e3e3e3',
+					),
+					'enable-background': 'new 0 0 20 20',
+				},
+				elt('path', {
+					d: 'M10,3.82l6.21,4.27l-2.57,7.41H6.37L3.79,8.09L10,3.82 M2,7.5L5.3,17h9.4L18,7.5L10,2L2,7.5z',
+				}),
+			),
+		);
+
+		this.hexagon = elt(
+			'p',
+			{
+				className: '',
+				onclick: (event) => {
+					event.stopPropagation();
+					dispatch({ tool: 'hexagon', selectedBrush: undefined });
+				},
+			},
+			elt(
+				'svg',
+				{
+					...iconDownloader(
+						'http://www.w3.org/2000/svg',
+						'15px',
+						'0 0 20 20',
+						'15px',
+						'#e3e3e3',
+					),
+					'enable-background': 'new 0 0 20 20',
+				},
+				elt('path', {
+					d: 'M16.27,10l-3.14,5.5H6.87L3.73,10l3.14-5.5h6.26L16.27,10z M6,3l-4,7l4,7h8l4-7l-4-7H6z',
+				}),
+			),
+		);
+
+		this.star = elt(
+			'p',
+			{
+				className: '',
+				onclick: (event) => {
+					event.stopPropagation();
+					dispatch({ tool: 'star', selectedBrush: undefined });
+				},
+			},
+			elt(
+				'svg',
+				{
+					...iconDownloader(
+						'http://www.w3.org/2000/svg',
+						'15px',
+						'0 0 24 24',
+						'15px',
+						'#e3e3e3',
+					),
+				},
+				elt('path', {
+					d: 'M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z',
+				}),
+			),
+		);
+
+		this.fourPointStar = elt(
+			'p',
+			{
+				className: '',
+				onclick: (event) => {
+					event.stopPropagation();
+					dispatch({ tool: 'fourPointStar', selectedBrush: undefined });
+				},
+			},
+			elt(
+				'svg',
+				{
+					...iconDownloader(
+						'http://www.w3.org/2000/svg',
+						'13px',
+						'0 0 24 24',
+						'13px',
+						'#e3e3e3',
+					),
+				},
+				elt('path', {
+					d: 'M12 2 L14.5 9.5 L22 12 L14.5 14.5 L12 22 L9.5 14.5 L2 12 L9.5 9.5 Z',
+					fill: 'none',
+					stroke: '#e3e3e3',
+					'stroke-width': '2',
+				}),
+			),
+		);
+
+		this.sixPointStar = elt(
+			'p',
+			{
+				className: '',
+				onclick: (event) => {
+					event.stopPropagation();
+					dispatch({ tool: 'sixPointStar', selectedBrush: undefined });
+				},
+			},
+			elt(
+				'svg',
+				{
+					...iconDownloader(
+						'http://www.w3.org/2000/svg',
+						'13px',
+						'0 0 24 24',
+						'13px',
+						'#e3e3e3',
+					),
+				},
+				elt('path', {
+					d: 'M12 2 L14.5 7.5 L20.7 8.3 L16 12 L20.7 15.7 L14.5 16.5 L12 22 L9.5 16.5 L3.3 15.7 L8 12 L3.3 8.3 L9.5 7.5 Z',
+					fill: 'none',
+					stroke: 'currentColor',
+					'stroke-width': '2',
+					'stroke-linejoin': 'round',
+				}),
+			),
+		);
+
+		this.heart = elt(
+			'p',
+			{
+				className: '',
+				onclick: (event) => {
+					event.stopPropagation();
+					dispatch({ tool: 'heart', selectedBrush: undefined });
+				},
+			},
+			elt(
+				'svg',
+				{
+					...iconDownloader(
+						'http://www.w3.org/2000/svg',
+						'15px',
+						'0 0 24 24',
+						'15px',
+						'#e3e3e3',
+					),
+				},
+				elt('path', {
+					d: 'M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z',
+				}),
+			),
+		);
+
+		this.triangle = elt(
+			'p',
+			{
+				className: '',
+				onclick: (event) => {
+					event.stopPropagation();
+					dispatch({ tool: 'triangle', selectedBrush: undefined });
+				},
+			},
+			elt(
+				'svg',
+				{
+					...iconDownloader(
+						'http://www.w3.org/2000/svg',
+						'15px',
+						'0 0 24 24',
+						'15px',
+						'#e3e3e3',
+					),
+				},
+				elt('path', {
+					d: 'M12 7.77L18.39 18H5.61L12 7.77M12 4L2 20h20L12 4z',
+				}),
+			),
+		);
+
+		this.rightTriangle = elt(
+			'p',
+			{
+				className: '',
+				onclick: (event) => {
+					event.stopPropagation();
+					dispatch({ tool: 'rightTriangle', selectedBrush: undefined });
+				},
+			},
+			elt(
+				'svg',
+				{
+					...iconDownloader(
+						'http://www.w3.org/2000/svg',
+						'13px',
+						'0 0 24 24',
+						'13px',
+						'#e3e3e3',
+					),
+					'enable-background': 'new 0 0 24 24',
+				},
+				elt('path', {
+					d: 'M2,22h20V2L2,22z M20,20H6.83L20,6.83V20z',
+				}),
+			),
+		);
+
+		this.shapes = elt(
+			'div',
+			{
+				className:
+					'flex flex-row gap-x-3 gap-y-1 items-center justify-center flex-wrap ring-1 ring-white/30 h-15 w-36 p-1 rounded-md overflow-y-scroll custom-scroll-bar',
+			},
+			this.line,
+			this.circle,
+			this.triangle,
+			this.rightTriangle,
+			this.rectangle,
+			this.square,
+			this.rhombus,
+			this.pentagon,
+			this.hexagon,
+			this.fourPointStar,
+			this.star,
+			this.sixPointStar,
+			this.heart,
+		);
+
+		this.shapeBrushesIcon = elt(
+			'p',
+			{
+				className: ' p-1 rounded-sm ',
+				onclick: () => {
+					dispatch({ toggleShapeBrushes: !this.state.toggleShapeBrushes });
+				},
+			},
+			elt('img', {
+				className: '',
+				src: '../assets/border_color_16dp_4DA3FF.svg',
+			}),
+		);
+
+		this.shapeBrushesDropDown = elt(
+			'div',
+			{
+				className:
+					'flex flex-col absolute gap-y-1 p-1 w-48 top-7 transition-all duration-150 left-3 overflow-auto h-56 custom-scroll-bar absolute bg-custom-tooltip-gray rounded-md shadow shadow-custom-gray z-100',
+			},
+			...this.createShapeBrushesDropDown(dispatch),
+		);
+
+		this.shapeBrushes = elt(
+			'div',
+			{ className: 'relative transition-all duration-150' },
+			this.shapeBrushesIcon,
+			this.shapeBrushesDropDown,
+		);
+
+		this.shapeControl = elt(
+			'div',
+			{
+				className: 'flex flex-row justify-around items-center w-full h-20',
+			},
+			this.shapes,
+			this.shapeBrushes,
+		);
+
+		this.controlLabel = elt(
+			'p',
+			{ className: 'text-center text-sm text-white/60' },
+			'Shapes',
+		);
+		this.dom = elt(
+			'div',
+			{ className: 'flex flex-col items-center justify-around h-25 ' },
+			this.shapeControl,
+			this.controlLabel,
+		);
+
+		this.handleOutsideClick = (event) => {
+			if (!this.shapeBrushes.contains(event.target))
+				dispatch({ toggleShapeBrushes: false });
+		};
+		this.syncState(this.state);
+	}
+
+	createShapeBrushesDropDown(dispatch) {
+		return shapeBrushOptions.map((option) => {
+			const optionElement = elt(
+				'div',
+				{
+					className:
+						'relative hover:bg-white/10 transition-all duration-150 items-center flex flex-row rounded-md overflow-hidden ',
+					onclick: (event) => {
+						event.stopPropagation();
+
+						dispatch({
+							selectedShapeBrush: option,
+						});
+					},
+				},
+				elt('div', {
+					className:
+						'indicator transition-opacity opacity-0 absolute top-2 left-0 bottom-2 w-[2px] bg-custom-blue rounded-md',
+				}),
+				elt(
+					'p',
+					{
+						className: 'p-2 hover:text-white transition-all duration-150',
+					},
+					option,
+				),
+			);
+			optionElement.indicator = optionElement.querySelector('.indicator');
+			optionElement.brushName = option;
+			return optionElement;
+		});
+	}
+
+	syncState(state) {
+		this.state = state;
+
+		if (this.state.toggleShapeBrushes) {
+			document.addEventListener('click', this.handleOutsideClick);
+		} else {
+			document.addEventListener('click', this.handleOutsideClick);
+		}
+		this.shapeBrushesIcon.classList.toggle(
+			'hover:bg-custom-glass-black',
+			!this.state.toggleShapeBrushes,
+		);
+		iconBorderClasses.forEach((cls) => {
+			this.shapeBrushesIcon.classList.toggle(
+				cls,
+				this.state.toggleShapeBrushes,
+			);
+		});
+		this.shapeBrushesDropDown.classList.toggle(
+			'tooltipVisible',
+			this.state.toggleShapeBrushes,
+		);
+		this.shapeBrushesDropDown.classList.toggle(
+			'tooltipHidden',
+			!this.state.toggleShapeBrushes,
+		);
+
+		this.shapeBrushes.classList.toggle(
+			'disabled-ui',
+			!!this.state.selectedBrush,
+		);
+		Array.from(this.shapeBrushesDropDown.children).forEach((optionElement) => {
+			const isSelected =
+				optionElement.brushName === this.state.selectedShapeBrush;
+			if (optionElement.indicator) {
+				optionElement.indicator.style.opacity = isSelected ? '1' : '0';
+				optionElement.classList.toggle('bg-custom-glass-black', isSelected);
+			}
+		});
+	}
+}
+
 export class ColorSelect {
 	constructor(state, { dispatch }) {
 		this.input = elt('input', {
@@ -752,6 +1271,21 @@ export class ColorSelect {
 		);
 	}
 
+	createShapeBrushesDropDown(dispatch) {
+		return shapeBrushOptions.map((option) => {
+			return elt(
+				'p',
+				{
+					className: '',
+					onclick: (event) => {
+						event.stopPropagation();
+						dispatch({ selectedShapeBrush: option });
+					},
+				},
+				option,
+			);
+		});
+	}
 	syncState(state) {
 		this.input.value = rgbToHex(state.color);
 	}
@@ -817,7 +1351,7 @@ export class BrushSelect {
 			'div',
 			{
 				className:
-					'flex flex-col hover:text-white gap-y-1 p-1 w-48 top-15 left-5 overflow-auto h-80 custom-scroll-bar absolute bg-custom-tooltip-gray rounded-md shadow shadow-custom-gray z-100',
+					'flex flex-col gap-y-1 p-1 w-48 top-15 left-5 overflow-auto h-80 custom-scroll-bar absolute bg-custom-tooltip-gray rounded-md shadow shadow-custom-gray z-100',
 			},
 			...this.createBrushOptions(dispatch),
 		);
@@ -913,7 +1447,7 @@ export class BrushSelect {
 		iconBorderClasses.forEach((cls) => {
 			this.brushControl.classList.toggle(
 				cls,
-				this.state.toggleBrush || this.state.selectedBrush !== null,
+				this.state.toggleBrush || this.state.selectedBrush !== undefined,
 			);
 		});
 		this.brushControl.classList.toggle('bg-white/10', !this.state.toggleBrush);
@@ -1072,48 +1606,3 @@ export class EraseAllButton {
 
 	syncState() {}
 }
-
-/* const ZOOM = [1, 1.5, 3, 6, 12, 24];
-let i = 0;
-export class ZoomControls {
-	constructor(state, { dispatch }) {
-		this.zoom = state.zoom;
-		this.dom = elt(
-			'div',
-			{ className: 'inline p-5 ml-3 ' },
-			elt(
-				'button',
-				{
-					onclick: () => {
-						if (i < ZOOM.length) {
-							i += 1;
-							dispatch({ zoom: ZOOM[i] });
-						}
-					},
-					className:
-						'bg-gray-700 text-white rounded-lg px-3 py-2 ml-2 focus:ring-2 focus:ring-green-500 hover:bg-gray-500',
-				},
-				'🔍+',
-			),
-			elt(
-				'button',
-				{
-					onclick: () => {
-						if (i > 0) {
-							i -= 1;
-							dispatch({ zoom: ZOOM[i] });
-						}
-					},
-					className:
-						'bg-gray-700 text-white rounded-lg px-3 py-2 ml-2 focus:ring-2 focus:ring-green-500 hover:bg-gray-500',
-				},
-				'🔍-',
-			),
-		);
-	}
-
-	syncState(state) {
-		this.zoom = state.zoom;
-	}
-}
- */
