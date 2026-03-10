@@ -10,20 +10,67 @@
 	--color-custom-glass-black: rgba(255, 255, 255, 0.08);
 }
 
-@layer utilities {
-	.tooltipVisible {
-		opacity: 1;
-		pointer-events: auto;
-		transition-duration: 0.3s;
-		transform: translateY(0);
-	}
-	.tooltipHidden {
-		opacity: 0;
-		pointer-events: none;
-		transition-duration: 0.3s;
-		transform: translateY(-4px);
+/* Global Foundation */
+@layer base {
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
 	}
 
+	* {
+		margin: 0;
+	}
+
+	html,
+	body,
+	#root {
+		height: 100%;
+	}
+
+	img,
+	picture,
+	video,
+	svg {
+		display: block;
+		max-width: 100%;
+	}
+
+	body {
+		min-height: 100vh;
+		line-height: 1.5;
+		-webkit-font-smoothing: antialiased;
+	}
+
+	input,
+	button,
+	textarea,
+	select {
+		font: inherit;
+	}
+
+	button {
+		background: none;
+		border: none;
+	}
+
+	p,
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		overflow-wrap: break-word;
+	}
+
+	html:focus-within {
+		scroll-behavior: smooth;
+	}
+}
+
+/* Reusable UI Components */
+@layer components {
 	.switch {
 		position: relative;
 		display: block;
@@ -117,6 +164,88 @@
 	.zoom-slider:hover::-moz-range-thumb {
 		transform: scale(1.25);
 	}
+
+	/* DOM STYLE UTILITIES */
+	.icon-style {
+		@apply rounded-sm mt-1 p-2 hover:bg-custom-glass-black transition-all duration-150;
+	}
+
+	.icon-highlight-style {
+		@apply ring-1 ring-custom-blue bg-custom-black;
+	}
+
+	.link-icon-style {
+		@apply bg-custom-glass-black hover:bg-white/10 w-8 h-8 border border-white/10 p-1 rounded-sm;
+	}
+
+	.link-icon-highlight-style {
+		@apply bg-custom-blue rounded-sm p-1 border border-white/5;
+	}
+
+	.shape-icon-style {
+		@apply rounded-sm hover:bg-custom-glass-black p-1 h-6 w-6 transition-all duration-150;
+	}
+
+	.shape-icon-highlight-style {
+		@apply ring-1 ring-custom-blue;
+	}
+
+	.popup-card-style {
+		@apply absolute cursor-default shadow-sm shadow-gray-600 bg-custom-tooltip-gray p-1 top-12 left-3 rounded-md min-w-32;
+	}
+
+	.card-options-style {
+		@apply p-1 hover:bg-custom-glass-black rounded-md transition-all duration-150;
+	}
+
+	.feature-div-style {
+		@apply relative text-white flex flex-col justify-center items-center;
+	}
+
+	.control-label-style {
+		@apply text-white/60 text-center text-sm;
+	}
+
+	.features-div-style {
+		@apply flex flex-row flex-wrap gap-x-6 justify-around items-center;
+	}
+
+	.control-div-style {
+		@apply flex flex-col justify-around items-center h-27 px-3 outline outline-white/30;
+	}
+
+	.resize-input-style {
+		@apply w-24 outline-none hover:bg-custom-glass-black focus:bg-custom-black  border-b-[#e3e3e3] border border-x-white/10 border-t-white/10 bg-white/10 rounded-sm p-1;
+	}
+
+	.resize-error-message-style {
+		@apply absolute top-15 text-red-500 text-[10px] mt-1;
+	}
+
+	.btn-primary {
+		@apply px-2 py-1 min-w-32 border-none outline-none rounded-md;
+	}
+
+	.btn-secondary {
+		@apply bg-custom-glass-black hover:bg-white/10 border border-white/2 text-white min-w-32 px-2 py-1 outline-none rounded-md;
+	}
+}
+
+/* Atomic Helper */
+@layer utilities {
+	.tooltipVisible {
+		opacity: 1;
+		pointer-events: auto;
+		transition-duration: 0.3s;
+		transform: translateY(0);
+	}
+	.tooltipHidden {
+		opacity: 0;
+		pointer-events: none;
+		transition-duration: 0.3s;
+		transform: translateY(-4px);
+	}
+
 	.custom-scroll-bar::-webkit-scrollbar-track {
 		background: transparent;
 	}

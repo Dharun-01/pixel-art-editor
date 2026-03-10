@@ -1,13 +1,7 @@
 import {
-	drawLine,
-	applySize,
-	applyMirror,
 	getBrushStamp,
 	getPencilStamp,
-	getStampedPoints,
 	calculateStampSpacing,
-	interpolateStampPosition,
-	applyStampAtPosition,
 	hexToRgb,
 	elt,
 	drawGridOnZoom,
@@ -20,6 +14,7 @@ import {
 	flipVertical,
 	flipHorizontal,
 } from './utils.js';
+import { toolStarterCode } from './tools/utilities.js';
 import { Picture } from './picture.js';
 
 const offScreen = document.createElement('canvas');
@@ -180,28 +175,14 @@ export function brush(
 	pos,
 	state,
 	dispatch,
-	getColor = () => state.color,
-	getOpacity = () => state.opacity,
+	getColor = () => state.tools.color,
+	getOpacity = () => state.tools.opacity,
 ) {
-	let stampCache = null;
-	let lastStampPos = null;
-	if (
-		!stampCache ||
-		state.brushSize !== stampCache.size ||
-		state.selectedBrush !== stampCache.shape ||
-		state.selectedShapeBrush !== stampCache.shape
-	) {
-		stampCache = {
-			stamp: getBrushStamp(state),
-			size: state.brushSize,
-			shape: state.selectedBrush || state.selectedShapeBrush,
-		};
-	}
-
-	const stamp = stampCache.stamp;
-	const spacing = calculateStampSpacing(state);
-	let color = getColor();
-	let opacity = getOpacity();
+	const { stamp, spacing, color, opacity, lastStampPos } = toolStarterCode(
+		state,
+		getColor,
+		getOpacity,
+	);
 	function connect(newPos, state) {
 		let result = drawBrushStamps(
 			state,
@@ -213,7 +194,10 @@ export function brush(
 			color,
 			opacity,
 		);
-		dispatch({ picture: state.picture.draw(result.allPoints) });
+		dispatch({
+			type: 'SET_PICTURE',
+			stringValue: state.drawing.picture.draw(result.allPoints),
+		});
 		lastStampPos = result.lastPos;
 		pos = newPos;
 	}
@@ -228,26 +212,16 @@ export function line(
 	pos,
 	state,
 	dispatch,
-	getColor = () => state.color,
-	getOpacity = () => state.opacity,
+	getColor = () => state.tools.color,
+	getOpacity = () => state.tools.opacity,
 ) {
-	let lastStampPos = null;
-	let color = getColor();
-	let opacity = getOpacity();
-	if (
-		!stampCache ||
-		stampCache.size !== state.brushSize ||
-		stampCache.shape !== state.selectedShapeBrush
-	) {
-		stampCache = {
-			size: state.brushSize,
-			shape: state.selectedShapeBrush,
-			stamp: getBrushStamp(state),
-		};
-	}
-	let stamp = stampCache.stamp;
-	let spacing = calculateStampSpacing(state);
-	let base = state.picture;
+	const { stamp, spacing, color, opacity, lastStampPos } = toolStarterCode(
+		state,
+		getColor,
+		getOpacity,
+	);
+
+	let base = state.drawing.picture;
 	return (end, state, isFinal) => {
 		const result = drawShapeStamps(
 			state,
@@ -261,16 +235,11 @@ export function line(
 			'line',
 		);
 
-		if (!isFinal)
-			dispatch({
-				isPreview: true,
-				picture: base.draw(result),
-			});
-		else
-			dispatch({
-				picture: base.draw(result),
-				isPreview: false,
-			});
+		dispatch({
+			type: 'SET_PICTURE',
+			isPreview: !isFinal ? true : false,
+			stringValue: base.draw(result),
+		});
 	};
 }
 
@@ -375,7 +344,6 @@ export function rightTriangle(
 		let topVertex = { x: pos.x, y: pos.y };
 		let bottomRightVertex = { x: to.x, y: to.y };
 		let bottomLeftVertex = { x: pos.x, y: to.y };
-
 		let resultRight = drawShapeStamps(
 			state,
 			stamp,
@@ -441,15 +409,6 @@ export function rhombus(
 	let spacing = calculateStampSpacing(state);
 	function drawRhombus(to) {
 		let size = Math.max(Math.abs(to.x - pos.x), Math.abs(to.y - pos.y));
-
-		let drawn = [];
-
-		// A rhombus has 4 edges connecting 4 vertices
-		// Top vertex: (pos.x, pos.y - size)
-		// Right vertex: (pos.x + size, pos.y)
-		// Bottom vertex: (pos.x, pos.y + size)
-		// Left vertex: (pos.x - size, pos.y)
-
 		let top = { x: pos.x, y: pos.y - size };
 		let right = { x: pos.x + size, y: pos.y };
 		let bottom = { x: pos.x, y: pos.y + size };

@@ -13,7 +13,6 @@ export function drawGridOnZoom(cx, startX, startY, endX, endY) {
 	cx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
 	cx.lineWidth = 0.1;
 	cx.imageSmoothingEnabled = false;
-
 	// Vertical line
 	for (let x = startX; x <= endX; x += 10) {
 		cx.beginPath();
@@ -31,40 +30,66 @@ export function drawGridOnZoom(cx, startX, startY, endX, endY) {
 	}
 }
 
-export function drawAxisLines(cx, startX, startY, endX, endY, state) {
+/* ---DRAW AXIS LINES HELPERS--- */
+export function drawVerticalAxis(cx, startX, endX, startY, endY) {
+	// Vertical axis line
+	let midX = (startX + endX) / 2;
+	cx.beginPath();
+	cx.moveTo(midX, startY + 1);
+	cx.lineTo(midX, endY + 1);
+	cx.stroke();
+}
+
+export function drawHorizontalAxis(cx, startX, endX, startY, endY) {
+	let midY = (startY + endY) / 2;
+	// Horizontal axis line
+	cx.beginPath();
+	cx.moveTo(startX, midY);
+	cx.lineTo(endX + 1, midY);
+	cx.stroke();
+}
+
+export function drawMainDiagonalAxis(cx, startX, endX, startY, endY) {
+	cx.beginPath();
+	cx.moveTo(startX, startY);
+	cx.lineTo(endX + 1, endY + 1);
+	cx.stroke();
+}
+
+export function drawOffDiagonalAxis(cx, startX, endX, startY, endY) {
+	cx.beginPath();
+	cx.moveTo(endX, startY);
+	cx.lineTo(startX, endY + 1);
+	cx.stroke();
+}
+
+export function drawOrthogonalAxis(cx, startX, endX, startY, endY) {
+	drawVerticalAxis(cx, startX, endX, startY, endY);
+	drawHorizontalAxis(cx, startX, endX, startY, endY);
+}
+
+export function drawDiagonalAxis(cx, startX, endX, startY, endY) {
+	drawMainDiagonalAxis(cx, startX, endX, startY, endY);
+	drawOffDiagonalAxis(cx, startX, endX, startY, endY);
+}
+/* ---DRAW AXIS LINES HELPERS--- */
+
+let axisDrawers = {
+	vertical: drawVerticalAxis,
+	horizontal: drawHorizontalAxis,
+	mainDiagonal: drawMainDiagonalAxis,
+	offDiagonal: drawOffDiagonalAxis,
+	orthogonal: drawOrthogonalAxis,
+	diagonal: drawDiagonalAxis,
+};
+
+/* Draws axis according to the mirror type */
+export function drawAxisLines(cx, startX, startY, endX, endY, axis) {
 	cx.strokeStyle = 'rgba(77, 163, 255, 1)';
 	cx.lineWidth = 1;
 	cx.imageSmoothingEnabled = false;
-	if (state.mirrorVertical) {
-		// Vertical axis line
-		let midX = (startX + endX) / 2;
-		cx.beginPath();
-		cx.moveTo(midX, startY + 1);
-		cx.lineTo(midX, endY + 1);
-		cx.stroke();
-	}
-	if (state.mirrorHorizontal) {
-		let midY = (startY + endY) / 2;
-		// Horizontal axis line
-		cx.beginPath();
-		cx.moveTo(startX, midY);
-		cx.lineTo(endX + 1, midY);
-		cx.stroke();
-	}
 
-	if (state.mirrorMainDiagonal) {
-		cx.beginPath();
-		cx.moveTo(startX, startY);
-		cx.lineTo(endX + 1, endY + 1);
-		cx.stroke();
-	}
-
-	if (state.mirrorOffDiagonal) {
-		cx.beginPath();
-		cx.moveTo(endX, startY);
-		cx.lineTo(startX, endY + 1);
-		cx.stroke();
-	}
+	axisDrawers[axis]?.(cx, startX, endX, startY, endY);
 }
 
 export function rgbToHex([r, g, b]) {
@@ -73,17 +98,22 @@ export function rgbToHex([r, g, b]) {
 
 export function pointerPosition(pos, domNode, state) {
 	let rect = domNode.getBoundingClientRect();
-	let zoom = domNode.zoom || 1;
+	let zoom = state.drawing.zoomLevel || 1;
 	let x = Math.floor((pos.clientX - rect.left) / zoom);
 	let y = Math.floor((pos.clientY - rect.top) / zoom);
+	/* console.log('rect:', rect.left, rect.top);
+	console.log('client:', pos.clientX, pos.clientY);
+	console.log('zoom:', zoom);
+	console.log(
+		'result:',
+		(pos.clientX - rect.left) / zoom,
+		(pos.clientY - rect.top) / zoom,
+	);
+	console.log('x:' + x, 'y:' + y); */
 	return {
 		x,
 		y,
 	};
-}
-
-export function updateState(state, action) {
-	return { ...state, ...action };
 }
 
 export function elt(type, props, ...children) {
@@ -91,11 +121,18 @@ export function elt(type, props, ...children) {
 	let svgElements = ['svg', 'path'];
 	if (!svgElements.includes(type)) {
 		dom = document.createElement(type);
-		if (props) Object.assign(dom, props);
-	} else {
-		dom = document.createElementNS('http://www.w3.org/2000/svg', type);
-		for (let [key, value] of Object.entries(props)) {
-			dom.setAttribute(key, value);
+		if (props) {
+			Object.entries(props).forEach(([key, value]) => {
+				if (key.startsWith('data-')) {
+					dom.setAttribute(key, value);
+				}
+				Object.assign(dom, props);
+			});
+		} else {
+			dom = document.createElementNS('http://www.w3.org/2000/svg', type);
+			for (let [key, value] of Object.entries(props)) {
+				dom.setAttribute(key, value);
+			}
 		}
 	}
 
@@ -117,7 +154,6 @@ export function drawBrushStamps(
 	opacity,
 ) {
 	const allStampedPoints = [];
-	console.log(spacing);
 	const startPos = lastStampPos || pos;
 
 	const path = interpolateStampPosition(startPos, newPos, spacing);
@@ -164,7 +200,7 @@ export function drawShapeStamps(
 	let allStampedPoints = [];
 	let startPos = lastStampPos || pos;
 	let path;
-	if (shape === 'circle')
+	if (shape === 'Symmetrical Circle')
 		path = interpolateCircleStampPosition(startPos, end, spacing);
 	else path = interpolateStampPosition(startPos, end, spacing);
 	let mirroredPath = applyMirror(path, state);
@@ -222,7 +258,7 @@ export function iconDownloader(...iconProps) {
 	return svgProperties;
 }
 
-export function customName() {
+export function customName(link) {
 	let imageName = prompt('Save as');
 	if (!imageName) {
 		alert('Please Enter a Name');
@@ -231,22 +267,11 @@ export function customName() {
 }
 
 export function applySize(points, state) {
-	/* 	let brushSize = 2;
-	if (state.sketch == 'Marker') {
-		if (state.tool === 'erase') {
-			brushSize = 30;
-		} else {
-			brushSize = 3;
-		}
-	} else {
-		if (state.tool === 'erase') brushSize = 20;
-	} */
-
-	if (!state.brushSize) return points;
+	if (!state.tools.brushSize) return points;
 	let result = [];
 	for (let p of points) {
-		for (let dx = 0; dx < state.brushSize; dx++) {
-			for (let dy = 0; dy < state.brushSize; dy++) {
+		for (let dx = 0; dx < state.tools.brushSize; dx++) {
+			for (let dy = 0; dy < state.tools.brushSize; dy++) {
 				result.push({
 					x: p.x + dx,
 					y: p.y + dy,
@@ -260,22 +285,23 @@ export function applySize(points, state) {
 }
 
 export function calculateStampSpacing(state) {
-	const brushType = state.selectedBrush || state.selectedShapeBrush || 'Brush';
+	const brushType =
+		state.tools.selectedBrush || state.tools.selectedShapeBrush || 'BRUSH';
 
 	const spacingMap = {
 		Pencil: 0.15,
-		Brush: 0.25,
-		'Calligraphy brush': 0.005,
-		'Calligraphy pen': 0.005,
-		Airbrush: 0.1,
-		'Oil brush': 0.4,
-		Crayon: 0.5,
-		Marker: 0.005,
-		'Natural pencil': 0.3,
-		'Watercolor brush': 0.15,
+		BRUSH: 0.25,
+		CALLIGRAPHY_BRUSH: 0.005,
+		CALLIGRAPHY_PEN: 0.005,
+		AIRBRUSH: 0.1,
+		OIL_BRUSH: 0.4,
+		CRAYON: 0.5,
+		MARKER: 0.005,
+		NATURAL_PENCIL: 0.3,
+		WATERCOLOR_BRUSH: 0.15,
 	};
 	const spacingRatio = spacingMap[brushType] || 0.15;
-	return Math.max(1, state.brushSize * spacingRatio);
+	return Math.max(1, state.tools.brushSize * spacingRatio);
 }
 
 export function interpolateStampPosition(from, to, spacing) {
@@ -309,9 +335,9 @@ export function applyStampAtPosition(stampPos, stamp, color, opacity, state) {
 
 		if (
 			x < 0 ||
-			x >= state.picture.width ||
+			x >= state.drawing.picture.width ||
 			y < 0 ||
-			y >= state.picture.height
+			y >= state.drawing.picture.height
 		) {
 			continue;
 		}
@@ -322,43 +348,44 @@ export function applyStampAtPosition(stampPos, stamp, color, opacity, state) {
 }
 
 export function getPencilStamp(state) {
-	const size = state.brushSize || 3;
+	const size = state.tools.brushSize || 3;
 	return STAMP.pencil(size);
 }
 
 export function getBrushStamp(state) {
 	let stamp;
-	const brushType = state.selectedBrush || state.selectedShapeBrush || 'Brush';
-	const size = state.brushSize || 3;
-	const opacity = state.opacity / 100;
+	const brushType =
+		state.tools.selectedBrush || state.tools.selectedShapeBrush || 'BRUSH';
+	const size = state.tools.brushSize || 3;
+	const opacity = state.tools.opacity / 100;
 	const calligraphyBrushAngle = -45;
 	const calligraphyPenAngle = 45;
 	switch (brushType) {
 		case 'Brush':
 			stamp = STAMP.circle(size);
 			break;
-		case 'Calligraphy brush':
+		case 'CALLIGRAPHY_BRUSH':
 			stamp = STAMP.calligraphyBrush(size, calligraphyBrushAngle);
 			break;
-		case 'Calligraphy pen':
+		case 'CALLIGRAPHY_PEN':
 			stamp = STAMP.calligraphyPen(size, calligraphyPenAngle);
 			break;
-		case 'Airbrush':
+		case 'AIRBRUSH':
 			stamp = STAMP.airbrush(size);
 			break;
-		case 'Oil brush':
+		case 'OIL_BRUSH':
 			stamp = STAMP.oilBrush(size);
 			break;
-		case 'Crayon':
+		case 'CRAYON':
 			stamp = STAMP.crayon(size);
 			break;
-		case 'Marker':
+		case 'MARKER':
 			stamp = STAMP.marker(size);
 			break;
-		case 'Natural pencil':
+		case 'NATURAL PENCIL':
 			stamp = STAMP.naturalPencil(size);
 			break;
-		case 'Watercolor brush':
+		case 'WATERCOLOR_BRUSH':
 			stamp = STAMP.watercolorBrush(size);
 			break;
 
@@ -378,7 +405,7 @@ export function getStampedPoints(brushedPoints, stamp, state) {
 				x: x,
 				y: y,
 				color: point.color,
-				opacity: state.opacity / 100 || opacity,
+				opacity: state.tools.opacity / 100 || opacity,
 			});
 		}
 	}
@@ -538,72 +565,75 @@ export function reflectSelect(selectName, dispatch) {
 	return { reflectCheckbox, reflectOption };
 }
 
+/* MIRROR UTILITIES */
+function verticalMirrorType(state, p) {
+	let mirroredX = state.drawing.picture.width - 1 - p.x;
+	return [{ x: mirroredX, y: p.y, color: p.color, opacity: p.opacity }];
+}
+
+function horizontalMirrorType(state, p) {
+	let mirroredY = state.drawing.picture.height - 1 - p.y;
+	return [{ x: p.x, y: mirroredY, color: p.color, opacity: p.opacity }];
+}
+
+function mainDiagonalMirrorType(state, p) {
+	let normalizedX = p.x / state.drawing.picture.width;
+	let normalizedY = p.y / state.drawing.picture.height;
+	let mirroredX = Math.round(normalizedY * state.drawing.picture.width);
+	let mirroredY = Math.round(normalizedX * state.drawing.picture.height);
+
+	mirroredX = Math.max(0, Math.min(state.drawing.picture.width - 1, mirroredX));
+	mirroredY = Math.max(
+		0,
+		Math.min(state.drawing.picture.height - 1, mirroredY),
+	);
+	return [{ x: mirroredX, y: mirroredY, color: p.color, opacity: p.opacity }];
+}
+
+function offDiagonalMirrorType(state, p) {
+	let normalizedX = p.x / state.drawing.picture.width;
+	let normalizedY = p.y / state.drawing.picture.height;
+	let mirroredX = Math.round((1 - normalizedY) * state.drawing.picture.width);
+	let mirroredY = Math.round((1 - normalizedX) * state.drawing.picture.height);
+	mirroredX = Math.max(0, Math.min(state.drawing.picture.width - 1, mirroredX));
+	mirroredY = Math.max(
+		0,
+		Math.min(state.drawing.picture.height - 1, mirroredY),
+	);
+	return [{ x: mirroredX, y: mirroredY, color: p.color, opacity: p.opacity }];
+}
+
+function orthogonalMirrorType(state, p) {
+	return [...verticalMirrorType(state, p), ...horizontalMirrorType(state, p)];
+}
+
+function diagonalMirrorType(state, p) {
+	return [
+		...mainDiagonalMirrorType(state, p),
+		...offDiagonalMirrorType(state, p),
+	];
+}
+/* MIRROR UTILITIES */
+
 export function applyMirror(points, state) {
 	let result = [];
-	result = [...points];
-	if (
-		!state.mirrorVertical &&
-		!state.mirrorHorizontal &&
-		!state.mirrorMainDiagonal &&
-		!state.mirrorOffDiagonal
-	) {
+	const axis = state.ui?.transform?.mirror?.axis;
+	if (!axis) {
 		return result;
 	}
 
-	function mirroredPoint(p, mirrorType) {
-		if (mirrorType === 'vertical') {
-			let mirroredX = state.picture.width - 1 - p.x;
-			return { x: mirroredX, y: p.y, color: p.color, opacity: p.opacity };
-		}
+	const mirrorFunctions = {
+		vertical: verticalMirrorType,
+		horizontal: horizontalMirrorType,
+		mainDiagonal: mainDiagonalMirrorType,
+		offDiagonal: offDiagonalMirrorType,
+		orthogonal: orthogonalMirrorType,
+		diagonal: diagonalMirrorType,
+	};
 
-		if (mirrorType === 'horizontal') {
-			let mirroredY = state.picture.height - 1 - p.y;
-			return { x: p.x, y: mirroredY, color: p.color, opacity: p.opacity };
-		}
-
-		if (mirrorType === 'mainDiagonal') {
-			let normalizedX = p.x / state.picture.width;
-			let normalizedY = p.y / state.picture.height;
-			let mirroredX = Math.round(normalizedY * state.picture.width);
-			let mirroredY = Math.round(normalizedX * state.picture.height);
-
-			mirroredX = Math.max(0, Math.min(state.picture.width - 1, mirroredX));
-			mirroredY = Math.max(0, Math.min(state.picture.height - 1, mirroredY));
-			return { x: mirroredX, y: mirroredY, color: p.color, opacity: p.opacity };
-		}
-
-		if (mirrorType === 'offDiagonal') {
-			let normalizedX = p.x / state.picture.width;
-			let normalizedY = p.y / state.picture.height;
-			let mirroredX = Math.round((1 - normalizedY) * state.picture.width);
-			let mirroredY = Math.round((1 - normalizedX) * state.picture.height);
-			mirroredX = Math.max(0, Math.min(state.picture.width, mirroredX));
-			mirroredY = Math.max(0, Math.min(state.picture.height, mirroredY));
-			return { x: mirroredX, y: mirroredY, color: p.color, opacity: p.opacity };
-		}
-	}
-
-	const mirrorTypes = [];
-	if (state.mirrorVertical) mirrorTypes.push('vertical');
-	if (state.mirrorHorizontal) mirrorTypes.push('horizontal');
-	if (state.mirrorMainDiagonal) mirrorTypes.push('mainDiagonal');
-	if (state.mirrorOffDiagonal) mirrorTypes.push('offDiagonal');
-
-	for (let mirrorType of mirrorTypes) {
-		//collect mirrored points for current mirror type
-		let mirroredPoints = points.map((p) => mirroredPoint(p, mirrorType));
-		// add first point directly to result to avoid line drawing from last point of previous segment
-		if (mirroredPoints.length > 0) {
-			result.push(mirroredPoints[0]);
-		}
-		// draw lines between consecutive mirrored points
-		for (let i = 1; i < mirroredPoints.length; i++) {
-			let from = mirroredPoints[i - 1];
-			let to = mirroredPoints[i];
-			let linePoints = drawLine(from, to, from.color, from.opacity);
-			result.push(...linePoints);
-		}
-	}
+	const mirrorFn = mirrorFunctions[axis];
+	const mirroredPoints = points.flatMap((p) => mirrorFn(state, p));
+	result = [...mirroredPoints];
 	return result;
 }
 

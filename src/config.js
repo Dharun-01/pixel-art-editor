@@ -1,83 +1,35 @@
-import { Picture } from './picture.js';
-import { hexToRgb } from './utils.js';
+import { createInitialState } from './state/factory.js';
+import { ImageSelectController } from './controls/controller/ImageController.js';
+import { ToolSelectController } from './controls/controller/toolController.js';
+import { BrushSelectController } from './controls/controller/brushController.js';
+import { ShapeSelectController } from './controls/controller/shapeController.js';
+import { pencil, brush } from './tools/drawingTools.js';
+
 import {
-	pencil,
-	brush,
-	fill,
-	rectangle,
-	pick,
 	line,
-	erase,
-	circle,
-	rhombus,
-	square,
 	triangle,
 	rightTriangle,
+	rhombus,
+	square,
+	rectangle,
 	pentagon,
 	hexagon,
 	star,
-	heart,
 	fourPointStar,
 	sixPointStar,
-} from './tools.js';
+	circle,
+	heart,
+} from './tools/shapeTools.js';
 
-import {
-	ImageSelect,
-	ToolSelect,
-	BrushSelect,
-	ShapeSelect,
-	ColorSelect,
-	SketchSelect,
-	SaveButton,
-	LoadButton,
-	UndoButton,
-	RedoButton,
-	EraseButton,
-	EraseAllButton,
-} from './controls.js';
+import { fill, pick, erase, zoomPlus } from './tools/utilityTools.js';
 
-export let startState = {
-	tool: 'brush',
-	sketch: 'Pencil',
-	opacity: 100,
-	color: new Uint8ClampedArray([0, 0, 0, 255]),
-	cursor: false,
-	picture: Picture.empty(1000, 400, hexToRgb('#f0f0f0'), 255),
-	previewPicture: null,
-	redone: [],
-	toggleRotate: false,
-	toggleFlip: false,
-	toggleMirror: false,
-	toggleResize: false,
-	toggleLinkIcon: false,
-	toggleGrid: false,
-	togglePencil: false,
-	toggleFill: false,
-	toggleErase: false,
-	toggleColorPicker: false,
-	toggleZoomPlus: false,
-	toggleZoomSelect: false,
-	toggleZoomSelectDownArrow: false,
-	toggleBrush: false,
-	toggleShapeBrushes: false,
-	selectedBrush: 'Brush',
-	selectedShapeBrush: 'Brush',
-	brushSize: 3,
-	rotate: null,
-	flip: null,
-	mirrorVertical: false,
-	mirrorHorizontal: false,
-	mirrorMainDiagonal: false,
-	mirrorOffDiagonal: false,
-	done: [],
-	zoom: 1,
-	doneAt: 0,
-};
+export let startState = createInitialState();
 
 export let baseTools = {
 	pencil,
 	brush,
 	fill,
+	zoomPlus,
 	rectangle,
 	pick,
 	circle,
@@ -94,18 +46,10 @@ export let baseTools = {
 	sixPointStar,
 	heart,
 };
-export let baseSketches = { marker: 'Marker', pencil: 'Pencil' };
+
 export let baseControls = [
-	ImageSelect,
-	ToolSelect,
-	BrushSelect,
-	ShapeSelect,
-	ColorSelect,
-	SketchSelect,
-	SaveButton,
-	LoadButton,
-	UndoButton,
-	RedoButton,
-	EraseButton,
-	EraseAllButton,
+	ImageSelectController,
+	ToolSelectController,
+	BrushSelectController,
+	ShapeSelectController,
 ];
