@@ -12,10 +12,9 @@ export class SideControlsCalculationService {
 	}
 
 	static getThumbsPosition(slider, value, min, max) {
-		const rect = slider.getBoundingClientRect();
 		const ratio = (value - min) / (max - min);
-		const x = rect.left + ratio * rect.width;
-		const y = rect.top + rect.height / 2;
+		const x = ratio * slider.offsetWidth;
+		const y = 82;
 		return { x, y };
 	}
 }

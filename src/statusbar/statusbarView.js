@@ -71,7 +71,7 @@ export class StatusbarView {
 
 		this.fitWindowIcon = createIconDom(
 			'../../assets/fit_screen_16dp_E3E3E3_FILL0_wght400_GRAD0_opsz20.svg',
-			'hover:bg-custom-glass-black p-1 rounded-sm',
+			'hover:bg-custom-glass-black p-1 rounded-sm transition-all duration-150',
 			this.handlers.onFitWindow,
 		);
 
@@ -325,7 +325,7 @@ export class StatusbarView {
 	}
 
 	updateCanvasSize(size) {
-		this.canvasSizeText.textContent = size;
+		this.canvasSizeText.textContent = size + 'px';
 	}
 
 	updateZoomLevel(level) {

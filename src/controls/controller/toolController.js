@@ -30,6 +30,7 @@ export class ToolSelectController {
 	syncState(newState) {
 		const { active } = newState.ui.drawingTools;
 		const tools = ['pencil', 'fill', 'erase', 'pick', 'zoomPlus'];
+		console.log('active tool: ' + active);
 		// Highlight the active tool
 		tools.forEach((tool) => {
 			const isActive = active === tool;

@@ -53,8 +53,8 @@ export function shapePanelReducer(state, action) {
 			action.stringValue,
 		);
 		newTool = setExclusiveValue(newTool, 'selectedBrush', null);
-		let newUi = setExclusiveValue(ui, config.togglePath, false);
-		return { ...state, tools: newTool, ui: newUi };
+		/* let newUi = setExclusiveValue(ui, config.togglePath, false); */
+		return { ...state, tools: newTool /* ui: newUi */ };
 	}
 
 	return state;

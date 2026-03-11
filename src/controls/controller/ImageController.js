@@ -312,6 +312,7 @@ export class ImageSelectController {
 					//  blue + pointer
 					saveBtn.classList.toggle('bg-custom-blue', bothValid);
 					saveBtn.classList.toggle('text-custom-black', bothValid);
+					saveBtn.classList.toggle('hover:bg-custom-blue-hover', bothValid);
 
 					//locked when invalid
 					saveBtn.classList.toggle('cursor-not-allowed', !bothValid);

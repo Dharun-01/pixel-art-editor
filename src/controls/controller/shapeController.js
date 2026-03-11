@@ -1,3 +1,4 @@
+import { isThisSecond } from 'date-fns';
 import { ShapeSelectView } from '../view/shapeView';
 export class ShapeSelectController {
 	constructor(state, { dispatch }) {
@@ -41,29 +42,29 @@ export class ShapeSelectController {
 		this.dispatch({ type: 'SET_SHAPE', stringValue: shape });
 	}
 
-	/* openPopup() {
+	openPopup() {
 		this.dispatch({ type: 'SET_SHAPE_BRUSH' });
 		const onOutsideClick = (event) => {
 			/* if (event.target.closest(`[data-popup="${featureName}"]`)) return; */ // This is used if You want the popup to close only when clicked anywhere outside the popup.
-	/* 	this.dispatch({ type: 'SET_SHAPE_BRUSH' });
+			this.dispatch({ type: 'SET_SHAPE_BRUSH' });
 			document.removeEventListener('click', onOutsideClick);
-		}; */
+		};
 
-	/* setTimeout(() => document.addEventListener('click', onOutsideClick), 0); */
-	// }
+		setTimeout(() => document.addEventListener('click', onOutsideClick), 0);
+	}
 
 	handleShapeBrushClick() {
-		this.dispatch({ type: 'SET_SHAPE_BRUSH' });
-		/* this.openPopup(); */
+		this.openPopup();
 	}
 
 	handleBrushType(brushType) {
 		let allCaps = brushType.toUpperCase();
-		this.dispatch({ type: `VALUE_${allCaps}`, stringValue: allCaps });
+		this.dispatch({ type: `SHAPE_VALUE_${allCaps}`, stringValue: allCaps });
 	}
 
 	syncState(newState) {
 		const { active } = newState.ui.drawingTools;
+
 		const shapes = [
 			'rectangle',
 			'circle',
@@ -80,10 +81,19 @@ export class ShapeSelectController {
 			'line',
 		];
 
+		// disables if the shape is not clicked else enables the shape brush
+		const isActiveShape = shapes.includes(active);
+
+		this.view.featureShapeBrush.style.opacity = isActiveShape ? '1' : '0.5';
+		this.view.featureShapeBrush.style.pointerEvents = isActiveShape
+			? 'auto'
+			: 'none';
+
 		shapes.forEach((shape) => {
 			const isActive = active === shape;
 			this.view.highlightIcon(shape, isActive, 'shape-icon-highlight-style');
 		});
+
 		const { activeBrush } = newState.ui.drawingShapeTools;
 		if (activeBrush) {
 			this.view.showPopup('shapeBrush', true);

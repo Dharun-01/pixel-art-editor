@@ -13,7 +13,17 @@ export const shapeBooleanMap = {
 	},
 };
 
-const SHAPE_BRUSH_VALUES = [...BRUSH_VALUES];
+const SHAPE_BRUSH_VALUES = [
+	'SHAPE_VALUE_BRUSH',
+	'SHAPE_VALUE_CALLIGRAPHY_BRUSH',
+	'SHAPE_VALUE_CALLIGRAPHY_PEN',
+	'SHAPE_VALUE_AIRBRUSH',
+	'SHAPE_VALUE_OIL_BRUSH',
+	'SHAPE_VALUE_CRAYON',
+	'SHAPE_VALUE_MARKER',
+	'SHAPE_VALUE_NATURAL_PENCIL',
+	'SHAPE_VALUE_WATERCOLOR_BRUSH',
+];
 
 const shapeBrushValueMapConfig = {
 	valuePath: 'selectedShapeBrush', // this is all in upperCase letters

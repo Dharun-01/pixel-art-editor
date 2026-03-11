@@ -11,8 +11,7 @@ export class SideControlsView {
 			'p',
 			{
 				className:
-					'bg-custom-gray text-[12px] shadow shadow-custom-black opacity-0 transition-all duration-150 ease-out absolute text-white p-1 rounded-sm z-100 rotate-90',
-				style: 'transform:translate(-50%, 50%); margin-top: -40px;',
+					'bg-custom-gray text-[12px] opacity-0 transition-all duration-150 ease-out absolute text-white min-w-10 min-h-6 flex justify-center items-center rounded-sm z-100 rotate-90',
 			},
 			'1px',
 		);
@@ -20,8 +19,7 @@ export class SideControlsView {
 			'p',
 			{
 				className:
-					'bg-custom-gray opacity-0 text-[12px] transition-all duration-150 ease-out absolute text-white p-1 rounded-sm rotate-90',
-				style: 'transform:translate(-50%, 50%); margin-top: 100px',
+					'bg-custom-gray opacity-0 text-[12px] transition-all duration-150 ease-out absolute text-white min-w-8 min-h-6 flex justify-center items-center rounded-sm rotate-90',
 			},
 			'100%',
 		);

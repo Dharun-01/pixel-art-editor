@@ -30,7 +30,7 @@ export class ShapeSelectView {
 			},
 			...featureShapesDom,
 		);
-		const featureShapeBrush = elt(
+		this.featureShapeBrush = elt(
 			'div',
 			{ className: '' },
 			featuresArray[featuresArray.length - 1],
@@ -40,7 +40,7 @@ export class ShapeSelectView {
 			'div',
 			{ className: 'features-div-style' },
 			featuresShapesWrapped,
-			featureShapeBrush,
+			this.featureShapeBrush,
 		);
 
 		const controlLabelDom = createControlLabel('Shapes', 'control-label-style');

@@ -48,9 +48,9 @@ export class SideControlsController {
 	handleBrushSize(state) {
 		// Use active tool defaults if brush size not manually set
 		if (state.ui.drawingTools.active === 'pencil')
-			return BRUSH_DEFAULTS['Pencil'];
+			return state.tools.brushSize || BRUSH_DEFAULTS[brushName];
 		const brushName = state.tools.selectedBrush || 'Brush';
-		return state.tools.brushSize ?? BRUSH_DEFAULTS[brushName] ?? 3;
+		return state.tools.brushSize ?? BRUSH_DEFAULTS[brushName] ?? 8;
 	}
 
 	handleSizeControlInput(value) {
