@@ -191,6 +191,34 @@
 		@apply ring-1 ring-custom-blue;
 	}
 
+	.primary-slot-style {
+		@apply rounded-[50%] border border-white/10 w-6 h-6;
+	}
+
+	.secondary-slot-style {
+		@apply rounded-[50%] border border-white/10 w-6 h-6;
+	}
+
+	.color-slot-style {
+		@apply border border-white/30 rounded-[50%] w-5 h-5;
+		background-image:
+			linear-gradient(45deg, #ccc 25%, transparent 25%),
+			linear-gradient(-45deg, #ccc 25%, transparent 25%),
+			linear-gradient(45deg, transparent 75%, #ccc 75%),
+			linear-gradient(-45deg, transparent 75%, #ccc 75%);
+		background-size: 8px 8px;
+		background-position:
+			0 0,
+			0 4px,
+			4px -4px,
+			-4px 0px;
+		background-color: white;
+	}
+
+	.active-color-slot {
+		@apply ring-2 ring-custom-blue ring-offset-1 ring-offset-custom-gray;
+	}
+
 	.popup-card-style {
 		@apply absolute cursor-default shadow-sm shadow-gray-600 bg-custom-tooltip-gray p-1 top-12 left-3 rounded-md min-w-32;
 	}
@@ -215,12 +243,17 @@
 		@apply flex flex-col justify-around items-center h-27 px-3 outline outline-white/30;
 	}
 
-	.resize-input-style {
-		@apply w-24 outline-none hover:bg-custom-glass-black focus:bg-custom-black  border-b-[#e3e3e3] border border-x-white/10 border-t-white/10 bg-white/10 rounded-sm p-1;
+	.resize-input-style,
+	.hex-input-style {
+		@apply w-24 h-8 outline-none hover:bg-custom-glass-black focus:bg-custom-black  border-b-[#e3e3e3] border border-x-white/10 border-t-white/10 bg-white/10 rounded-sm p-1;
 	}
 
 	.resize-error-message-style {
 		@apply absolute top-15 text-red-500 text-[10px] mt-1;
+	}
+
+	.hexInput-error-message-style {
+		@apply absolute top-8 text-red-500 text-[10px] mt-1;
 	}
 
 	.btn-primary {

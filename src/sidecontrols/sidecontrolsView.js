@@ -95,7 +95,7 @@ export class SideControlsView {
 			'div',
 			{
 				className:
-					'fixed top-60 -left-20 z-100 flex flex-col h-24 gap-y-2 justify-center  -rotate-90 items-center',
+					'fixed top-60 -left-20 z-20 flex flex-col h-24 gap-y-2 justify-center  -rotate-90 items-center',
 			},
 			this.sizeController,
 			this.opacityController,

@@ -3,6 +3,8 @@ import { ImageSelectController } from './controls/controller/ImageController.js'
 import { ToolSelectController } from './controls/controller/toolController.js';
 import { BrushSelectController } from './controls/controller/brushController.js';
 import { ShapeSelectController } from './controls/controller/shapeController.js';
+import { ColorSelectController } from './controls/controller/colorController.js';
+
 import { pencil, brush } from './tools/drawingTools.js';
 
 import {
@@ -52,4 +54,5 @@ export let baseControls = [
 	ToolSelectController,
 	BrushSelectController,
 	ShapeSelectController,
+	ColorSelectController,
 ];

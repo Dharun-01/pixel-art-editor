@@ -6,6 +6,7 @@ import { historyPanelReducer } from './historyPanelReducer.js';
 import { pictureReducer } from './pictureReducer.js';
 import { statusbarReducer } from './statusbarReducer.js';
 import { setSizeReducer } from './setSizeReducer.js';
+import { colorPanelReducer } from './colorPanelReducer.js';
 
 export function rootReducer(state, action) {
 	let newState = state;
@@ -17,5 +18,6 @@ export function rootReducer(state, action) {
 	newState = pictureReducer(newState, action);
 	newState = statusbarReducer(newState, action);
 	newState = setSizeReducer(newState, action);
+	newState = colorPanelReducer(newState, action);
 	return newState;
 }

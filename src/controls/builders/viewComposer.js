@@ -1,6 +1,7 @@
 import {
 	buildStandardFeature,
 	buildIconOnlyFeature,
+	buildDivOnlyFeature,
 	buildCustomFeature,
 } from './featureBuilders.js';
 
@@ -32,7 +33,9 @@ export function composeFeatures(config, handlers, customBuilders) {
 			case 'icon-only':
 				result = buildIconOnlyFeature(featureName, featureConfig, handlers);
 				break;
-
+			case 'div-only':
+				result = buildDivOnlyFeature(featureName, featureConfig, handlers);
+				break;
 			case 'custom':
 				result = buildCustomFeature(
 					featureName,

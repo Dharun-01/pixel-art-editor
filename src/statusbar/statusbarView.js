@@ -199,7 +199,7 @@ export class StatusbarView {
 			'div',
 			{
 				className:
-					'fixed bottom-0 text-white left-0 flex flex-row justify-between items-center h-10 w-screen bg-custom-gray z-50',
+					'fixed bottom-0 text-white left-0 flex flex-row justify-between items-center h-10 w-screen bg-custom-gray z-20',
 			},
 			this.leftStatus,
 			this.rightStatus,

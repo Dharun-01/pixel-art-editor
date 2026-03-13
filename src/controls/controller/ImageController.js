@@ -1,5 +1,4 @@
 import { ImageSelectView } from '../view/ImageView.js';
-import { Picture } from '../../picture.js';
 
 import {
 	ImageSelectRotateService,

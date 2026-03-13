@@ -2,6 +2,7 @@ import { createIconDom } from '../../components/toggleIcon.js';
 import { createPopupCard } from '../../components/popupCard.js';
 import { createCardOption } from '../../components/cardOptions.js';
 import { createFeatureDiv } from '../../components/featureDiv.js';
+import { elt } from '../../utils.js';
 
 // ═══════════════════════════════════════
 // BUILDER FUNCTIONS (Pure, reusable)
@@ -51,6 +52,22 @@ export function buildIconOnlyFeature(name, config, handlers) {
 	);
 
 	return { dom: icon, icon, popup: null, refs: {} }; // Return the icon as the feature DOM, and also include it in the return object for reference in syncState
+}
+
+// Used in color controls
+export function buildDivOnlyFeature(name, config, handlers) {
+	const div = elt(
+		'div',
+		{
+			className: `${config.divStyle}`,
+			'data-slot': `${config.data.slot}`,
+			'data-empty': 'true',
+			style: `background-color: ${config.data.defaultColor}`,
+		},
+		'',
+	);
+
+	return { dom: div, icon: null, popup: null, refs: { [`${name}`]: div } };
 }
 
 /**

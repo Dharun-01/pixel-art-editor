@@ -22,7 +22,7 @@ export class HeaderView {
 			'div',
 			{
 				className:
-					'fixed flex flex-row justify-between top-0 left-0 z-50 h-10 w-screen bg-custom-black',
+					'fixed flex flex-row justify-between top-0 left-0 z-30 h-10 w-screen bg-custom-black',
 			},
 			left,
 			right,

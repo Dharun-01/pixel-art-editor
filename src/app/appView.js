@@ -18,7 +18,7 @@ export class AppView {
 			'div',
 			{
 				className:
-					'fixed flex flex-row items-center h-27 w-full bg-custom-gray top-10 left-0 z-40',
+					'fixed flex flex-row items-center h-27 w-full bg-custom-gray top-10 left-0 z-30',
 			},
 			...this.createControls(),
 		);
@@ -49,6 +49,14 @@ export class AppView {
 				this.canvasView,
 			),
 		);
+
+		this.overlay = elt('div', {
+			className: 'fixed inset-0 w-screen h-screen bg-black/50 z-40',
+			// z-40 — below the popup (z-50) but above everything else
+		});
+
+		// appends the overlay into the controls view because if it lies in the parent appView, overlay z-index is greater than control's feature Div z-index and the popup inherits the z-index of the parent element thus losing the stack competition and the popup stays BEHIND the overlay.
+		this.controlsView.appendChild(this.overlay);
 
 		return elt(
 			'div',

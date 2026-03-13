@@ -31,8 +31,13 @@ export const initialUiState = {
 		zoomSelect: false,
 		zoomSelectDownArrow: false,
 	},
-	utilities: {
-		linkIcon: false,
+	color: {
+		isCustomActive: false,
+		activeSlot: 'primaryColor',
+		hue: 0,
+		saturation: 0,
+		brightness: 0,
+		hexInputErrorMessage: null,
 	},
 	cursorVisible: null, // Status bar pixel position stats
 };

@@ -7,7 +7,8 @@ import { createButton } from '../../components/button.js';
 import { createRadioInput } from '../../components/radioInput.js';
 import { createLabel } from '../../components/label.js';
 import { createErrorMessage } from '../../components/errorMessage.js';
-import { elt } from '../../utils.js';
+import { elt, hexToRgb } from '../../utils.js';
+import { createParaContent } from '../../components/paraTag.js';
 
 // ═══════════════════════════════════════
 // CUSTOM CONTENT BUILDERS
@@ -242,7 +243,149 @@ export function createResizeContent(handlers) {
 	};
 }
 
+export function createColorContent(handlers) {
+	const editColorText = createParaContent(
+		'text-md text-[#E3E3E3]',
+		'Edit Color',
+	);
+
+	// saturation box
+	const sbCanvas = elt('canvas', {
+		width: 200,
+		height: 130,
+		className: 'cursor-crosshair rounded-sm block',
+	});
+
+	// Thumb inside the saturation box
+	const sbThumb = elt('div', {
+		className:
+			'w-3 h-3 rounded-full border-2 border-white absolute cursor-crosshair',
+		style: 'box-shadow: 0 0 0 1px black; top: 0; left: 0;',
+	});
+
+	const sbWrapper = elt(
+		'div',
+		{
+			className: 'relative',
+			style: 'width: 200px; height: 130px; overflow: hidden;',
+		},
+		sbCanvas,
+		sbThumb,
+	);
+
+	// hue slider
+	const hueCanvas = elt('canvas', {
+		width: 200,
+		height: 14,
+		className: 'cursor-pointer rounded-sm block',
+	});
+
+	const hueThumb = elt('div', {
+		className:
+			'absolute w-6 -top-0 cursor-pointer h-[14px] rounded-sm border border-black',
+	});
+
+	// Thumb inside the hue slider
+	const hueWrapper = elt(
+		'div',
+		{
+			className: 'relative overflow-hidden',
+			style: 'width: 200px; height: 14px;',
+		},
+		hueCanvas,
+		hueThumb,
+	);
+
+	const sbAndHueCanvasWrapper = elt(
+		'div',
+		{ className: 'gap-y-2 flex flex-col' },
+		sbWrapper,
+		hueWrapper,
+	);
+
+	// preview of color
+	const preview = elt('div', {
+		className: 'w-8 h-32 border border-gray-500 rounded-sm',
+	});
+
+	// input box to manually input the color
+	const hexInput = elt('input', {
+		type: 'text',
+		maxLength: 7,
+		className: 'hex-input-style',
+		placeholder: '#000000',
+		onchange: (event) => {
+			handlers.onHexInputChange(event.target.value);
+		},
+	});
+
+	//hex input error message
+	const hexInputErrorMessage = createErrorMessage(
+		'hexInput-error-message-style ',
+		'',
+	);
+
+	const hexInputSystem = elt(
+		'div',
+		{ className: 'flex flex-col gap-y-1 relative' },
+		hexInput,
+		hexInputErrorMessage,
+	);
+
+	const entireColorSelectionSystem = elt(
+		'div',
+		{ className: 'flex flex-row gap-x-5' },
+		sbAndHueCanvasWrapper,
+		preview,
+		hexInputSystem,
+	);
+
+	const okButton = createButton(
+		'px-2 py-1 bg-custom-blue hover:bg-custom-blue-hover text-custom-black min-w-32 rounded-md',
+		'Ok',
+		() => handlers.onOkButtonClick(),
+	);
+
+	const cancelButton = createButton('btn-secondary', 'Cancel', () =>
+		handlers.onCancelButtonClick(),
+	);
+
+	// Wrapper to Wrap the Save and Cancel buttons
+	const buttonBox = elt(
+		'div',
+		{
+			className:
+				'flex flex-row mt-6 gap-x-5 text-custom-black items-center justify-start',
+		},
+		okButton,
+		cancelButton,
+	);
+
+	return {
+		dom: elt(
+			'div',
+			{
+				className:
+					'flex flex-col absolute shadow-sm shadow-gray-600 z-50 gap-y-5 min-w-36 min-h-32 bg-custom-tooltip-gray p-5 top-12 right-80 rounded-md',
+			},
+			editColorText,
+			entireColorSelectionSystem,
+			buttonBox,
+		),
+		refs: {
+			sbCanvas,
+			hueCanvas,
+			sbThumb,
+			hueThumb,
+			preview,
+			hexInput,
+			hexInputErrorMessage,
+		},
+	};
+}
+
 export const CUSTOM_BUILDERS = {
 	createMirrorContent,
 	createResizeContent,
+	createColorContent,
 };

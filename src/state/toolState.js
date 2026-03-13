@@ -4,5 +4,5 @@ export const initialToolState = {
 	color: new Uint8ClampedArray([0, 0, 0, 255]),
 	selectedBrush: 'Brush',
 	selectedShapeBrush: 'Brush',
-	brushSize: 8,
+	brushSize: 4,
 };

@@ -1,12 +1,66 @@
 import { Picture } from './picture.js';
 import { STAMP } from './stamps.js';
+
 export function hexToRgb(hex) {
 	let hexWithoutHash = hex.slice(1);
+
+	if (hexWithoutHash.length === 3) {
+		hexWithoutHash =
+			hexWithoutHash[0] +
+			hexWithoutHash[0] +
+			hexWithoutHash[1] +
+			hexWithoutHash[1] +
+			hexWithoutHash[2] +
+			hexWithoutHash[2];
+	}
+
 	return new Uint8ClampedArray([
 		parseInt(hexWithoutHash.slice(0, 2), 16),
 		parseInt(hexWithoutHash.slice(2, 4), 16),
 		parseInt(hexWithoutHash.slice(4, 6), 16),
 	]);
+}
+
+export function rgbToHsv(r, g, b) {
+	// Normalize to 0-1
+	r /= 255;
+	g /= 255;
+	b /= 255;
+
+	const max = Math.max(r, g, b);
+	const min = Math.min(r, g, b);
+	const delta = max - min;
+
+	// --- Brightness (Value) ---
+	const v = max; // 0-1
+
+	// --- Saturation ---
+	const s = max === 0 ? 0 : delta / max; // 0-1
+
+	// --- Hue ---
+	let h = 0;
+
+	if (delta !== 0) {
+		if (max === r) {
+			h = ((g - b) / delta) % 6;
+		} else if (max === g) {
+			h = (b - r) / delta + 2;
+		} else {
+			// max === b
+			h = (r - g) / delta + 4;
+		}
+
+		h *= 60; // convert to degrees
+
+		if (h < 0) h += 360; // keep positive
+	}
+
+	return [Math.round(h), Math.round(s * 100), Math.round(v * 100)];
+}
+
+export function hexToHsv(hex) {
+	const [r, g, b] = hexToRgb(hex);
+	return rgbToHsv(r, g, b);
 }
 
 export function drawGridOnZoom(cx, startX, startY, endX, endY) {

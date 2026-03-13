@@ -8,6 +8,7 @@ import '../input.css';
 export class AppController {
 	constructor(state, config) {
 		this.state = state;
+		this.dispatch = config.dispatch;
 		let { tools, controls, dispatch } = config;
 
 		this.headerbarController = new HeaderController(this.state, config);
@@ -45,7 +46,7 @@ export class AppController {
 			this.canvasController,
 			this.statusbarController,
 		);
-
+		this.attachOverlayEventHandlers();
 		this.syncState(this.state);
 	}
 
@@ -53,6 +54,12 @@ export class AppController {
 		return {
 			onKeyDown: (event) => this.handleKeyDown(event),
 		};
+	}
+
+	attachOverlayEventHandlers() {
+		this.appView.overlay.addEventListener('click', () => {
+			this.dispatch({ type: 'SET_CUSTOM_ACTIVE' }); // same as cancel
+		});
 	}
 
 	handleKeyDown(event, config) {}
@@ -68,5 +75,9 @@ export class AppController {
 		this.statusbarController.syncState(this.state);
 		this.sideControlsController.syncState(this.state);
 		for (let ctrl of this.controls) ctrl.syncState(this.state);
+
+		const isCustomActive = newState.ui.color.isCustomActive;
+		this.appView.overlay.classList.toggle('tooltipVisible', isCustomActive);
+		this.appView.overlay.classList.toggle('tooltipHidden', !isCustomActive);
 	}
 }
