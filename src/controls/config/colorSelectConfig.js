@@ -40,6 +40,7 @@ export const COLOR_SELECT_CONFIG = {
 	customColorSelector: {
 		type: 'custom',
 		icon: '../../../assets/palette_16dp_4DA3FF_FILL0_wght400_GRAD0_opsz20.svg',
+		tooltip: 'Custom Color',
 		iconStyle: 'icon-style',
 		featureDivStyle: 'feature-div-style',
 		renderContent: 'createColorContent',

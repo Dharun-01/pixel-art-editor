@@ -14,6 +14,7 @@ export function createInput(
 	onMouseUp,
 	onMouseLeave,
 	onMouseEnter,
+	placeholder,
 ) {
 	return elt('input', {
 		type: type,
@@ -22,6 +23,7 @@ export function createInput(
 		value: value,
 		className: `${classes}`,
 		id: id,
+		placeholder: placeholder,
 		maxLength: maxLength,
 		oninput: (event) => {
 			event.stopPropagation();

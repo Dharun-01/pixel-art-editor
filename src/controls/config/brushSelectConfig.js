@@ -2,6 +2,7 @@ export const BRUSH_SELECT_CONFIG = {
 	brush: {
 		type: 'standard',
 		icon: '../../../assets/brush_16dp_4DA3FF_FILL0_wght400_GRAD0_opsz20.svg',
+		tooltip: 'Brush',
 		iconStyle: 'icon-style',
 		cardOptionsStyle: 'card-options-style',
 		popupStyle: 'popup-card-style',

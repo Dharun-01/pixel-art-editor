@@ -26,10 +26,11 @@ export class ShapeSelectView {
 			'div',
 			{
 				className:
-					'flex flex-wrap justify-center items-center overflow-y-scroll h-10 custom-scroll-bar max-w-28  gap-x-2 rounded-md py-1 border border-white/20 ',
+					'flex flex-wrap justify-center items-center overflow-auto h-10 custom-scroll-bar max-w-28  gap-x-2 rounded-md py-1 border border-white/20 ',
 			},
 			...featureShapesDom,
 		);
+
 		this.featureShapeBrush = elt(
 			'div',
 			{ className: '' },
@@ -38,7 +39,7 @@ export class ShapeSelectView {
 
 		const featuresContainer = elt(
 			'div',
-			{ className: 'features-div-style' },
+			{ className: 'features-div-style min-w-48' },
 			featuresShapesWrapped,
 			this.featureShapeBrush,
 		);

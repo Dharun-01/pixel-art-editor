@@ -9,6 +9,7 @@ import { createLabel } from '../../components/label.js';
 import { createErrorMessage } from '../../components/errorMessage.js';
 import { elt, hexToRgb } from '../../utils.js';
 import { createParaContent } from '../../components/paraTag.js';
+import { createCustomSelect } from '../../components/customSelect.js';
 
 // ═══════════════════════════════════════
 // CUSTOM CONTENT BUILDERS
@@ -366,7 +367,7 @@ export function createColorContent(handlers) {
 			'div',
 			{
 				className:
-					'flex flex-col absolute shadow-sm shadow-gray-600 z-50 gap-y-5 min-w-36 min-h-32 bg-custom-tooltip-gray p-5 top-12 right-80 rounded-md',
+					'flex flex-col absolute shadow-sm shadow-gray-600 z-50 gap-y-5 min-w-36 min-h-32 bg-custom-tooltip-gray p-5 top-12 right-30 rounded-md',
 			},
 			editColorText,
 			entireColorSelectionSystem,
@@ -384,8 +385,297 @@ export function createColorContent(handlers) {
 	};
 }
 
+export function createExportContent(handlers) {
+	const fileNameLabel = createLabel('fileName', 'File Name:', 'text-gray-300');
+	const fileNameInput = createInput(
+		'text',
+		'header-input-style',
+		25,
+		'fileName',
+		(eventValue) => {
+			handlers.onExportNameInputChange(eventValue);
+		},
+		null,
+		null,
+		null,
+		null,
+		null,
+		null,
+		null,
+		null,
+		null,
+		'MyArt',
+	);
+
+	const fileTypeLabel = createLabel('', 'Format:', 'text-gray-300');
+	const fileTypeSelect = createCustomSelect(
+		'custom-select-wrapper-style',
+		'custom-select-trigger-style',
+		'custom-select-drop-down-style',
+		'custom-select-option-style',
+		[
+			{ label: 'PNG', value: 'png' },
+			{ label: 'JPEG', value: 'jpeg' },
+			{ label: 'WEBP', value: 'webp' },
+		],
+		(value) => handlers.onExportSelectChange(value),
+	);
+
+	const scaleLabel = createLabel('', 'Scale:', 'text-gray-300');
+	const scaleSelect = createCustomSelect(
+		'custom-select-wrapper-style',
+		'custom-select-trigger-style',
+		'custom-select-drop-down-style',
+		'custom-select-option-style',
+		[
+			{ label: '1x', value: 1 },
+			{ label: '2x', value: 2 },
+			{ label: '3x', value: 3 },
+			{ label: '4x', value: 4 },
+			{ label: '5x', value: 5 },
+			{ label: '6x', value: 6 },
+			{ label: '7x', value: 7 },
+			{ label: '8x', value: 8 },
+			{ label: '9x', value: 9 },
+			{ label: '10x', value: 10 },
+		],
+		(value) => handlers.onScaleSelectChange(value),
+	);
+
+	const sliderTooltip = elt(
+		'p',
+		{
+			className:
+				'bg-custom-black z-50 absolute shadow shadow-custom-black p-2 rounded-sm text-[12px]',
+			style:
+				'transform:translate(-50%, -25%); transition: opacity 150ms ease; margin-top: -25px; opacity: 0;',
+		},
+		'92',
+	);
+
+	const qualityLabel = createLabel('qualityRange', 'Quality:', 'text-gray-300');
+	const qualityRange = createInput(
+		'range',
+		'quality-slider h-[3px] w-48 appearance-none bg-white/10 rounded-lg',
+		3,
+		'qualityRange',
+		(value) => handlers.onQualityRangeChange(value),
+		null,
+		1,
+		100,
+		85,
+		null,
+		() => handlers.onQualityRangeMouseDown(),
+		() => handlers.onQualityRangeMouseUp(),
+		() => handlers.onQualityRangeMouseLeave(),
+		() => handlers.onQualityRangeMouseEnter(),
+	);
+
+	const qualitySlider = elt(
+		'div',
+		{
+			className: 'relative flex flex-row justify-around items-center h-8',
+		},
+
+		sliderTooltip,
+		qualityRange,
+	);
+
+	// export button to export the picture
+	const exportButton = createButton(
+		'btn-primary bg-custom-blue hover:bg-custom-blue-hover',
+		'Export',
+		() => handlers.onExport(),
+	);
+
+	const tableWrapper = elt(
+		'table',
+		{ className: 'w-full border-separate border-spacing-y-1' },
+		elt(
+			'tbody',
+			{},
+			createRow(fileNameLabel, fileNameInput),
+			createRow(fileTypeLabel, fileTypeSelect),
+			createRow(qualityLabel, qualitySlider),
+			createRow(scaleLabel, scaleSelect),
+		),
+	);
+
+	const cancelButton = createButton('btn-secondary', 'Cancel', () =>
+		handlers.onExportCancel(),
+	);
+
+	// Wrapper to Wrap the Save and Cancel buttons
+	const buttonBox = elt(
+		'div',
+		{
+			className:
+				'flex flex-row mt-6 gap-x-2 text-custom-black items-center justify-between',
+		},
+		exportButton,
+		cancelButton,
+	);
+
+	return {
+		dom: elt(
+			'div',
+			{
+				className:
+					'flex flex-col absolute shadow-sm shadow-gray-600 z-50 gap-y-5 min-w-36 min-h-32 bg-custom-tooltip-gray p-5 top-20 right-60 rounded-md',
+			},
+			tableWrapper,
+			buttonBox,
+		),
+		refs: {
+			sliderTooltip,
+			qualityRange,
+			fileNameExportInput: fileNameInput,
+			qualityLabel,
+		},
+	};
+}
+
+export function createShareContent(handlers) {
+	const titleLabel = createLabel('fileTitle', 'Title:', 'text-gray-300');
+	const titleNameInput = createInput(
+		'text',
+		'header-input-style',
+		50,
+		'fileTitle',
+		(eventValue) => {
+			handlers.onTitleNameInputChange(eventValue);
+		},
+		null,
+		null,
+		null,
+		null,
+		null,
+		null,
+		null,
+		null,
+		null,
+		'My Art',
+	);
+
+	const descriptionLabel = createLabel(
+		'description',
+		'Description:',
+		'text-gray-300',
+	);
+
+	const descriptionInput = elt('textarea', {
+		className: 'header-input-style resize-none', // resize-none prevents user resizing
+		id: 'description',
+		rows: 3,
+		maxLength: 150,
+		placeholder: 'Add a description...',
+		oninput: (e) => handlers.onDescriptionChange(e.target.value),
+	});
+
+	const fileNameLabel = createLabel('fileName', 'File Name:', 'text-gray-300');
+	const fileNameInput = createInput(
+		'text',
+		'header-input-style',
+		25,
+		'fileName',
+		(eventValue) => {
+			handlers.onShareNameInputChange(eventValue);
+		},
+		null,
+		null,
+		null,
+		null,
+		null,
+		null,
+		null,
+		null,
+		null,
+		'MyArt',
+	);
+
+	const fileTypeLabel = createLabel('', 'Format:', 'text-gray-300');
+	const fileTypeSelect = createCustomSelect(
+		'custom-select-wrapper-style',
+		'custom-select-trigger-style',
+		'custom-select-drop-down-style',
+		'custom-select-option-style',
+		[
+			{ label: 'PNG', value: 'png' },
+			{ label: 'JPEG', value: 'jpeg' },
+			{ label: 'WEBP', value: 'webp' },
+		],
+		(value) => handlers.onShareSelectChange(value),
+	);
+
+	const shareButton = createButton(
+		'btn-primary bg-custom-blue hover:bg-custom-blue-hover',
+		'Share',
+		() => handlers.onShare(),
+	);
+
+	const cancelButton = createButton('btn-secondary', 'Cancel', () =>
+		handlers.onShareCancel(),
+	);
+
+	// Wrapper to Wrap the Save and Cancel buttons
+	const buttonBox = elt(
+		'div',
+		{
+			className:
+				'flex flex-row mt-6 gap-x-2 text-custom-black items-center justify-between',
+		},
+		shareButton,
+		cancelButton,
+	);
+
+	const tableWrapper = elt(
+		'table',
+		{ className: 'w-full border-separate border-spacing-y-1' },
+		elt(
+			'tbody',
+			{},
+			createRow(titleLabel, titleNameInput),
+			createRow(descriptionLabel, descriptionInput),
+			createRow(fileNameLabel, fileNameInput),
+			createRow(fileTypeLabel, fileTypeSelect),
+		),
+	);
+
+	return {
+		dom: elt(
+			'div',
+			{
+				className:
+					'flex flex-col absolute shadow-sm shadow-gray-600 z-50 gap-y-5 min-w-36 min-h-32 bg-custom-tooltip-gray p-5 top-12 right-30 rounded-md',
+			},
+			tableWrapper,
+			buttonBox,
+		),
+		refs: { titleNameInput, descriptionInput, fileNameInput },
+	};
+}
+
+/* ||  UTILITIES */
+function createRow(label, input) {
+	return elt(
+		'tr',
+		{},
+		elt(
+			'td',
+			{
+				className:
+					'text-gray-400 text-sm pr-4 py-2 whitespace-nowrap align-middle',
+			},
+			label,
+		),
+		elt('td', { className: 'py-2 w-full align-middle' }, input),
+	);
+}
+/* UTILITIES */
 export const CUSTOM_BUILDERS = {
 	createMirrorContent,
 	createResizeContent,
 	createColorContent,
+	createExportContent,
+	createShareContent,
 };

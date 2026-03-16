@@ -1,4 +1,8 @@
 import { elt } from '../utils';
-export function createLabel(labelFor, labelText) {
-	return elt('label', { htmlFor: labelFor, className: '' }, labelText);
+export function createLabel(labelFor, labelText, classes) {
+	return elt(
+		'label',
+		{ htmlFor: labelFor, className: `${classes}` },
+		labelText,
+	);
 }

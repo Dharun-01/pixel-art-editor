@@ -75,11 +75,27 @@ export class StatusbarView {
 			this.handlers.onFitWindow,
 		);
 
+		this.fitWindowHoverTooltip = createParaContent(
+			'text-gray-300 bg-black rounded-md px-2 py-1 absolute -top-10  -left-7 whitespace-nowrap pointer-events-none delay-300 featureTooltipHidden z-50',
+			'Fit Window',
+		);
+
+		this.fitWindowIcon.addEventListener('mouseenter', (event) => {
+			this.fitWindowHoverTooltip.classList.add('featureTooltipVisible');
+			this.fitWindowHoverTooltip.classList.remove('featureTooltipHidden');
+		});
+
+		this.fitWindowIcon.addEventListener('mouseleave', (event) => {
+			this.fitWindowHoverTooltip.classList.add('featureTooltipHidden');
+			this.fitWindowHoverTooltip.classList.remove('featureTooltipVisible');
+		});
+
 		this.fitWindow = elt(
 			'p',
 			{
-				className: 'p-1 rounded-sm',
+				className: 'p-1 rounded-sm relative',
 			},
+			this.fitWindowHoverTooltip,
 			this.fitWindowIcon,
 		);
 
@@ -140,11 +156,41 @@ export class StatusbarView {
 			this.handlers.onZoomIn,
 		);
 
+		this.zoomInHoverTooltip = createParaContent(
+			'text-gray-300 bg-black rounded-md px-2 py-1 absolute -top-12  -right-0 whitespace-nowrap pointer-events-none delay-300 featureTooltipHidden z-50',
+			'Zoom In',
+		);
+
+		this.zoomInIcon.addEventListener('mouseenter', (event) => {
+			this.zoomInHoverTooltip.classList.add('featureTooltipVisible');
+			this.zoomInHoverTooltip.classList.remove('featureTooltipHidden');
+		});
+
+		this.zoomInIcon.addEventListener('mouseleave', (event) => {
+			this.zoomInHoverTooltip.classList.add('featureTooltipHidden');
+			this.zoomInHoverTooltip.classList.remove('featureTooltipVisible');
+		});
+
 		this.zoomOutIcon = createIconDom(
 			'../assets/zoom_out_16dp_4DA3FF_FILL0_wght400_GRAD0_opsz20.svg',
 			'hover:bg-custom-glass-black rounded-sm p-1 transition-all duration-150',
 			this.handlers.onZoomOut,
 		);
+
+		this.zoomOutHoverTooltip = createParaContent(
+			'text-gray-300 bg-black rounded-md px-2 py-1 absolute -top-12  -left-7 whitespace-nowrap pointer-events-none delay-300 featureTooltipHidden z-50',
+			'Zoom Out',
+		);
+
+		this.zoomOutIcon.addEventListener('mouseenter', (event) => {
+			this.zoomOutHoverTooltip.classList.add('featureTooltipVisible');
+			this.zoomOutHoverTooltip.classList.remove('featureTooltipHidden');
+		});
+
+		this.zoomOutIcon.addEventListener('mouseleave', (event) => {
+			this.zoomOutHoverTooltip.classList.add('featureTooltipHidden');
+			this.zoomOutHoverTooltip.classList.remove('featureTooltipVisible');
+		});
 
 		this.zoomRange = createInput(
 			'range',
@@ -179,9 +225,11 @@ export class StatusbarView {
 				className:
 					'relative flex flex-row justify-around items-center w-72 h-5',
 			},
+			this.zoomOutHoverTooltip,
 			this.zoomOutIcon,
 			this.sliderTooltip,
 			this.zoomRange,
+			this.zoomInHoverTooltip,
 			this.zoomInIcon,
 		);
 
@@ -199,7 +247,7 @@ export class StatusbarView {
 			'div',
 			{
 				className:
-					'fixed bottom-0 text-white left-0 flex flex-row justify-between items-center h-10 w-screen bg-custom-gray z-20',
+					'fixed bottom-0 text-white left-0 flex flex-row justify-between items-center h-10 w-screen bg-custom-gray z-10',
 			},
 			this.leftStatus,
 			this.rightStatus,
@@ -265,8 +313,8 @@ export class StatusbarView {
 	 * Update tooltip text and input
 	 */
 	updateZoomDisplay(value) {
-		this.sliderTooltip.textContent = `${value}%`;
-		this.zoomSelectInput.value = `${value}%`;
+		this.sliderTooltip.textContent = Math.round(value) + '%';
+		this.zoomSelectInput.value = Math.round(value) + '%';
 	}
 
 	/**

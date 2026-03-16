@@ -1,64 +1,89 @@
-import { createIconDom } from '../components/toggleIcon';
+import { createFeatures } from '../components/features';
+import { CUSTOM_BUILDERS } from '../controls/builders/customContentBuilders';
+import { composeFeatures } from '../controls/builders/viewComposer';
 import { elt } from '../utils';
-import { headerLeftConfig, headerRightConfig } from './config/headerBar.config';
+import { HEADER_SELECT_CONFIG } from './config/headerBar.config';
+import { headerBarUiUpdateServices } from './services/headerbarServices';
 
 export class HeaderView {
 	constructor(handlers) {
 		this.handlers = handlers;
+		const { features, references } = composeFeatures(
+			HEADER_SELECT_CONFIG,
+			handlers,
+			CUSTOM_BUILDERS,
+		);
+		this.featureElements = features;
+		this.references = references;
+		this.dom = this.assembleDom();
+	}
 
-		const left = elt(
-			'div',
-			{ className: 'flex flex-row pl-5 gap-x-8 items-center h-full' },
-			...this.createLeftHeader(),
+	assembleDom() {
+		const featuresArray = Object.values(this.featureElements);
+		const leftFeatures = featuresArray.slice(0, 3);
+		const rightFeatures = featuresArray.slice(3);
+
+		const leftFeaturesContainer = createFeatures(
+			leftFeatures,
+			'header-features-div-style gap-x-8',
+		);
+		const rightFeaturesContainer = createFeatures(
+			rightFeatures,
+			'header-features-div-style gap-x-6',
 		);
 
-		const right = elt(
-			'div',
-			{ className: 'flex flex-row pr-5 gap-x-8 items-center h-full ml-auto' },
-			...this.createRightHeader(),
-		);
-
-		this.dom = elt(
+		return elt(
 			'div',
 			{
 				className:
-					'fixed flex flex-row justify-between top-0 left-0 z-30 h-10 w-screen bg-custom-black',
+					'fixed flex flex-row justify-between px-5 top-0 left-0 z-30 h-12 w-screen bg-custom-black',
 			},
-			left,
-			right,
+			leftFeaturesContainer,
+			rightFeaturesContainer,
 		);
 	}
 
-	/* The first part of the left side of the header */
-	createLeftHeader() {
-		return headerLeftConfig.map((option) =>
-			elt(
-				'p',
-				{
-					className:
-						'text-md text-white hover:bg-custom-glass-black px-2 py-1 rounded-sm transition-all duration-150',
-				},
-				option,
-			),
-		);
+	showPopup(featureName, visible) {
+		const popup = this.references[`${featureName}Popup`];
+		if (popup) {
+			popup.classList.toggle('tooltipVisible', visible);
+			popup.classList.toggle('tooltipHidden', !visible);
+		}
 	}
 
-	/* Right part of the left side of the header (Icons like download, import, export, share, undo, redo) */
-	createRightHeader() {
-		const actions = [
-			this.handlers.onDownload,
-			this.handlers.onShare,
-			this.handlers.onUpload,
-			this.handlers.onExport,
-			this.handlers.onUndo,
-			this.handlers.onRedo,
-		];
-		return headerRightConfig.map((icon, i) =>
-			createIconDom(
-				icon,
-				'hover:bg-custom-glass-black px-2 py-1 rounded-sm transition-all duration-150',
-				actions[i],
-			),
-		);
+	hideAllPopups() {
+		Object.keys(this.featureElements).forEach((name) => {
+			this.showPopup(name, false);
+		});
+	}
+
+	updateSliderColor(value, qualityRange) {
+		const gradient = headerBarUiUpdateServices.getSliderGradient(value);
+		qualityRange.style.background = gradient;
+	}
+
+	updateSliderValue(value, qualityRange) {
+		qualityRange.value = Number(parseInt(value, 10));
+		this.updateSliderColor(value, qualityRange);
+	}
+
+	updateTooltipPosition(x, y, tooltip) {
+		console.log(x, y);
+
+		tooltip.style.left = `${x}px`;
+		tooltip.style.top = `${y}px`;
+		console.log(tooltip);
+	}
+
+	updateTooltipValue(tooltip, value) {
+		tooltip.textContent = Math.round(value);
+	}
+
+	showTooltip(tooltip) {
+		tooltip.style.opacity = '1';
+	}
+
+	hideTooltip(tooltip) {
+		tooltip.style.opacity = '0';
 	}
 }

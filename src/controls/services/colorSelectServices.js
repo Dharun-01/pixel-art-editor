@@ -52,4 +52,33 @@ export class colorSelectServices {
 
 		return true;
 	}
+
+	static shiftColorsWhenFull(slotLength, slots, references) {
+		for (let i = 0; i < slotLength - 1; i++) {
+			references[slots[i]].dataset.color =
+				references[slots[i + 1]].dataset.color;
+			references[slots[i]].style.background =
+				references[slots[i + 1]].dataset.color;
+		}
+	}
+
+	static getSlotLength(slots) {
+		return slots.length;
+	}
+
+	static getHexColor(references) {
+		return references.hexInput.value;
+	}
+
+	static setLastSlotToNewColor(references, slots, slotLength, hexColor) {
+		references[slots[slotLength - 1]].style.background = hexColor;
+		references[slots[slotLength - 1]].dataset.color = hexColor;
+	}
+
+	static fillEmptySlot(references, emptySlot, hexColor) {
+		references[emptySlot].style.background = hexColor;
+		references[emptySlot].dataset.color = hexColor;
+		references[emptySlot].dataset.empty = 'false';
+		references[emptySlot].classList.remove('empty-slot');
+	}
 }

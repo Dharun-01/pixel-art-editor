@@ -39,5 +39,23 @@ export const initialUiState = {
 		brightness: 0,
 		hexInputErrorMessage: null,
 	},
+	header: {
+		activeIcon: null, // 'export' || 'share'
+		export: {
+			fileName: 'My Picture',
+			fileType: 'png',
+			scale: 1,
+			quality: 0.92,
+		},
+		share: {
+			title: 'My Drawing',
+			description: 'Check out my pixel art!',
+			fileName: 'pixelArt',
+			fileType: 'png',
+		},
+	},
+	layer: {
+		isActive: false,
+	},
 	cursorVisible: null, // Status bar pixel position stats
 };

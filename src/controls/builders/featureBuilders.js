@@ -1,4 +1,5 @@
 import { createIconDom } from '../../components/toggleIcon.js';
+import { createParaContent } from '../../components/paraTag.js';
 import { createPopupCard } from '../../components/popupCard.js';
 import { createCardOption } from '../../components/cardOptions.js';
 import { createFeatureDiv } from '../../components/featureDiv.js';
@@ -13,13 +14,47 @@ import { elt } from '../../utils.js';
  */
 
 export function buildStandardFeature(name, config, handlers) {
-	// create icon
-	const icon = createIconDom(
-		config.icon,
-		config.iconStyle,
-		handlers[`on${capitalize(name)}Click`],
+	let icon, stringValue;
+
+	// If the clickable is a text
+	if (config.icon) {
+		// create icon
+		icon = createIconDom(
+			config.icon,
+			config.iconStyle,
+			handlers[`on${capitalize(name)}Click`],
+		);
+	}
+	// If the clickable is a text
+	if (config.string) {
+		stringValue = elt(
+			'p',
+			{
+				className:
+					'text-md text-white hover:bg-custom-glass-black py-1 px-2 rounded-sm transition-all duration-150',
+				onclick: () => handlers[`on${capitalize(name)}Click`](),
+			},
+			config.string,
+		);
+	}
+
+	const tooltip = createParaContent(
+		'text-gray-300 bg-black rounded-md px-2 py-1 absolute top-12 whitespace-nowrap pointer-events-none delay-300 z-50 featureTooltipHidden',
+		config.tooltip,
 	);
 
+	let clickable = icon || stringValue;
+	if (icon) {
+		clickable.addEventListener('mouseenter', (event) => {
+			tooltip.classList.add('featureTooltipVisible');
+			tooltip.classList.remove('featureTooltipHidden');
+		});
+
+		clickable.addEventListener('mouseleave', (event) => {
+			tooltip.classList.add('featureTooltipHidden');
+			tooltip.classList.remove('featureTooltipVisible');
+		});
+	}
 	//create popup options
 	const optionElements = config.options.map((option) => {
 		return createCardOption(
@@ -33,9 +68,20 @@ export function buildStandardFeature(name, config, handlers) {
 	const popupCard = createPopupCard(optionElements, config.popupStyle);
 
 	// create feature div to hold icon and popup
-	const featureDiv = createFeatureDiv(icon, popupCard, config.featureDivStyle);
+	const featureDiv = createFeatureDiv(
+		icon || stringValue,
+		popupCard,
+		config.featureDivStyle,
+		tooltip,
+	);
 
-	return { icon: icon, dom: featureDiv, popup: popupCard, refs: {} };
+	return {
+		icon: icon || stringValue,
+		dom: featureDiv,
+		popup: popupCard,
+		tooltip,
+		refs: {},
+	};
 }
 
 /**
@@ -51,7 +97,33 @@ export function buildIconOnlyFeature(name, config, handlers) {
 		handlers[`on${capitalize(name)}Click`],
 	);
 
-	return { dom: icon, icon, popup: null, refs: {} }; // Return the icon as the feature DOM, and also include it in the return object for reference in syncState
+	const tooltip = createParaContent(
+		'text-gray-300 fixed bg-black rounded-md z-50 px-2 py-1 top-12 whitespace-nowrap pointer-events-none delay-300 featureTooltipHidden',
+		config.tooltip,
+	);
+
+	document.body.appendChild(tooltip);
+	const wrapper = elt(
+		'div',
+		{ className: 'relative flex flex-row justify-center items-center' },
+		icon,
+		tooltip,
+	);
+
+	icon.addEventListener('mouseenter', (event) => {
+		const rect = icon.getBoundingClientRect();
+		tooltip.style.left = rect.left + 'px';
+		tooltip.style.top = rect.bottom + 6 + 'px';
+		tooltip.classList.add('featureTooltipVisible');
+		tooltip.classList.remove('featureTooltipHidden');
+	});
+
+	icon.addEventListener('mouseleave', (event) => {
+		tooltip.classList.add('featureTooltipHidden');
+		tooltip.classList.remove('featureTooltipVisible');
+	});
+
+	return { dom: wrapper, icon, popup: null, tooltip, refs: {} }; // Return the icon as the feature DOM, and also include it in the return object for reference in syncState
 }
 
 // Used in color controls
@@ -94,14 +166,34 @@ export function buildCustomFeature(name, config, handlers, customBuilders) {
 	// create popup card with custom content
 	const result = builderFunction(handlers); // Pass handlers to the builder function so it can attach actions to custom options
 
+	const tooltip = createParaContent(
+		'text-gray-300 bg-black rounded-md px-2 py-1 absolute top-12 whitespace-nowrap pointer-events-none delay-300 featureTooltipHidden z-50',
+		config.tooltip,
+	);
+
+	icon.addEventListener('mouseenter', (event) => {
+		tooltip.classList.add('featureTooltipVisible');
+		tooltip.classList.remove('featureTooltipHidden');
+	});
+
+	icon.addEventListener('mouseleave', (event) => {
+		tooltip.classList.add('featureTooltipHidden');
+		tooltip.classList.remove('featureTooltipVisible');
+	});
+
 	const popupDom = result.dom; // The custom builder should return an object with a 'dom' property containing the popup content
 
 	const refs = result.refs || {}; // The custom builder can also return any references to important elements (like switches) that need to be accessed in syncState
 
 	// combine into a feature
-	const featureDiv = createFeatureDiv(icon, popupDom, config.featureDivStyle);
+	const featureDiv = createFeatureDiv(
+		icon,
+		popupDom,
+		config.featureDivStyle,
+		tooltip,
+	);
 
-	return { icon: icon, dom: featureDiv, popup: popupDom, refs: refs }; // Return both the feature div and the popup for reference in syncState
+	return { icon: icon, dom: featureDiv, popup: popupDom, tooltip, refs: refs }; // Return both the feature div and the popup for reference in syncState
 }
 
 // ═══════════════════════════════════════

@@ -6,6 +6,7 @@ export const IMAGE_SELECT_CONFIG = {
 	rotate: {
 		type: 'standard',
 		icon: '../../../assets/rotate_90_degrees_cw_16dp_4DA3FF_FILL0_wght400_GRAD0_opsz20.svg',
+		tooltip: 'Rotate',
 		iconStyle: 'icon-style',
 		cardOptionsStyle: 'card-options-style',
 		popupStyle: 'popup-card-style',
@@ -20,6 +21,7 @@ export const IMAGE_SELECT_CONFIG = {
 	flip: {
 		type: 'standard',
 		icon: '../../../assets/flip_16dp_4DA3FF_FILL0_wght400_GRAD0_opsz20.svg',
+		tooltip: 'Flip',
 		iconStyle: 'icon-style',
 		cardOptionsStyle: 'card-options-style',
 		popupStyle: 'popup-card-style',
@@ -32,6 +34,7 @@ export const IMAGE_SELECT_CONFIG = {
 
 	grid: {
 		type: 'icon-only',
+		tooltip: 'Grid',
 		icon: '../../../assets/grid_3x3_16dp_4DA3FF_FILL0_wght400_GRAD0_opsz20.svg',
 		iconStyle: 'icon-style',
 	},
@@ -43,6 +46,7 @@ export const IMAGE_SELECT_CONFIG = {
 	mirror: {
 		type: 'custom',
 		icon: '../../../assets/align_justify_center_16dp_4DA3FF_FILL0_wght400_GRAD0_opsz20.svg',
+		tooltip: 'Mirror',
 		iconStyle: 'icon-style',
 		featureDivStyle: 'feature-div-style',
 		renderContent: 'createMirrorContent', // Reference to custom builder function
@@ -51,6 +55,7 @@ export const IMAGE_SELECT_CONFIG = {
 	resize: {
 		type: 'custom',
 		icon: '../../../assets/resize_16dp_4DA3FF_FILL0_wght400_GRAD0_opsz20.svg',
+		tooltip: 'Resize',
 		iconStyle: 'icon-style',
 		featureDivStyle: 'feature-div-style',
 		renderContent: 'createResizeContent', // Reference to custom builder function

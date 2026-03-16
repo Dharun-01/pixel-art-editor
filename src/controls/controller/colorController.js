@@ -142,32 +142,37 @@ export class ColorSelectController {
 	}
 
 	handleOkButtonClick() {
-		const hexColor = this.view.references.hexInput.value;
+		const hexColor = colorSelectServices.getHexColor(this.view.references);
 		const isAnySlotEmpty = slots.every(
 			(slot) => this.view.references[slot].dataset.empty === 'false',
 		);
 
 		if (isAnySlotEmpty) {
-			const slotLength = slots.length;
-			for (let i = 0; i < slotLength - 1; i++) {
-				this.view.references[slots[i]].dataset.color =
-					this.view.references[slots[i + 1]].dataset.color;
-				this.view.references[slots[i]].style.background =
-					this.view.references[slots[i + 1]].dataset.color;
-			}
-			this.view.references[slots[slotLength - 1]].style.background = hexColor;
-			this.view.references[slots[slotLength - 1]].dataset.color = hexColor;
+			const slotLength = colorSelectServices.getSlotLength(slots);
+			colorSelectServices.shiftColorsWhenFull(
+				slotLength,
+				slots,
+				this.view.references,
+			);
+
+			colorSelectServices.setLastSlotToNewColor(
+				this.view.references,
+				slots,
+				slotLength,
+				hexColor,
+			);
+			this.dispatch({ type: 'SET_CUSTOM_ACTIVE' });
+			return;
 		}
 
-		for (let i = 0; i < slots.length; i++) {
-			if (this.view.references[slots[i]].dataset.empty === 'true') {
-				this.view.references[slots[i]].style.background = hexColor;
-				this.view.references[slots[i]].dataset.color = hexColor;
-				this.view.references[slots[i]].dataset.empty = 'false';
-				this.view.references[slots[i]].classList.remove('empty-slot');
-				break;
-			}
-		}
+		const emptySlot = slots.find(
+			(slot) => this.view.references[slot].dataset.empty === 'true',
+		);
+		colorSelectServices.fillEmptySlot(
+			this.view.references,
+			emptySlot,
+			hexColor,
+		);
 
 		this.dispatch({ type: 'SET_CUSTOM_ACTIVE' });
 	}
@@ -216,19 +221,18 @@ export class ColorSelectController {
 
 		this.view.references.hexInput.classList.toggle('border-b-red-500', isError);
 
-		this.view.references.customColorSelectorIcon.classList.toggle(
-			'icon-highlight-style',
-			color.isCustomActive,
-		);
+		// highlights custom color select icon.
+		this.view.highlightIcon('customColorSelector', color.isCustomActive);
 
-		this.view.references['primaryColor'].classList.toggle(
-			'active-color-slot',
-			color.activeSlot === 'primaryColor',
-		);
-		this.view.references['secondaryColor'].classList.toggle(
-			'active-color-slot',
-			color.activeSlot === 'secondaryColor',
-		);
+		// clear all slots first
+		['primaryColor', 'secondaryColor'].forEach((slot) => {
+			this.view.references[slot].classList.remove('active-color-slot');
+		});
+
+		// then highlight only the active one
+		if (color.activeSlot) {
+			this.view.references[color.activeSlot].classList.add('active-color-slot');
+		}
 
 		this.view.showPopup(color.isCustomActive);
 

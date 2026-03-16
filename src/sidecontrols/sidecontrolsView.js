@@ -1,4 +1,5 @@
 import { createInput } from '../components/inputTag.js';
+import { createParaContent } from '../components/paraTag.js';
 import { createIconDom } from '../components/toggleIcon.js';
 import { elt } from '../utils.js';
 import { SideControlsCalculationService } from './services/sidecontrolsServices.js';
@@ -15,6 +16,7 @@ export class SideControlsView {
 			},
 			'1px',
 		);
+
 		this.opacityTooltip = elt(
 			'p',
 			{
@@ -29,12 +31,41 @@ export class SideControlsView {
 			'rotate-90',
 			null,
 		);
+		this.sizeHoverTooltip = createParaContent(
+			'text-gray-300 bg-black rounded-md px-2 py-1 absolute top-2 -right-9 rotate-90 whitespace-nowrap pointer-events-none delay-300 featureTooltipHidden z-50',
+			'Size',
+		);
+
+		this.sizeIcon.addEventListener('mouseenter', (event) => {
+			this.sizeHoverTooltip.classList.add('featureTooltipVisible');
+			this.sizeHoverTooltip.classList.remove('featureTooltipHidden');
+		});
+
+		this.sizeIcon.addEventListener('mouseleave', (event) => {
+			this.sizeHoverTooltip.classList.add('featureTooltipHidden');
+			this.sizeHoverTooltip.classList.remove('featureTooltipVisible');
+		});
 
 		this.opacityIcon = createIconDom(
 			'../../assets/opacity_16dp_E3E3E3_FILL0_wght400_GRAD0_opsz20.svg',
 			'rotate-90',
 			null,
 		);
+
+		this.opacityHoverTooltip = createParaContent(
+			'text-gray-300 bg-black rounded-md px-2 py-1 absolute top-5 -right-12 rotate-90 whitespace-nowrap pointer-events-none delay-300 featureTooltipHidden z-50',
+			'Opacity',
+		);
+
+		this.opacityIcon.addEventListener('mouseenter', (event) => {
+			this.opacityHoverTooltip.classList.add('featureTooltipVisible');
+			this.opacityHoverTooltip.classList.remove('featureTooltipHidden');
+		});
+
+		this.opacityIcon.addEventListener('mouseleave', (event) => {
+			this.opacityHoverTooltip.classList.add('featureTooltipHidden');
+			this.opacityHoverTooltip.classList.remove('featureTooltipVisible');
+		});
 
 		this.sizeControlSlider = createInput(
 			'range',
@@ -75,6 +106,7 @@ export class SideControlsView {
 				className:
 					'bg-custom-gray relative flex gap-x-3 items-center justify-center  rounded-lg py-1 px-2 h-8',
 			},
+			this.sizeHoverTooltip,
 			this.sizeTooltip,
 			this.sizeControlSlider,
 			this.sizeIcon,
@@ -86,6 +118,7 @@ export class SideControlsView {
 				className:
 					'bg-custom-gray relative flex items-center justify-center gap-x-3 h-8 rounded-lg py-1 px-2',
 			},
+			this.opacityHoverTooltip,
 			this.opacityControlSlider,
 			this.opacityIcon,
 			this.opacityTooltip,
@@ -95,7 +128,7 @@ export class SideControlsView {
 			'div',
 			{
 				className:
-					'fixed top-60 -left-20 z-20 flex flex-col h-24 gap-y-2 justify-center  -rotate-90 items-center',
+					'fixed top-[53%] -left-20 z-10 flex flex-col h-24 gap-y-2 justify-center  -rotate-90 items-center',
 			},
 			this.sizeController,
 			this.opacityController,

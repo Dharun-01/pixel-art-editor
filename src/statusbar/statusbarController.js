@@ -85,7 +85,10 @@ export class StatusbarController {
 		this.isDragging = true;
 		this.view.updateTooltipToThumb();
 		this.view.updateZoomDisplay(value);
-		this.dispatch({ type: 'SET_ZOOM_LEVEL', stringValue: value / 100 });
+		this.dispatch({
+			type: 'SET_ZOOM_LEVEL',
+			stringValue: Math.round(value) / 100,
+		});
 	}
 
 	handleZoomRangeMouseDown() {

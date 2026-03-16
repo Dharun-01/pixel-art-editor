@@ -38,7 +38,9 @@ export class BrushSelectView {
 	showPopup(featureName, visible) {
 		const popup = this.references[`${featureName}Popup`];
 		if (popup) {
-			popup.classList.toggle('tooltipVisible', visible);
+			if (visible) {
+				popup.classList.toggle('tooltipVisible', visible);
+			}
 			popup.classList.toggle('tooltipHidden', !visible);
 		}
 	}

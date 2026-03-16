@@ -46,7 +46,7 @@ export class ColorSelectView {
 		// This is the custom color selection DOM
 		this.customColorSelection = elt(
 			'div',
-			{ className: 'flex flex-row ' },
+			{ className: 'flex flex-row min-w-14' },
 			featuresArray[featuresArrayLength - 1],
 		);
 
@@ -70,7 +70,7 @@ export class ColorSelectView {
 
 		return elt(
 			'div',
-			{ className: 'control-div-style' },
+			{ className: 'control-div-style py-2' },
 			this.colorDom,
 			controlLabelDom,
 		);
@@ -148,9 +148,22 @@ export class ColorSelectView {
 			'tooltipHidden',
 			!isActive,
 		);
-		this.references['customColorSelectorPopup'].classList.toggle(
-			'tooltipVisible',
-			isActive,
-		);
+		if (isActive) {
+			this.references['customColorSelectorPopup'].classList.toggle(
+				'tooltipVisible',
+				isActive,
+			);
+			this.references['customColorSelectorTooltip'].classList.replace(
+				'tooltipVisible',
+				'tooltipHidden',
+			);
+		}
+	}
+
+	highlightIcon(featureName, highlighted) {
+		const icon = this.references[`${featureName}Icon`];
+		if (icon) {
+			icon.classList.toggle('icon-highlight-style', highlighted);
+		}
 	}
 }

@@ -65,6 +65,14 @@ export class ImageSelectView {
 		}
 	}
 
+	showTooltip(featureName) {
+		const tooltip = this.references[`${featureName}Tooltip`];
+		if (tooltip) {
+			tooltip.classList.add('opacity-100');
+		}
+	}
+
+	hideTooltip() {}
 	unhighlightAllIcons() {
 		Object.keys(this.featureElements).forEach((name) => {
 			this.highlightIcon(name, false);

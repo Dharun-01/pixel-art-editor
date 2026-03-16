@@ -58,6 +58,11 @@ export class AppController {
 
 	attachOverlayEventHandlers() {
 		this.appView.overlay.addEventListener('click', () => {
+			if (this.state.ui.header.activeIcon) {
+				this.dispatch({ type: 'SET_ACTIVE_ICON', stringValue: null });
+				return;
+			}
+
 			this.dispatch({ type: 'SET_CUSTOM_ACTIVE' }); // same as cancel
 		});
 	}
@@ -77,7 +82,9 @@ export class AppController {
 		for (let ctrl of this.controls) ctrl.syncState(this.state);
 
 		const isCustomActive = newState.ui.color.isCustomActive;
-		this.appView.overlay.classList.toggle('tooltipVisible', isCustomActive);
-		this.appView.overlay.classList.toggle('tooltipHidden', !isCustomActive);
+		const showOverlay = isCustomActive || !!newState.ui.header.activeIcon;
+
+		this.appView.overlay.classList.toggle('tooltipVisible', showOverlay);
+		this.appView.overlay.classList.toggle('tooltipHidden', !showOverlay);
 	}
 }
