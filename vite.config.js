@@ -4,7 +4,7 @@ import { resolve } from 'path';
 
 export default defineConfig({
 	plugins: [react()],
-	base: './',
+	base: '/pixel-art-editor/',
 	build: {
 		target: 'esnext',
 		rollupOptions: {
