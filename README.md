@@ -4,7 +4,7 @@ A vanilla JavaScript pixel art editor built with HTML5 Canvas.
 
 ## Features
 
-- Drawing tools (pencil, line, rectangle, circle)
+- Drawing tools (pencil, line, rectangle, circle, etc....)
 - Color picker
 - Undo/Redo support
 - Zoom controls
@@ -18,17 +18,6 @@ A vanilla JavaScript pixel art editor built with HTML5 Canvas.
 2. Select a tool from the dropdown
 3. Pick a color
 4. Click and drag on the canvas to draw
-
-## Keyboard Shortcuts
-
-- `d` - Draw tool
-- `f` - Fill tool
-- `r` - Rectangle tool
-- `c` - Circle tool
-- `l` - Line tool
-- `p` - Color picker
-- `Ctrl/Cmd + Z` - Undo
-- `Ctrl/Cmd + Y` - Redo
 
 ## Development
 
