@@ -46,17 +46,19 @@ export class Picture {
 
 			// Alpha composition (normal blend)
 			const outA = srcA + dstA * (1 - srcA);
-
 			if (outA > 0) {
 				copy[index] = Math.round(
 					((srcR * srcA + dstR * dstA * (1 - srcA)) / outA) * 255,
 				);
+
 				copy[index + 1] = Math.round(
 					((srcG * srcA + dstG * dstA * (1 - srcA)) / outA) * 255,
 				);
+
 				copy[index + 2] = Math.round(
 					((srcB * srcA + dstB * dstA * (1 - srcA)) / outA) * 255,
 				);
+
 				copy[index + 3] = Math.round(outA * 255);
 			}
 

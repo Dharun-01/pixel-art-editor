@@ -57,6 +57,7 @@ export class BrushSelectController {
 		const { active } = newState.ui.drawingTools;
 
 		if (active === 'brush') {
+			this.view.hideTooltipOnPopupActive(this.view.references['brushTooltip']);
 			this.view.highlightIcon('brush', true);
 			this.view.showPopup('brush', true);
 		} else {

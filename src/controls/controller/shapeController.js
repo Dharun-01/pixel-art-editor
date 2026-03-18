@@ -40,6 +40,7 @@ export class ShapeSelectController {
 
 	handleShapeClick(shape) {
 		this.dispatch({ type: 'SET_SHAPE', stringValue: shape });
+		this.view.hideTooltipOnPopupActive(this.view.references[`${shape}Tooltip`]);
 	}
 
 	openPopup() {
@@ -60,6 +61,7 @@ export class ShapeSelectController {
 	handleBrushType(brushType) {
 		let allCaps = brushType.toUpperCase();
 		this.dispatch({ type: `SHAPE_VALUE_${allCaps}`, stringValue: allCaps });
+		this.dispatch({ type: 'SET_SHAPE_BRUSH' });
 	}
 
 	syncState(newState) {
@@ -96,7 +98,12 @@ export class ShapeSelectController {
 
 		const { activeBrush } = newState.ui.drawingShapeTools;
 		if (activeBrush) {
+			this.view.hideTooltipOnPopupActive(
+				this.view.references['shapeBrushTooltip'],
+			);
+
 			this.view.showPopup('shapeBrush', true);
+
 			this.view.highlightIcon(
 				'shapeBrush',
 				!!activeBrush,

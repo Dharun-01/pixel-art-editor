@@ -1,5 +1,5 @@
 export const HEADER_SELECT_CONFIG = {
-	file: {
+	/* file: {
 		type: 'standard',
 		string: 'File',
 		tooltip: 'File',
@@ -43,6 +43,15 @@ export const HEADER_SELECT_CONFIG = {
 			{ label: '', action: '' },
 		],
 	},
+ */
+	save: {
+		type: 'custom',
+		icon: '../../../assets/save_16dp_E3E3E3_FILL0_wght400_GRAD0_opsz20.svg',
+		tooltip: 'Save Project',
+		iconStyle: 'icon-style',
+		featureDivStyle: 'featureDivStyle',
+		renderContent: 'createSaveContent',
+	},
 
 	share: {
 		type: 'custom',
@@ -52,11 +61,16 @@ export const HEADER_SELECT_CONFIG = {
 		featureDivStyle: 'feature-div-style',
 		renderContent: 'createShareContent',
 	},
-
+	load: {
+		type: 'icon-only',
+		icon: '../../../assets/file_open_16dp_E3E3E3_FILL0_wght400_GRAD0_opsz20.svg',
+		tooltip: 'Open file',
+		iconStyle: 'icon-style',
+	},
 	upload: {
 		type: 'icon-only',
 		icon: '../../../assets/upload_file_16dp_E3E3E3_FILL0_wght400_GRAD0_opsz20.svg',
-		tooltip: 'Upload',
+		tooltip: 'Import',
 		iconStyle: 'icon-style',
 	},
 

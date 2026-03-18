@@ -1,5 +1,4 @@
 import { composeFeatures } from '../builders/viewComposer';
-import { createFeatures } from '../../components/features';
 import { elt } from '../../utils';
 import { createControlLabel } from '../../components/controlLabel';
 import { SHAPE_SELECT_CONFIG } from '../config/shapeSelectConfig';
@@ -53,8 +52,23 @@ export class ShapeSelectView {
 		);
 	}
 
+	hideTooltipOnPopupActive(reference) {
+		reference.classList.add('featureTooltipHidden');
+		reference.classList.remove('featureTooltipVisible');
+	}
+
 	showPopup(featureName, visible) {
 		const popup = this.references[`${featureName}Popup`];
+		const icon = this.references[`${featureName}Icon`];
+
+		if (!popup) return;
+
+		if (visible && icon) {
+			const rect = icon.getBoundingClientRect();
+			popup.style.left = rect.left + rect.width + 'px';
+			popup.style.top = rect.bottom + 4 + 'px';
+		}
+
 		if (popup) {
 			popup.classList.toggle('tooltipVisible', visible);
 			popup.classList.toggle('tooltipHidden', !visible);

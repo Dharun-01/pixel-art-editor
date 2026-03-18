@@ -1,3 +1,4 @@
+import { autoSave } from '../app/services/autoSaveService.js';
 import { PictureCanvasView } from './canvasView.js';
 import { CanvasPointerEventServices } from './services/canvasPointerEventService.js';
 import { CanvasInteractionServices } from './services/canvasInteractionService.js';
@@ -20,6 +21,7 @@ export class PictureCanvasController {
 		this.ImageData = this.cx.createImageData(picture.width, picture.height);
 		this.zoom = null;
 		this.mirrorAxis = state.ui.transform.mirror.axis;
+		this.autoTimer = null;
 		this.syncState(picture, this.state);
 	}
 
@@ -214,20 +216,27 @@ export class PictureCanvasController {
 			state.drawing.previewPicture,
 		);
 		const newMirrorAxis = state.ui.transform.mirror.axis;
-		if (
-			CanvasSyncStateServices.isSamePictureOrZoom(
-				this.picture,
-				picture,
-				this.zoom,
-				state.drawing.zoomLevel,
-				isPreview,
-				this.gridVisible,
-				state.ui.transform.gridVisible,
-				this.mirrorAxis,
-				newMirrorAxis,
-			)
-		)
-			return;
+		const isSame = CanvasSyncStateServices.isSamePictureOrZoom(
+			this.picture,
+			picture,
+			this.zoom,
+			state.drawing.zoomLevel,
+			isPreview,
+			this.gridVisible,
+			state.ui.transform.gridVisible,
+			this.mirrorAxis,
+			newMirrorAxis,
+		);
+
+		if (!isSame) {
+			clearTimeout(this.autoTimer);
+
+			this.autoTimer = setTimeout(() => {
+				autoSave(this.state.drawing.picture);
+			}, 1000);
+		}
+
+		if (isSame) return;
 
 		this.ImageData = drawPicture(
 			state,

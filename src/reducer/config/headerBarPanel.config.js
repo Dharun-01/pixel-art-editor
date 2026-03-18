@@ -8,4 +8,5 @@ export const headerBarValueMap = {
 	SET_EXPORT_FORMAT: 'header.export.fileType',
 	SET_EXPORT_SCALE: 'header.export.scale',
 	SET_EXPORT_QUALITY: 'header.export.quality',
+	SET_SAVE_FILENAME: 'header.save.fileName',
 };

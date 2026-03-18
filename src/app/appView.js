@@ -17,8 +17,7 @@ export class AppView {
 		this.controlsView = elt(
 			'div',
 			{
-				className:
-					'fixed flex flex-row items-center h-27 w-full bg-custom-gray top-12 left-0 z-10',
+				className: 'controls-holder-style',
 			},
 			...this.createControls(),
 		);
@@ -36,6 +35,30 @@ export class AppView {
 	}
 
 	buildDom() {
+		this.portraitWarning = elt(
+			'div',
+			{
+				className: 'portrait-warning-style',
+			},
+			elt('p', { className: 'text-5xl mb-4' }, '🔄'),
+			elt(
+				'p',
+				{
+					className: 'text-white text-lg text-center px-8 font-medium',
+				},
+				'Rotate your device for the best experience',
+			),
+			elt(
+				'p',
+				{
+					className: 'text-white/50 text-sm text-center px-8 mt-2',
+				},
+				'This app works best in landscape mode',
+			),
+		);
+
+		document.body.appendChild(this.portraitWarning);
+
 		// Scrollable canvas area that fills the space between controls and statusbar
 		const canvasArea = elt(
 			'div',

@@ -5,6 +5,7 @@ import { createCardOption } from '../components/cardOptions';
 import { createPopupCard } from '../components/popupCard';
 import { elt } from '../utils.js';
 import { StatusbarCalculationService } from './services/statusbarServices.js';
+import { createFeatureSeparator } from '../components/featureSeparator.js';
 const zoomValues = [
 	'1000%',
 	'900%',
@@ -31,6 +32,7 @@ export class StatusbarView {
 			null,
 			null,
 		);
+
 		this.pixelText = createParaContent('text-white text-[12px] w-24 h-5', '');
 
 		this.pixelPosition = elt(
@@ -53,9 +55,14 @@ export class StatusbarView {
 			'1000x400px',
 		);
 
+		this.canvasSeparator = createFeatureSeparator(
+			'w-[1px] h-5 bg-white/30 rounded-sm my-auto',
+		);
+
 		this.canvasSize = elt(
 			'div',
 			{ className: 'flex flex-row justify-center gap-x-2 items-center w-26' },
+			this.canvasSeparator,
 			this.canvasIcon,
 			this.canvasSizeText,
 		);
@@ -63,7 +70,7 @@ export class StatusbarView {
 		this.leftStatus = elt(
 			'div',
 			{
-				className: 'flex flex-row justify-left items-center w-100 h-5',
+				className: 'flex flex-row justify-left items-center w-100 h-8',
 			},
 			this.pixelPosition,
 			this.canvasSize,
@@ -71,7 +78,7 @@ export class StatusbarView {
 
 		this.fitWindowIcon = createIconDom(
 			'../../assets/fit_screen_16dp_E3E3E3_FILL0_wght400_GRAD0_opsz20.svg',
-			'hover:bg-custom-glass-black p-1 rounded-sm transition-all duration-150',
+			'hover:bg-custom-glass-black hover:ring hover:ring-white/30 p-1 rounded-sm transition-all duration-150',
 			this.handlers.onFitWindow,
 		);
 
@@ -90,14 +97,18 @@ export class StatusbarView {
 			this.fitWindowHoverTooltip.classList.remove('featureTooltipVisible');
 		});
 
-		this.fitWindow = elt(
-			'p',
-			{
-				className: 'p-1 rounded-sm relative',
-			},
-			this.fitWindowHoverTooltip,
-			this.fitWindowIcon,
-		);
+		((this.fitWindowSeparator = createFeatureSeparator(
+			'w-[1px] h-5 bg-white/30 rounded-sm my-auto',
+		)),
+			(this.fitWindow = elt(
+				'p',
+				{
+					className: 'p-1 relative flex flex-row gap-x-1',
+				},
+				this.fitWindowHoverTooltip,
+				this.fitWindowIcon,
+				this.fitWindowSeparator,
+			)));
 
 		this.zoomSelectDownArrowIcon = createIconDom(
 			'../../assets/keyboard_arrow_down_16dp_E3E3E3_FILL0_wght400_GRAD0_opsz20.svg',
@@ -120,6 +131,7 @@ export class StatusbarView {
 			null,
 			null,
 			null,
+			'',
 		);
 
 		this.zoomDropDown = this.createZoomDropDown();
@@ -152,7 +164,7 @@ export class StatusbarView {
 
 		this.zoomInIcon = createIconDom(
 			'../../assets/zoom_in_16dp_4DA3FF_FILL0_wght400_GRAD0_opsz20.svg',
-			'hover:bg-custom-glass-black rounded-sm p-1 transition-all duration-150',
+			'hover:bg-custom-glass-black hover:ring hover:ring-white/30 p-1 rounded-sm transition-all duration-150',
 			this.handlers.onZoomIn,
 		);
 
@@ -173,7 +185,7 @@ export class StatusbarView {
 
 		this.zoomOutIcon = createIconDom(
 			'../assets/zoom_out_16dp_4DA3FF_FILL0_wght400_GRAD0_opsz20.svg',
-			'hover:bg-custom-glass-black rounded-sm p-1 transition-all duration-150',
+			'hover:bg-custom-glass-black hover:ring hover:ring-white/30 p-1 rounded-sm transition-all duration-150',
 			this.handlers.onZoomOut,
 		);
 
@@ -236,7 +248,7 @@ export class StatusbarView {
 		this.rightStatus = elt(
 			'div',
 			{
-				className: 'flex flex-row gap-x-6 items-center h-5',
+				className: 'flex flex-row gap-x-6 items-center h-8',
 			},
 			this.fitWindow,
 			this.zoomSelect,
@@ -380,6 +392,11 @@ export class StatusbarView {
 		this.zoomSelectInput.value = `${level}%`;
 		this.zoomRange.value = level;
 		this.sliderTooltip.textContent = `${level}%`;
+	}
+
+	hideTooltipOnPopupActive(reference) {
+		reference.classList.add('featureTooltipHidden');
+		reference.classList.remove('featureTooltipVisible');
 	}
 
 	showDropDown(visible) {

@@ -69,7 +69,7 @@ export class SideControlsView {
 
 		this.sizeControlSlider = createInput(
 			'range',
-			'zoom-slider w-48 appearance-none bg-white/60 h-[3px] rounded-lg ',
+			'zoom-slider size-control-slider-style ',
 			null,
 			null,
 			(value) => this.handlers.onSizeControlInput(value),
@@ -85,7 +85,7 @@ export class SideControlsView {
 		);
 		this.opacityControlSlider = createInput(
 			'range',
-			'zoom-slider w-48 appearance-none bg-white/60 h-[3px] rounded-lg ',
+			'opacity-control-slider-style zoom-slider ',
 			null,
 			null,
 			(value) => this.handlers.onOpacityControlInput(value),
@@ -127,8 +127,7 @@ export class SideControlsView {
 		this.dom = elt(
 			'div',
 			{
-				className:
-					'fixed top-[53%] -left-20 z-10 flex flex-col h-24 gap-y-2 justify-center  -rotate-90 items-center',
+				className: 'side-control-dom-style',
 			},
 			this.sizeController,
 			this.opacityController,

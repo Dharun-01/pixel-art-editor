@@ -1,4 +1,5 @@
 import { AppView } from './appView';
+import { Picture } from '../picture';
 import { PictureCanvasController } from '../canvas/canvasController';
 import { HeaderController } from '../headerBar/headerBarController';
 import { SideControlsController } from '../sidecontrols/sidecontrolsController';
@@ -18,10 +19,6 @@ export class AppController {
 		);
 		this.statusbarController = new StatusbarController(this.state, config);
 
-		this.controls = controls.map((Control) => {
-			return new Control(state, config);
-		});
-
 		this.canvasController = new PictureCanvasController(
 			this.state,
 			(pos) => {
@@ -37,6 +34,15 @@ export class AppController {
 			state.drawing.picture,
 			config,
 		);
+
+		const enrichedConfig = {
+			...config,
+			canvasEl: this.canvasController.dom, // DOM Passed for animation of flip and rotate180 feature.
+		};
+
+		this.controls = controls.map((Control) => {
+			return new Control(state, enrichedConfig);
+		});
 
 		this.appView = new AppView(
 			this.createHandlers(),

@@ -28,6 +28,7 @@ export class StatusbarController {
 	}
 
 	handleFitWindow() {
+		this.view.hideTooltipOnPopupActive(this.view.fitWindowHoverTooltip);
 		const expectedZoom = this.calculateExpectedZoom();
 		const expectedZoomPercentage =
 			this.calculateExpectedZoomPercentage(expectedZoom);
@@ -37,9 +38,6 @@ export class StatusbarController {
 
 	handleZoomDropDown() {
 		this.dispatch({ type: 'TOGGLE_ZOOM_DOWN_ARROW' });
-		// Read the NEW state from dispatch result, or toggle based on current
-		const isVisible = !this.state.ui.zoomControls.zoomSelectDownArrow;
-		this.view.showPopup(isVisible);
 	}
 
 	handleZoomSelect(value) {
@@ -66,11 +64,13 @@ export class StatusbarController {
 	}
 
 	handleZoomIn() {
+		this.view.hideTooltipOnPopupActive(this.view.zoomInHoverTooltip);
 		const value = this.view.sliderValuePlus10();
 		this.dispatch({ type: 'SET_ZOOM_LEVEL', stringValue: value / 100 });
 	}
 
 	handleZoomOut() {
+		this.view.hideTooltipOnPopupActive(this.view.zoomOutHoverTooltip);
 		const value = this.view.sliderValueMinus10();
 		this.dispatch({ type: 'SET_ZOOM_LEVEL', stringValue: value / 100 });
 	}

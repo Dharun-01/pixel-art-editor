@@ -1,9 +1,10 @@
 import { ToolSelectView } from '../view/toolView';
 
 export class ToolSelectController {
-	constructor(state, { dispatch }) {
+	constructor(state, { dispatch, canvasEl }) {
 		this.state = state;
 		this.dispatch = dispatch;
+		this.canvasEl = canvasEl;
 		this.view = new ToolSelectView(this.createHandlers());
 		this.dom = this.view.dom;
 		this.syncState(state);
@@ -30,7 +31,9 @@ export class ToolSelectController {
 	syncState(newState) {
 		const { active } = newState.ui.drawingTools;
 		const tools = ['pencil', 'fill', 'erase', 'pick', 'zoomPlus'];
-		console.log('active tool: ' + active);
+
+		this.canvasEl.classList.toggle('cursor-zoom-in', active === 'zoomPlus');
+
 		// Highlight the active tool
 		tools.forEach((tool) => {
 			const isActive = active === tool;

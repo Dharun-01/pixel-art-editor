@@ -35,8 +35,22 @@ export class BrushSelectView {
 		);
 	}
 
+	hideTooltipOnPopupActive(reference) {
+		reference.classList.add('featureTooltipHidden');
+		reference.classList.remove('featureTooltipVisible');
+	}
+
 	showPopup(featureName, visible) {
 		const popup = this.references[`${featureName}Popup`];
+		const icon = this.references[`${featureName}Icon`];
+		if (!popup) return;
+
+		if (visible && icon) {
+			const rect = icon.getBoundingClientRect();
+			popup.style.left = rect.left + rect.width + 'px';
+			popup.style.top = rect.bottom + 4 + 'px';
+		}
+
 		if (popup) {
 			if (visible) {
 				popup.classList.toggle('tooltipVisible', visible);

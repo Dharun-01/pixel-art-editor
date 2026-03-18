@@ -31,7 +31,7 @@ export function buildStandardFeature(name, config, handlers) {
 			'p',
 			{
 				className:
-					'text-md text-white hover:bg-custom-glass-black py-1 px-2 rounded-sm transition-all duration-150',
+					'text-md text-white hover:ring hover:ring-white/30 cursor-default hover:bg-custom-glass-black py-1 px-2 rounded-sm transition-all duration-150',
 				onclick: () => handlers[`on${capitalize(name)}Click`](),
 			},
 			config.string,
@@ -39,7 +39,7 @@ export function buildStandardFeature(name, config, handlers) {
 	}
 
 	const tooltip = createParaContent(
-		'text-gray-300 bg-black rounded-md px-2 py-1 absolute top-12 whitespace-nowrap pointer-events-none delay-300 z-50 featureTooltipHidden',
+		'text-gray-300 bg-black rounded-md px-2 py-1 absolute top-7 whitespace-nowrap pointer-events-none delay-300 z-50 featureTooltipHidden',
 		config.tooltip,
 	);
 
@@ -67,10 +67,15 @@ export function buildStandardFeature(name, config, handlers) {
 	// create popup card
 	const popupCard = createPopupCard(optionElements, config.popupStyle);
 
+	popupCard.style.position = 'fixed';
+	popupCard.style.zIndex = '9999';
+
+	document.body.appendChild(popupCard);
+
 	// create feature div to hold icon and popup
 	const featureDiv = createFeatureDiv(
 		icon || stringValue,
-		popupCard,
+		'',
 		config.featureDivStyle,
 		tooltip,
 	);
@@ -183,12 +188,17 @@ export function buildCustomFeature(name, config, handlers, customBuilders) {
 
 	const popupDom = result.dom; // The custom builder should return an object with a 'dom' property containing the popup content
 
+	popupDom.style.position = 'fixed';
+	popupDom.style.zIndex = '9999';
+
+	document.body.appendChild(popupDom);
+
 	const refs = result.refs || {}; // The custom builder can also return any references to important elements (like switches) that need to be accessed in syncState
 
 	// combine into a feature
 	const featureDiv = createFeatureDiv(
 		icon,
-		popupDom,
+		'',
 		config.featureDivStyle,
 		tooltip,
 	);

@@ -17,6 +17,15 @@ export class HeaderController {
 
 	createHandlers() {
 		return {
+			/* apis for save */
+			onSaveClick: () => this.handleSaveClick(),
+			onSave: () => this.handleSave(),
+			onSaveNameInputChange: (value) => this.handleSaveNameChange(value),
+			onSaveCancel: () => this.handleSaveCancel(),
+
+			// api for loading the saved image .pixelArt
+			onLoadClick: () => this.handleLoadClick(),
+
 			/* apis for share feature */
 			onShareClick: () => this.handleShareClick(),
 			onShare: () => this.handleShare(),
@@ -48,6 +57,30 @@ export class HeaderController {
 			// api for redo feature
 			onRedoClick: () => this.handleRedoClick(),
 		};
+	}
+
+	handleSaveClick() {
+		this.dispatch({ type: 'SET_ACTIVE_ICON', stringValue: 'save' });
+	}
+
+	handleSave() {
+		headerBarCalculationServices.save(
+			this.state.drawing.picture,
+			this.state.ui.header.save.fileName,
+		);
+		this.dispatch({ type: 'SET_ACTIVE_ICON', stringValue: null }); // close popup after save
+	}
+
+	handleSaveNameChange(value) {
+		this.dispatch({ type: 'SET_SAVE_FILENAME', stringValue: value.trim() });
+	}
+
+	handleSaveCancel() {
+		this.dispatch({ type: 'SET_ACTIVE_ICON', stringValue: null });
+	}
+
+	handleLoadClick() {
+		headerBarCalculationServices.load(this.dispatch);
 	}
 
 	// custom ui-toggler
@@ -192,6 +225,12 @@ export class HeaderController {
 		const { header } = newState.ui;
 		const activeFeature = newState.ui.header.activeIcon;
 
+		if (!!activeFeature) {
+			this.view.hideTooltipOnPopupActive(
+				this.view.references[`${activeFeature}Tooltip`],
+			);
+		}
+
 		this.view.hideAllPopups();
 		this.view.showPopup(activeFeature, true);
 
@@ -205,6 +244,12 @@ export class HeaderController {
 		this.view.updateSliderValue(qualityValue, qualitySliderRange);
 
 		this.view.updateTooltipValue(qualitySliderTooltip, qualityValue);
+
+		// This is for save dialog DOM
+		if (activeFeature === 'save') {
+			const saveInput = this.view.references['saveFileNameInput'];
+			if (saveInput) saveInput.value = header.save.fileName;
+		}
 
 		// This is for share dialog DOM
 		this.view.references['titleNameInput'].value = header.share.title;

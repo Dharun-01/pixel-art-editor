@@ -46,6 +46,16 @@ export class ImageSelectView {
 
 	showPopup(featureName, visible) {
 		const popup = this.references[`${featureName}Popup`];
+		const icon = this.references[`${featureName}Icon`];
+		if (!popup) return;
+
+		// position's it using fixed coords from anchor's screen position
+		if (visible && icon) {
+			const rect = icon.getBoundingClientRect();
+			popup.style.top = rect.bottom + 6 + 'px'; // 4px gap below icon
+			popup.style.left = rect.left + rect.width + 'px';
+		}
+
 		if (popup) {
 			popup.classList.toggle('tooltipVisible', visible);
 			popup.classList.toggle('tooltipHidden', !visible);
@@ -58,6 +68,11 @@ export class ImageSelectView {
 		});
 	}
 
+	hideTooltipOnPopupActive(reference) {
+		reference.classList.add('featureTooltipHidden');
+		reference.classList.remove('featureTooltipVisible');
+	}
+
 	highlightIcon(featureName, highlighted) {
 		const icon = this.references[`${featureName}Icon`];
 		if (icon) {
@@ -65,14 +80,6 @@ export class ImageSelectView {
 		}
 	}
 
-	showTooltip(featureName) {
-		const tooltip = this.references[`${featureName}Tooltip`];
-		if (tooltip) {
-			tooltip.classList.add('opacity-100');
-		}
-	}
-
-	hideTooltip() {}
 	unhighlightAllIcons() {
 		Object.keys(this.featureElements).forEach((name) => {
 			this.highlightIcon(name, false);

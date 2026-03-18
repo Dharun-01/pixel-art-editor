@@ -22,7 +22,7 @@ export class LayerSelectView {
 	assembleDom() {
 		const featuresArray = Object.values(this.featureElements);
 		const featureStatusFlag = createParaContent(
-			'feature-status-tag-style min-w-24 max-h-7  bg-gray-500/30 text-gray-200 border-white/30 text-center text-nowrap',
+			'feature-status-tag-style min-w-24 max-h-7  bg-gray-500/30 text-gray-200 border-white/30 text-center text-nowrap pointer-events-none',
 			'Coming soon',
 		);
 
@@ -36,8 +36,7 @@ export class LayerSelectView {
 		return elt(
 			'div',
 			{
-				className:
-					'outline outline-white/30 min-w-48 flex flex-row justify-evenly items-center',
+				className: 'min-w-48 flex flex-row justify-evenly items-center',
 			},
 			elt(
 				'div',

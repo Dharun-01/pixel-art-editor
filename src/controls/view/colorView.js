@@ -28,7 +28,7 @@ export class ColorSelectView {
 		const activeColorSlots = featuresArray.slice(0, 2);
 		this.primaryAndSecondaryColor = elt(
 			'div',
-			{ className: 'flex flex-col gap-3' },
+			{ className: 'flex flex-col gap-3 z-50' },
 			...activeColorSlots,
 		);
 
@@ -38,7 +38,7 @@ export class ColorSelectView {
 		this.colorSlots = elt(
 			'div',
 			{
-				className: 'flex flex-row flex-wrap gap-2 items-center justify-center',
+				className: 'flex flex-row flex-wrap gap-2',
 			},
 			...colorSlots,
 		);
@@ -53,7 +53,7 @@ export class ColorSelectView {
 		// The whole Color DOM wrapper
 		this.colorDom = elt(
 			'div',
-			{ className: 'flex flex-row gap-x-2' },
+			{ className: 'flex flex-row gap-x-3 p-2 z-20' },
 			this.primaryAndSecondaryColor,
 			this.colorSlots,
 			this.customColorSelection,
@@ -144,20 +144,20 @@ export class ColorSelectView {
 	}
 
 	showPopup(isActive) {
-		this.references['customColorSelectorPopup'].classList.toggle(
-			'tooltipHidden',
-			!isActive,
-		);
-		if (isActive) {
-			this.references['customColorSelectorPopup'].classList.toggle(
-				'tooltipVisible',
-				isActive,
-			);
-			this.references['customColorSelectorTooltip'].classList.replace(
-				'tooltipVisible',
-				'tooltipHidden',
-			);
+		const popup = this.references['customColorSelectorPopup'];
+		const icon = this.references[`customColorSelectorIcon`];
+
+		if (!popup) return;
+
+		if (icon) {
+			const rect = icon.getBoundingClientRect();
+			popup.style.left = rect.left / 2.5 + 'px';
+			popup.style.top = rect.bottom + 'px';
 		}
+
+		popup.classList.toggle('tooltipHidden', !isActive);
+
+		popup.classList.toggle('tooltipVisible', isActive);
 	}
 
 	highlightIcon(featureName, highlighted) {

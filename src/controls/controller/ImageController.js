@@ -9,11 +9,12 @@ import {
 } from '../services/ImageControlServices';
 
 export class ImageSelectController {
-	constructor(state, { dispatch }) {
+	constructor(state, { dispatch, canvasEl }) {
 		this.state = state;
 		this.dispatch = dispatch;
 		this.view = new ImageSelectView(this.createHandlers());
 		this.dom = this.view.dom;
+		this.canvasEl = canvasEl;
 		this.syncState(state);
 	}
 
@@ -94,49 +95,112 @@ export class ImageSelectController {
 		this.dispatch({ type: 'SET_GRID' });
 	}
 
-	handleRotateDirection(direction) {
-		let rotatedPicture;
-		if (direction === 'right') {
-			rotatedPicture = ImageSelectRotateService.rotateRight(
-				this.state.drawing.picture,
-			);
-		} else if (direction === 'left') {
-			rotatedPicture = ImageSelectRotateService.rotateLeft(
-				this.state.drawing.picture,
-			);
-		} else if (direction === '180') {
-			rotatedPicture = ImageSelectRotateService.rotate180(
-				this.state.drawing.picture,
-			);
-		}
+	animateRotate(direction, onMidpoint) {
+		const canvas = this.canvasEl;
+		const duration = 150;
 
-		this.dispatch({ type: 'SET_ROTATE_DIRECTION', stringValue: direction });
-		this.dispatch({
-			type: 'SET_PICTURE',
-			stringValue: rotatedPicture,
-			isPreview: false,
+		canvas.style.transition = `transform ${duration}ms ease-in-out`;
+
+		const angle = direction === 'right' ? 90 : direction === 'left' ? -90 : 180;
+
+		// phase 1 — rotate canvas visually to flat or angle
+		canvas.style.transform = `rotateZ(${angle}deg)`;
+
+		setTimeout(() => {
+			//  reset transform BEFORE dispatch — canvas shows old pixels at 0deg
+			canvas.style.transition = 'none';
+			canvas.style.transform = 'rotateZ(0deg)';
+
+			requestAnimationFrame(() => {
+				// NOW dispatch — canvas redraws with new pixels at 0deg
+				onMidpoint();
+
+				requestAnimationFrame(() => {
+					// re-enable transition for next animation
+					canvas.style.transition = `transform ${duration}ms ease-in-out`;
+				});
+			});
+		}, duration);
+	}
+
+	handleRotateDirection(direction) {
+		const serviceMap = {
+			right: () =>
+				ImageSelectRotateService.rotateRight(this.state.drawing.picture),
+			left: () =>
+				ImageSelectRotateService.rotateLeft(this.state.drawing.picture),
+			180: () => ImageSelectRotateService.rotate180(this.state.drawing.picture),
+		};
+
+		// compute rotated picture before animation
+		const rotatedPicture = serviceMap[direction]?.();
+		if (!rotatedPicture) return;
+
+		this.animateRotate(direction, () => {
+			// all dispatches inside the callback — fire at midpoint
+			this.dispatch({ type: 'SET_ROTATE_DIRECTION', stringValue: direction });
+			this.dispatch({
+				type: 'SET_PICTURE',
+				stringValue: rotatedPicture,
+				isPreview: false,
+			});
 		});
 	}
 
-	handleFlipDirection(direction) {
-		let flippedPicture;
+	/* Animation for Flip */
+	animateFlip(axis, onMidpoint) {
+		const canvas = this.canvasEl;
+		const duration = 150;
 
+		// flatten
+		canvas.style.transition = `transform ${duration}ms ease-in-out`;
+		canvas.style.transform = axis === 'vertical' ? 'scaleX(0)' : 'scaleY(0)';
+
+		setTimeout(() => {
+			onMidpoint(); // dispatch the actual flip
+
+			// requestAnimationFrame ensures the new picture is painted
+			// before we start the open animation
+			requestAnimationFrame(() => {
+				requestAnimationFrame(() => {
+					canvas.style.transform = 'scale(1)'; // open back up
+				});
+			});
+		}, duration);
+	}
+
+	handleFlipDirection(direction) {
 		if (direction === 'vertical') {
+			this.animateFlip('vertical', () => {
+				let flippedPicture = ImageSelectFlipService.flipVertical(
+					this.state.drawing.picture,
+				);
+				this.dispatch({ type: 'SET_FLIP_DIRECTION', stringValue: direction });
+				this.dispatch({
+					type: 'SET_PICTURE',
+					stringValue: flippedPicture,
+					isPreview: false,
+				});
+			});
 			flippedPicture = ImageSelectFlipService.flipVertical(
 				this.state.drawing.picture,
 			);
 		} else {
+			this.animateFlip('horizontal', () => {
+				let flippedPicture = ImageSelectFlipService.flipHorizontal(
+					this.state.drawing.picture,
+				);
+				this.dispatch({ type: 'SET_FLIP_DIRECTION', stringValue: direction });
+				this.dispatch({
+					type: 'SET_PICTURE',
+					stringValue: flippedPicture,
+					isPreview: false,
+				});
+			});
 			flippedPicture = ImageSelectFlipService.flipHorizontal(
 				this.state.drawing.picture,
 			);
 		}
-
-		this.dispatch({ type: 'SET_FLIP_DIRECTION', stringValue: direction });
-		this.dispatch({
-			type: 'SET_PICTURE',
-			stringValue: flippedPicture,
-			isPreview: false,
-		});
 	}
 
 	handleReflectAxis(axis) {
@@ -234,6 +298,11 @@ export class ImageSelectController {
 		// toggles for all the modes - shows popup and highlights icon if active, hides and unhighlights if not
 		modes.forEach((mode) => {
 			const isActive = transform.activeMode === mode;
+			if (isActive) {
+				this.view.hideTooltipOnPopupActive(
+					this.view.references[`${mode}Tooltip`],
+				);
+			}
 			this.view.showPopup(mode, isActive);
 			this.view.highlightIcon(mode, isActive);
 		});
@@ -253,6 +322,7 @@ export class ImageSelectController {
 			const checkbox = this.view.references[refKey];
 			if (checkbox) checkbox.checked = currentAxis === axis;
 		});
+
 		// GRID TOGGLE
 		this.view.highlightIcon('grid', transform.gridVisible);
 

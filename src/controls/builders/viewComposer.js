@@ -55,7 +55,7 @@ export function composeFeatures(config, handlers, customBuilders) {
 
 		references[`${featureName}Icon`] = result.icon || null;
 		references[`${featureName}Popup`] = result.popup || null;
-		references[`${featureName}Tooltip`] = result.tooltip;
+		references[`${featureName}Tooltip`] = result.tooltip || null;
 
 		Object.entries(result.refs || {}).forEach(([key, value]) => {
 			references[key] = value; // Store any additional refs returned by the custom builder

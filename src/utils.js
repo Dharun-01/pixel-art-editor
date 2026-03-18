@@ -692,7 +692,7 @@ export function applyMirror(points, state) {
 }
 
 export function resizePicture(state, newWidth, newHeight) {
-	let newPicture = Picture.empty(newWidth, newHeight, hexToRgb('#f0f0f0'));
+	let newPicture = Picture.empty(newWidth, newHeight, hexToRgb('#ffffff'));
 	let minWidth = Math.min(state.picture.width, newWidth);
 	let minHeight = Math.min(state.picture.height, newHeight);
 	for (let y = 0; y < minHeight; y++) {
@@ -708,25 +708,4 @@ export function resizePicture(state, newWidth, newHeight) {
 	}
 
 	return newPicture;
-}
-
-export function drawLine(from, to, color, opacity) {
-	let points = [];
-
-	if (Math.abs(from.x - to.x) > Math.abs(from.y - to.y)) {
-		if (from.x > to.x) [from, to] = [to, from];
-		let slope = (to.y - from.y) / (to.x - from.x);
-		for (let { x, y } = from; x <= to.x; x++) {
-			points.push({ x, y: Math.round(y), color, opacity });
-			y += slope;
-		}
-	} else {
-		if (from.y > to.y) [from, to] = [to, from];
-		let slope = (to.x - from.x) / (to.y - from.y);
-		for (let { x, y } = from; y <= to.y; y++) {
-			points.push({ x: Math.round(x), y, color, opacity });
-			x += slope;
-		}
-	}
-	return points;
 }

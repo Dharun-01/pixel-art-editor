@@ -121,8 +121,16 @@ export function imagePanelReducer(state, action) {
 
 	// cancel resize
 	if (action.type === 'CANCEL_RESIZE') {
-		let newUi = setExclusiveValue(ui, 'transform.resize.width', null);
-		newUi = setExclusiveValue(newUi, 'transform.resize.height', null);
+		let newUi = setExclusiveValue(
+			ui,
+			'transform.resize.width',
+			state.ui.transform.resize.width,
+		);
+		newUi = setExclusiveValue(
+			newUi,
+			'transform.resize.height',
+			state.ui.transform.resize.height,
+		);
 		return { ...state, ui: newUi };
 	}
 

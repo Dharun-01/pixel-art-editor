@@ -11,8 +11,8 @@ export const initialUiState = {
 			axis: null, // 'vertical' | 'horizontal' | 'mainDiagonal' | 'offDiagonal' | 'orthogonal' | 'diagonal'
 		},
 		resize: {
-			width: null,
-			height: null, // { width: number, height: number }
+			width: 100 || null,
+			height: 100 || null, // { width: number, height: number }
 			widthErrorMessage: null,
 			heightErrorMessage: null,
 			unit: 'percentage', // or 'pixels'
@@ -46,6 +46,9 @@ export const initialUiState = {
 			fileType: 'png',
 			scale: 1,
 			quality: 0.92,
+		},
+		save: {
+			fileName: 'myArt',
 		},
 		share: {
 			title: 'My Drawing',

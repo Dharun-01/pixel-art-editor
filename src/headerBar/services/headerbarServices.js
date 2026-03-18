@@ -2,6 +2,91 @@ import { Picture } from '../../picture';
 import { elt } from '../../utils';
 
 export class headerBarCalculationServices {
+	static save(picture, fileName = 'My Art') {
+		const saveData = {
+			version: '1.0',
+			savedAt: new Date().toISOString(),
+			width: picture.width,
+			height: picture.height,
+			pixels: Array.from(picture.pixels),
+		};
+
+		const json = JSON.stringify(saveData);
+
+		const blob = new Blob([json], { type: 'application/json' });
+		const url = URL.createObjectURL(blob);
+		const link = document.createElement('a');
+		link.href = url;
+		link.download = `${fileName}.pixelArt`; // custom file extension
+		document.body.appendChild(link);
+		link.click();
+		link.remove();
+		URL.revokeObjectURL(url);
+	}
+
+	static load(dispatch) {
+		const input = document.createElement('input');
+		input.type = 'file';
+		input.accept = '.pixelArt, application/json';
+
+		input.onchange = () => {
+			let file = input.files[0];
+			if (!file) return;
+			let reader = new FileReader();
+			reader.onload = () => {
+				input.remove();
+
+				const pictureData = JSON.parse(reader.result);
+				const width = pictureData.width;
+				const height = pictureData.height;
+				const pixels = new Uint8ClampedArray(pictureData.pixels);
+				try {
+					if (
+						!pictureData.width ||
+						!pictureData.height ||
+						!Array.isArray(pictureData.pixels)
+					) {
+						alert('The required picture data is missing');
+						return;
+					}
+
+					if (
+						pictureData.pixels.length !==
+						pictureData.width * pictureData.height * 4
+					) {
+						alert('Invalid save file - Pixel data is corrupted');
+						return;
+					}
+
+					console.log(pictureData, width, height, pixels);
+					dispatch({
+						type: 'SET_PICTURE',
+						isPreview: false,
+						stringValue: new Picture(width, height, pixels),
+					});
+
+					dispatch({
+						type: 'SET_CANVAS_DIMENSIONS',
+						stringValue: `${pictureData.width}x${pictureData.height}`,
+					});
+				} catch (error) {
+					// JSON.parse throws SyntaxError if file is not valid JSON
+					console.error('Failed to load save file:', error);
+					alert(
+						'Failed to load file — it may be corrupted or not a valid save file.',
+					);
+				}
+
+				reader.onerror = () => {
+					alert('Failed to read file');
+				};
+			};
+			reader.readAsText(file);
+		};
+		document.body.appendChild(input);
+		input.click();
+	}
+
 	static upload(dispatch, pictureW, pictureH) {
 		let input = elt('input', {
 			type: 'file',
@@ -26,14 +111,21 @@ export class headerBarCalculationServices {
 		reader.addEventListener('load', () => {
 			let image = new Image();
 			image.onload = () => {
+				const width = image.naturalWidth;
+				const height = image.naturalHeight;
 				dispatch({
 					type: 'SET_PICTURE',
 					isPreview: false,
 					stringValue: headerBarCalculationServices.pictureFromImage(
 						image,
-						pictureW,
-						pictureH,
+						width,
+						height,
 					),
+				});
+
+				dispatch({
+					type: 'SET_CANVAS_DIMENSIONS',
+					stringValue: `${width}x${height}`,
 				});
 			};
 			image.src = reader.result;

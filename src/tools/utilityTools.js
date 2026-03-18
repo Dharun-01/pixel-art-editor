@@ -31,6 +31,7 @@ export function pick(pos, state, dispatch) {
 			state.drawing.picture.pixels[index + 3],
 		]),
 	});
+	dispatch({ type: 'SET_PENCIL', stringValue: 'pencil' });
 }
 
 let around = [
@@ -45,6 +46,8 @@ export function fill({ x, y }, state, dispatch) {
 		const i = (x + y * state.drawing.picture.width) * 4;
 		return state.drawing.picture.pixels.slice(i, i + 4);
 	};
+
+	console.log(state.tools.color);
 
 	const colorsMatch = (a, b) => a.every((v, i) => v === b[i]);
 	const targetColor = getPixel(x, y);
@@ -62,7 +65,7 @@ export function fill({ x, y }, state, dispatch) {
 			x: cx,
 			y: cy,
 			color: state.tools.color,
-			opacity: state.tools.opacity,
+			opacity: state.tools.opacity / 100,
 		});
 
 		for (const { dx, dy } of around) {

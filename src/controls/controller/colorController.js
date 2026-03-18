@@ -111,6 +111,7 @@ export class ColorSelectController {
 		const selectedColor = this.view.references[slot].dataset.color;
 		this.view.references[activeSlot].style.backgroundColor = selectedColor;
 		const [r, g, b] = hexToRgb(selectedColor);
+
 		this.dispatch({
 			type: 'SET_COLOR',
 			stringValue: new Uint8ClampedArray([r, g, b, 255]),

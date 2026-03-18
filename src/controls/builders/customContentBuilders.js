@@ -142,6 +142,7 @@ export function createResizeContent(handlers) {
 		null,
 		null,
 		null,
+		'',
 	);
 
 	const heightInput = createInput(
@@ -163,6 +164,7 @@ export function createResizeContent(handlers) {
 		null,
 		null,
 		null,
+		'',
 	);
 
 	// errorMessage
@@ -227,7 +229,7 @@ export function createResizeContent(handlers) {
 			{
 				'data-popup': 'resize',
 				className:
-					'flex flex-col absolute shadow-sm gap-y-6 shadow-gray-600 min-w-36 min-h-32 bg-custom-tooltip-gray p-3 top-12 left-10 rounded-md',
+					'flex flex-col shadow-sm gap-y-6 shadow-gray-600 min-w-36 min-h-32 bg-custom-tooltip-gray p-3 rounded-md',
 			},
 			radioSelectBox,
 			inputDataSystem,
@@ -367,7 +369,7 @@ export function createColorContent(handlers) {
 			'div',
 			{
 				className:
-					'flex flex-col absolute shadow-sm shadow-gray-600 z-50 gap-y-5 min-w-36 min-h-32 bg-custom-tooltip-gray p-5 top-12 right-30 rounded-md',
+					'flex flex-col shadow-sm shadow-gray-600 gap-y-5 min-w-36 min-h-32 bg-custom-tooltip-gray p-5 rounded-md',
 			},
 			editColorText,
 			entireColorSelectionSystem,
@@ -382,6 +384,79 @@ export function createColorContent(handlers) {
 			hexInput,
 			hexInputErrorMessage,
 		},
+	};
+}
+
+export function createSaveContent(handlers) {
+	const fileNameLabel = createLabel(
+		'saveFileName',
+		'File Name:',
+		'text-gray-300',
+	);
+	const fileNameInput = createInput(
+		'text',
+		'header-input-style',
+		50,
+		'saveFileName',
+		(value) => handlers.onSaveNameInputChange(value), // onInput
+		null,
+		null,
+		null,
+		null,
+		null,
+		null,
+		null,
+		null,
+		null,
+		'myArt', // placeholder
+	);
+
+	const saveButton = createButton(
+		'btn-primary bg-custom-blue hover:bg-custom-blue-hover text-custom-black',
+		'Save',
+		() => handlers.onSave(),
+	);
+
+	const cancelButton = createButton('btn-secondary', 'Cancel', () =>
+		handlers.onSaveCancel(),
+	);
+
+	const buttonBox = elt(
+		'div',
+		{
+			className: 'flex flex-row mt-6 items-center justify-around',
+		},
+		saveButton,
+		cancelButton,
+	);
+
+	const tableWrapper = elt(
+		'table',
+		{
+			className: 'w-full border-separate border-spacing-y-1',
+		},
+		elt('tbody', {}, createRow(fileNameLabel, fileNameInput)),
+	);
+
+	// info text
+	const infoText = createParaContent(
+		'text-gray-400 text-xs mt-2',
+		'Saves as .pixelArt file — reopen to continue editing',
+	);
+
+	return {
+		dom: elt(
+			'div',
+			{
+				className:
+					'flex flex-col shadow-sm shadow-gray-600 z-50 gap-y-3 bg-custom-tooltip-gray p-5 rounded-md',
+			},
+			createParaContent('text-[#E3E3E3] text-md font-semibold', 'Save Project'),
+			tableWrapper,
+			infoText,
+			buttonBox,
+		),
+		refs: { saveFileNameInput: fileNameInput },
 	};
 }
 
@@ -521,8 +596,9 @@ export function createExportContent(handlers) {
 			'div',
 			{
 				className:
-					'flex flex-col absolute shadow-sm shadow-gray-600 z-50 gap-y-5 min-w-36 min-h-32 bg-custom-tooltip-gray p-5 top-20 right-60 rounded-md',
+					'flex flex-col shadow-sm shadow-gray-600 z-50 gap-y-5 min-w-36 min-h-32 bg-custom-tooltip-gray p-5 rounded-md',
 			},
+			createParaContent('text-[#E3E3E3] font-semibold text-md', 'Export'),
 			tableWrapper,
 			buttonBox,
 		),
@@ -646,8 +722,9 @@ export function createShareContent(handlers) {
 			'div',
 			{
 				className:
-					'flex flex-col absolute shadow-sm shadow-gray-600 z-50 gap-y-5 min-w-36 min-h-32 bg-custom-tooltip-gray p-5 top-12 right-30 rounded-md',
+					'flex flex-col shadow-sm shadow-gray-600 gap-y-5 min-w-36 min-h-32 bg-custom-tooltip-gray p-5 rounded-md',
 			},
+			createParaContent('text-[#E3E3E3] text-md font-semibold', 'Share'),
 			tableWrapper,
 			buttonBox,
 		),
@@ -678,4 +755,5 @@ export const CUSTOM_BUILDERS = {
 	createColorContent,
 	createExportContent,
 	createShareContent,
+	createSaveContent,
 };
