@@ -1,7 +1,8 @@
+import { getAssetPath } from '../../utils';
 import Card from './card';
 export default function MiddleSection() {
 	function handleStartDrawing() {
-		window.location.href = '/editor';
+		window.location.href = './editor.html';
 	}
 
 	return (
@@ -80,7 +81,7 @@ button anxiety.'
 					<div className='flex flex-row flex-wrap gap-x-10 gap-y-10 mt-5'>
 						<div className='flex flex-col flex-wrap hover:scale-105 transition-transform gap-x-10 justify-center items-center mt-5  max-w-72 p-3 space-y-2 rounded-md z-50 bg-blue-800 backdrop-blur-2xl ring ring-custom-blue'>
 							<img
-								src='../../../assets/MyPicture.png'
+								src={getAssetPath('/icons/MyPicture.png')}
 								className='w-76 h-56 rounded-md'
 							/>
 							<p className='text-blue-100 text-lg'>
@@ -90,7 +91,7 @@ button anxiety.'
 						</div>
 						<div className='flex flex-col hover:scale-105 transition-transform flex-wrap gap-x-10 justify-center items-center mt-5  max-w-72 p-3 space-y-2 rounded-md z-50 bg-blue-800 backdrop-blur-2xl ring ring-custom-blue'>
 							<img
-								src='../../../assets/My Picture(2).png'
+								src={getAssetPath('/icons/My Picture(2).png')}
 								className='w-76 h-56 rounded-md'
 							/>
 							<p className='text-blue-100 text-lg'>
@@ -101,7 +102,7 @@ button anxiety.'
 
 						<div className='flex flex-col flex-wrap gap-x-10 justify-center hover:scale-105 transition-transform items-center mt-5  max-w-72 p-3 space-y-2 rounded-md z-50 bg-blue-800 backdrop-blur-2xl ring ring-custom-blue'>
 							<img
-								src='../../../assets/Human.png'
+								src={getAssetPath('/icons/Human.png')}
 								className='w-76 h-56 rounded-md'
 							/>
 							<p className='text-blue-100 text-lg'>

@@ -1,7 +1,7 @@
 import { createInput } from '../components/inputTag.js';
 import { createParaContent } from '../components/paraTag.js';
 import { createIconDom } from '../components/toggleIcon.js';
-import { elt } from '../utils.js';
+import { elt, getAssetPath } from '../utils.js';
 import { SideControlsCalculationService } from './services/sidecontrolsServices.js';
 
 export class SideControlsView {
@@ -27,7 +27,9 @@ export class SideControlsView {
 		);
 
 		this.sizeIcon = createIconDom(
-			'../../assets/line_weight_16dp_E3E3E3_FILL0_wght400_GRAD0_opsz20.svg',
+			getAssetPath(
+				'/icons/line_weight_16dp_E3E3E3_FILL0_wght400_GRAD0_opsz20.svg',
+			),
 			'rotate-90',
 			null,
 		);
@@ -47,7 +49,7 @@ export class SideControlsView {
 		});
 
 		this.opacityIcon = createIconDom(
-			'../../assets/opacity_16dp_E3E3E3_FILL0_wght400_GRAD0_opsz20.svg',
+			getAssetPath('/icons/opacity_16dp_E3E3E3_FILL0_wght400_GRAD0_opsz20.svg'),
 			'rotate-90',
 			null,
 		);

@@ -1,6 +1,12 @@
 import { Picture } from './picture.js';
 import { STAMP } from './stamps.js';
 
+const REPO_NAME = '/pixel-art-editor';
+export const getAssetPath = (path) => {
+	const base = import.meta.env.DEV ? '' : REPO_NAME;
+	return `${base}${path}`;
+};
+
 export function hexToRgb(hex) {
 	let hexWithoutHash = hex.slice(1);
 

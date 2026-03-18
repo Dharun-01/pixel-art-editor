@@ -1,3 +1,5 @@
+import { getAssetPath } from '../../utils';
+
 export const HEADER_SELECT_CONFIG = {
 	/* file: {
 		type: 'standard',
@@ -46,7 +48,9 @@ export const HEADER_SELECT_CONFIG = {
  */
 	save: {
 		type: 'custom',
-		icon: '../../../assets/save_16dp_E3E3E3_FILL0_wght400_GRAD0_opsz20.svg',
+		icon: getAssetPath(
+			'/icons/save_16dp_E3E3E3_FILL0_wght400_GRAD0_opsz20.svg',
+		),
 		tooltip: 'Save Project',
 		iconStyle: 'icon-style',
 		featureDivStyle: 'featureDivStyle',
@@ -55,7 +59,9 @@ export const HEADER_SELECT_CONFIG = {
 
 	share: {
 		type: 'custom',
-		icon: '../../../assets/share_16dp_E3E3E3_FILL0_wght400_GRAD0_opsz20.svg',
+		icon: getAssetPath(
+			'/icons/share_16dp_E3E3E3_FILL0_wght400_GRAD0_opsz20.svg',
+		),
 		tooltip: 'Share',
 		iconStyle: 'icon-style',
 		featureDivStyle: 'feature-div-style',
@@ -63,20 +69,26 @@ export const HEADER_SELECT_CONFIG = {
 	},
 	load: {
 		type: 'icon-only',
-		icon: '../../../assets/file_open_16dp_E3E3E3_FILL0_wght400_GRAD0_opsz20.svg',
+		icon: getAssetPath(
+			'/icons/file_open_16dp_E3E3E3_FILL0_wght400_GRAD0_opsz20.svg',
+		),
 		tooltip: 'Open file',
 		iconStyle: 'icon-style',
 	},
 	upload: {
 		type: 'icon-only',
-		icon: '../../../assets/upload_file_16dp_E3E3E3_FILL0_wght400_GRAD0_opsz20.svg',
+		icon: getAssetPath(
+			'/icons/upload_file_16dp_E3E3E3_FILL0_wght400_GRAD0_opsz20.svg',
+		),
 		tooltip: 'Import',
 		iconStyle: 'icon-style',
 	},
 
 	export: {
 		type: 'custom',
-		icon: '../../../assets/file_export_16dp_E3E3E3_FILL0_wght400_GRAD0_opsz20.svg',
+		icon: getAssetPath(
+			'/icons/file_export_16dp_E3E3E3_FILL0_wght400_GRAD0_opsz20.svg',
+		),
 		tooltip: 'Export',
 		iconStyle: 'icon-style',
 		featureDivStyle: 'feature-div-style',
@@ -85,14 +97,18 @@ export const HEADER_SELECT_CONFIG = {
 
 	undo: {
 		type: 'icon-only',
-		icon: '../../../assets/undo_16dp_E3E3E3_FILL0_wght400_GRAD0_opsz20.svg',
+		icon: getAssetPath(
+			'/icons/undo_16dp_E3E3E3_FILL0_wght400_GRAD0_opsz20.svg',
+		),
 		tooltip: 'Undo',
 		iconStyle: 'icon-style',
 	},
 
 	redo: {
 		type: 'icon-only',
-		icon: '../../../assets/redo_16dp_E3E3E3_FILL0_wght400_GRAD0_opsz20.svg',
+		icon: getAssetPath(
+			'/icons/redo_16dp_E3E3E3_FILL0_wght400_GRAD0_opsz20.svg',
+		),
 		tooltip: 'Redo',
 		iconStyle: 'icon-style',
 	},

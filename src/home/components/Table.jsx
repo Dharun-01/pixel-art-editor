@@ -25,7 +25,7 @@ export default function Table() {
 		});
 
 		// ── phase 3: navigate to editor ────────────────────────────
-		window.location.href = '/editor.html';
+		window.location.href = './editor.html';
 	}
 
 	return (
@@ -131,7 +131,7 @@ export default function Table() {
 					whileHover={{ rotate: -8, scale: 1.1 }}
 					className='absolute left-[260px] top-[120px] 
                                cursor-pointer flex flex-row gap-1'
-					onClick={() => (window.location.href = '/editor.html')}
+					onClick={() => (window.location.href = './editor.html')}
 				>
 					{['#F4D03F', '#E74C3C', '#3498DB'].map((color, i) => (
 						<div
@@ -153,7 +153,7 @@ export default function Table() {
                             rounded-sm shadow-lg cursor-pointer'
 					animate={{ rotateZ: 90 }}
 					style={{ background: '#fff' }}
-					onClick={() => (window.location.href = '/editor.html')}
+					onClick={() => (window.location.href = './editor.html')}
 				>
 					<div className='w-full h-3 bg-gray-600 rounded-t-sm' />
 				</motion.div>
@@ -164,7 +164,7 @@ export default function Table() {
 					className='absolute right-[80px] top-[60px] w-24 h-16 
                                rounded-full shadow-lg cursor-pointer
                                bg-white/90 flex flex-wrap gap-1 p-3'
-					onClick={() => (window.location.href = '/editor.html')}
+					onClick={() => (window.location.href = './editor.html')}
 				>
 					{[
 						'#E74C3C',
