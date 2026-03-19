@@ -1,4 +1,4 @@
-import { elt } from '../utils';
+import { elt, getAssetPath } from '../utils';
 import { createIconDom } from './toggleIcon';
 
 /**
@@ -30,7 +30,9 @@ export function createCustomSelect(
 	const triggerText = elt('span', {}, options[selectedIndex].label);
 
 	const chevron = createIconDom(
-		'../../assets/arrow_drop_down_16dp_E3E3E3_FILL0_wght400_GRAD0_opsz20.svg',
+		getAssetPath(
+			'/icons/arrow_drop_down_16dp_E3E3E3_FILL0_wght400_GRAD0_opsz20.svg',
+		),
 		'transition-all duration-150',
 		null,
 	);
