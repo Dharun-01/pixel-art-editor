@@ -113,7 +113,7 @@ export function createResizeContent(handlers) {
 
 	// To link two inputs (width and height)
 	const linkIcon = createIconDom(
-		getAssetPath('icons/link_off_16dp_E3E3E3_FILL0_wght400_GRAD0_opsz20.svg'),
+		getAssetPath('/icons/link_off_16dp_E3E3E3_FILL0_wght400_GRAD0_opsz20.svg'),
 		'',
 		handlers.onLinkClick,
 	);
