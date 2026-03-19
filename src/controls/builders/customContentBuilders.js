@@ -7,7 +7,7 @@ import { createButton } from '../../components/button.js';
 import { createRadioInput } from '../../components/radioInput.js';
 import { createLabel } from '../../components/label.js';
 import { createErrorMessage } from '../../components/errorMessage.js';
-import { elt, hexToRgb } from '../../utils.js';
+import { elt } from '../../utils.js';
 import { createParaContent } from '../../components/paraTag.js';
 import { createCustomSelect } from '../../components/customSelect.js';
 

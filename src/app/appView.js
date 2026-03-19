@@ -2,14 +2,12 @@ import { elt } from '../utils';
 
 export class AppView {
 	constructor(
-		handlers,
 		headerbarController,
 		controls,
 		sideControlsController,
 		canvasController,
 		statusbarController,
 	) {
-		this.handlers = handlers;
 		this.headerView = headerbarController.view.dom;
 		this.controls = controls;
 
@@ -86,9 +84,6 @@ export class AppView {
 			{
 				tabIndex: 0,
 				className: 'flex flex-col w-full h-screen',
-				onkeydown: (event) => {
-					this.handlers.onKeyDown(event);
-				},
 			},
 			this.headerView,
 			this.controlsView,

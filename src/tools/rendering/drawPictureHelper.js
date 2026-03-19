@@ -114,8 +114,6 @@ export function updateImageData(fullRedraw, picture, ImageData) {
 		return {
 			startX: dirtyStartX,
 			startY: dirtyStartY,
-			endX: dirtyEndX,
-			endY: dirtyEndY,
 			dirtyWidth: updatedDirtyWidth,
 			dirtyHeight: updatedDirtyHeight,
 		};
@@ -123,20 +121,21 @@ export function updateImageData(fullRedraw, picture, ImageData) {
 	return {
 		startX,
 		startY,
-		endX,
-		endY,
 		dirtyWidth,
 		dirtyHeight,
 	};
 }
 
 export function updateOffScreenData(picture, fullRedraw, ImageData) {
-	const { startX, startY, endX, endY, dirtyWidth, dirtyHeight } =
-		updateImageData(fullRedraw, picture, ImageData);
+	const { startX, startY, dirtyWidth, dirtyHeight } = updateImageData(
+		fullRedraw,
+		picture,
+		ImageData,
+	);
 
 	offCtx.putImageData(ImageData, 0, 0, startX, startY, dirtyWidth, dirtyHeight);
 
-	return { startX, startY, endX, endY, dirtyWidth, dirtyHeight };
+	return { startX, startY, dirtyWidth, dirtyHeight };
 }
 
 export function zoomCanvas(cx, zoom) {

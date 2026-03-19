@@ -45,12 +45,12 @@ export function buildStandardFeature(name, config, handlers) {
 
 	let clickable = icon || stringValue;
 	if (icon) {
-		clickable.addEventListener('mouseenter', (event) => {
+		clickable.addEventListener('mouseenter', () => {
 			tooltip.classList.add('featureTooltipVisible');
 			tooltip.classList.remove('featureTooltipHidden');
 		});
 
-		clickable.addEventListener('mouseleave', (event) => {
+		clickable.addEventListener('mouseleave', () => {
 			tooltip.classList.add('featureTooltipHidden');
 			tooltip.classList.remove('featureTooltipVisible');
 		});
@@ -115,7 +115,7 @@ export function buildIconOnlyFeature(name, config, handlers) {
 		tooltip,
 	);
 
-	icon.addEventListener('mouseenter', (event) => {
+	icon.addEventListener('mouseenter', () => {
 		const rect = icon.getBoundingClientRect();
 		tooltip.style.left = rect.left + 'px';
 		tooltip.style.top = rect.bottom + 6 + 'px';
@@ -123,7 +123,7 @@ export function buildIconOnlyFeature(name, config, handlers) {
 		tooltip.classList.remove('featureTooltipHidden');
 	});
 
-	icon.addEventListener('mouseleave', (event) => {
+	icon.addEventListener('mouseleave', () => {
 		tooltip.classList.add('featureTooltipHidden');
 		tooltip.classList.remove('featureTooltipVisible');
 	});
@@ -132,7 +132,7 @@ export function buildIconOnlyFeature(name, config, handlers) {
 }
 
 // Used in color controls
-export function buildDivOnlyFeature(name, config, handlers) {
+export function buildDivOnlyFeature(name, config) {
 	const div = elt(
 		'div',
 		{
@@ -176,12 +176,12 @@ export function buildCustomFeature(name, config, handlers, customBuilders) {
 		config.tooltip,
 	);
 
-	icon.addEventListener('mouseenter', (event) => {
+	icon.addEventListener('mouseenter', () => {
 		tooltip.classList.add('featureTooltipVisible');
 		tooltip.classList.remove('featureTooltipHidden');
 	});
 
-	icon.addEventListener('mouseleave', (event) => {
+	icon.addEventListener('mouseleave', () => {
 		tooltip.classList.add('featureTooltipHidden');
 		tooltip.classList.remove('featureTooltipVisible');
 	});

@@ -32,7 +32,7 @@ export class BrushSelectController {
 
 		this.dispatch({ type: 'SET_BRUSH', stringValue: featureName });
 
-		const outSideClick = (event) => {
+		const outSideClick = () => {
 			this.dispatch({ type: 'SET_BRUSH', stringValue: null });
 			document.removeEventListener('click', outSideClick);
 		};

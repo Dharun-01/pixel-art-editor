@@ -85,7 +85,7 @@ button anxiety.'
 								className='w-76 h-56 rounded-md'
 							/>
 							<p className='text-blue-100 text-lg'>
-								I don't know what this is... but it looks beautiful.{' '}
+								I don&apos;t know what this is... but it looks beautiful.
 								<span className='font-semibold'> -Anand </span>
 							</p>
 						</div>

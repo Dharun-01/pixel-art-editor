@@ -1,4 +1,3 @@
-import { isThisSecond } from 'date-fns';
 import { ShapeSelectView } from '../view/shapeView';
 export class ShapeSelectController {
 	constructor(state, { dispatch }) {
@@ -45,7 +44,7 @@ export class ShapeSelectController {
 
 	openPopup() {
 		this.dispatch({ type: 'SET_SHAPE_BRUSH' });
-		const onOutsideClick = (event) => {
+		const onOutsideClick = () => {
 			/* if (event.target.closest(`[data-popup="${featureName}"]`)) return; */ // This is used if You want the popup to close only when clicked anywhere outside the popup.
 			this.dispatch({ type: 'SET_SHAPE_BRUSH' });
 			document.removeEventListener('click', onOutsideClick);

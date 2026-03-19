@@ -15,7 +15,7 @@ export function createPolygonTool(
 		getColor,
 		getOpacity,
 	);
-	let base = state.drawing.picture;
+
 	function connect(to, currentState, isFinal) {
 		let result = shapeToolContext(
 			pos,

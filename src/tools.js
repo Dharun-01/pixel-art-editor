@@ -178,7 +178,7 @@ export function brush(
 	getColor = () => state.tools.color,
 	getOpacity = () => state.tools.opacity,
 ) {
-	const { stamp, spacing, color, opacity, lastStampPos } = toolStarterCode(
+	let { stamp, spacing, color, opacity, lastStampPos } = toolStarterCode(
 		state,
 		getColor,
 		getOpacity,

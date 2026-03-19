@@ -25,8 +25,11 @@ export function drawPicture(
 		ImageData,
 		zoom,
 	);
-	let { startX, startY, endX, endY, dirtyWidth, dirtyHeight } =
-		updateOffScreenData(picture, fullRedraw, imageData);
+	let { startX, startY, dirtyWidth, dirtyHeight } = updateOffScreenData(
+		picture,
+		fullRedraw,
+		imageData,
+	);
 	zoomCanvas(cx, zoom);
 	cx.drawImage(
 		offScreen,

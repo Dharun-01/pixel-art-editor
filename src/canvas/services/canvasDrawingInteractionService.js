@@ -10,7 +10,7 @@ export class CanvasDrawingInteractionServices {
 	 * @param {Object} state - Current state
 	 * @returns {Object} - Interaction controller
 	 */
-	static createInteraction(startPos, onMove, onEnd, state) {
+	static createInteraction(startPos, onMove, onEnd) {
 		let currentPos = startPos;
 
 		return {

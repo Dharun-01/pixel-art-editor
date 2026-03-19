@@ -1,5 +1,4 @@
 import { AppView } from './appView';
-import { Picture } from '../picture';
 import { PictureCanvasController } from '../canvas/canvasController';
 import { HeaderController } from '../headerBar/headerBarController';
 import { SideControlsController } from '../sidecontrols/sidecontrolsController';
@@ -45,7 +44,6 @@ export class AppController {
 		});
 
 		this.appView = new AppView(
-			this.createHandlers(),
 			this.headerbarController,
 			this.controls,
 			this.sideControlsController,
@@ -54,12 +52,6 @@ export class AppController {
 		);
 		this.attachOverlayEventHandlers();
 		this.syncState(this.state);
-	}
-
-	createHandlers() {
-		return {
-			onKeyDown: (event) => this.handleKeyDown(event),
-		};
 	}
 
 	attachOverlayEventHandlers() {
@@ -72,8 +64,6 @@ export class AppController {
 			this.dispatch({ type: 'SET_CUSTOM_ACTIVE' }); // same as cancel
 		});
 	}
-
-	handleKeyDown(event, config) {}
 
 	syncState(newState) {
 		this.state = newState;

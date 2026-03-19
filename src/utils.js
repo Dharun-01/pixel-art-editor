@@ -417,7 +417,6 @@ export function getBrushStamp(state) {
 	const brushType =
 		state.tools.selectedBrush || state.tools.selectedShapeBrush || 'BRUSH';
 	const size = state.tools.brushSize || 3;
-	const opacity = state.tools.opacity / 100;
 	const calligraphyBrushAngle = -45;
 	const calligraphyPenAngle = 45;
 	switch (brushType) {

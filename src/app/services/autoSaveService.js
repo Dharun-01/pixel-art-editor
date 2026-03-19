@@ -47,7 +47,7 @@ export async function autoSave(picture) {
 		transaction.onerror = (event) =>
 			console.warn('Auto save failed:' + event.target.error);
 	} catch (error) {
-		console.warn('Auto save failed');
+		console.warn('Auto save failed' + error);
 	}
 }
 
@@ -79,7 +79,7 @@ export async function restoreAutoSavedPicture() {
 				resolve(null);
 			};
 		});
-	} catch (error) {
+	} catch {
 		return null;
 	}
 }

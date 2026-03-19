@@ -38,12 +38,12 @@ export class SideControlsView {
 			'Size',
 		);
 
-		this.sizeIcon.addEventListener('mouseenter', (event) => {
+		this.sizeIcon.addEventListener('mouseenter', () => {
 			this.sizeHoverTooltip.classList.add('featureTooltipVisible');
 			this.sizeHoverTooltip.classList.remove('featureTooltipHidden');
 		});
 
-		this.sizeIcon.addEventListener('mouseleave', (event) => {
+		this.sizeIcon.addEventListener('mouseleave', () => {
 			this.sizeHoverTooltip.classList.add('featureTooltipHidden');
 			this.sizeHoverTooltip.classList.remove('featureTooltipVisible');
 		});
@@ -59,12 +59,12 @@ export class SideControlsView {
 			'Opacity',
 		);
 
-		this.opacityIcon.addEventListener('mouseenter', (event) => {
+		this.opacityIcon.addEventListener('mouseenter', () => {
 			this.opacityHoverTooltip.classList.add('featureTooltipVisible');
 			this.opacityHoverTooltip.classList.remove('featureTooltipHidden');
 		});
 
-		this.opacityIcon.addEventListener('mouseleave', (event) => {
+		this.opacityIcon.addEventListener('mouseleave', () => {
 			this.opacityHoverTooltip.classList.add('featureTooltipHidden');
 			this.opacityHoverTooltip.classList.remove('featureTooltipVisible');
 		});
@@ -80,10 +80,10 @@ export class SideControlsView {
 			248,
 			this.handlers.getBrushSize(),
 			null,
-			(value) => this.handlers.onSizeControlMouseDown(),
-			(value) => this.handlers.onSizeControlMouseUp(),
-			(value) => this.handlers.onSizeControlMouseLeave(),
-			(value) => this.handlers.onSizeControlMouseEnter(),
+			(_value) => this.handlers.onSizeControlMouseDown(),
+			(_value) => this.handlers.onSizeControlMouseUp(),
+			(_value) => this.handlers.onSizeControlMouseLeave(),
+			(_value) => this.handlers.onSizeControlMouseEnter(),
 		);
 		this.opacityControlSlider = createInput(
 			'range',
@@ -96,10 +96,10 @@ export class SideControlsView {
 			100,
 			this.handlers.getBrushOpacity(),
 			null,
-			(value) => this.handlers.onOpacityControlMouseDown(),
-			(value) => this.handlers.onOpacityControlMouseUp(),
-			(value) => this.handlers.onOpacityControlMouseLeave(),
-			(value) => this.handlers.onOpacityControlMouseEnter(),
+			(_value) => this.handlers.onOpacityControlMouseDown(),
+			(_value) => this.handlers.onOpacityControlMouseUp(),
+			(_value) => this.handlers.onOpacityControlMouseLeave(),
+			(_value) => this.handlers.onOpacityControlMouseEnter(),
 		);
 
 		this.sizeController = elt(

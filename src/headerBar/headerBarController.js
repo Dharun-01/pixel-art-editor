@@ -1,4 +1,3 @@
-import { isThisSecond } from 'date-fns';
 import { HeaderView } from './headerBarView';
 import {
 	headerBarCalculationServices,
@@ -225,7 +224,7 @@ export class HeaderController {
 		const { header } = newState.ui;
 		const activeFeature = newState.ui.header.activeIcon;
 
-		if (!!activeFeature) {
+		if (activeFeature) {
 			this.view.hideTooltipOnPopupActive(
 				this.view.references[`${activeFeature}Tooltip`],
 			);

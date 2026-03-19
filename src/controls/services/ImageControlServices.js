@@ -1,5 +1,4 @@
 import { Picture } from '../../picture.js';
-import { hexToRgb } from '../../utils.js';
 
 export class ImageSelectRotateService {
 	static rotateRight(picture) {

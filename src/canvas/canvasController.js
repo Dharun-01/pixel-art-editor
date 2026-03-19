@@ -87,14 +87,7 @@ export class PictureCanvasController {
 		);
 
 		// Mouse up handler
-		const handleMouseUp = (upEvent) => {
-			const endPos = CanvasPointerEventServices.getMousePosition(
-				upEvent,
-				this.dom,
-
-				this.state,
-			);
-
+		const handleMouseUp = () => {
 			interaction.finalize();
 
 			this.dom.removeEventListener('mousemove', handleMouseMove);

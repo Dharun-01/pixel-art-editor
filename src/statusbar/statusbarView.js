@@ -93,12 +93,12 @@ export class StatusbarView {
 			'Fit Window',
 		);
 
-		this.fitWindowIcon.addEventListener('mouseenter', (event) => {
+		this.fitWindowIcon.addEventListener('mouseenter', () => {
 			this.fitWindowHoverTooltip.classList.add('featureTooltipVisible');
 			this.fitWindowHoverTooltip.classList.remove('featureTooltipHidden');
 		});
 
-		this.fitWindowIcon.addEventListener('mouseleave', (event) => {
+		this.fitWindowIcon.addEventListener('mouseleave', () => {
 			this.fitWindowHoverTooltip.classList.add('featureTooltipHidden');
 			this.fitWindowHoverTooltip.classList.remove('featureTooltipVisible');
 		});
@@ -181,12 +181,12 @@ export class StatusbarView {
 			'Zoom In',
 		);
 
-		this.zoomInIcon.addEventListener('mouseenter', (event) => {
+		this.zoomInIcon.addEventListener('mouseenter', () => {
 			this.zoomInHoverTooltip.classList.add('featureTooltipVisible');
 			this.zoomInHoverTooltip.classList.remove('featureTooltipHidden');
 		});
 
-		this.zoomInIcon.addEventListener('mouseleave', (event) => {
+		this.zoomInIcon.addEventListener('mouseleave', () => {
 			this.zoomInHoverTooltip.classList.add('featureTooltipHidden');
 			this.zoomInHoverTooltip.classList.remove('featureTooltipVisible');
 		});
@@ -204,12 +204,12 @@ export class StatusbarView {
 			'Zoom Out',
 		);
 
-		this.zoomOutIcon.addEventListener('mouseenter', (event) => {
+		this.zoomOutIcon.addEventListener('mouseenter', () => {
 			this.zoomOutHoverTooltip.classList.add('featureTooltipVisible');
 			this.zoomOutHoverTooltip.classList.remove('featureTooltipHidden');
 		});
 
-		this.zoomOutIcon.addEventListener('mouseleave', (event) => {
+		this.zoomOutIcon.addEventListener('mouseleave', () => {
 			this.zoomOutHoverTooltip.classList.add('featureTooltipHidden');
 			this.zoomOutHoverTooltip.classList.remove('featureTooltipVisible');
 		});

@@ -34,7 +34,7 @@ export function composeFeatures(config, handlers, customBuilders) {
 				result = buildIconOnlyFeature(featureName, featureConfig, handlers);
 				break;
 			case 'div-only':
-				result = buildDivOnlyFeature(featureName, featureConfig, handlers);
+				result = buildDivOnlyFeature(featureName, featureConfig);
 				break;
 			case 'custom':
 				result = buildCustomFeature(

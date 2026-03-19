@@ -11,8 +11,8 @@ export const initialUiState = {
 			axis: null, // 'vertical' | 'horizontal' | 'mainDiagonal' | 'offDiagonal' | 'orthogonal' | 'diagonal'
 		},
 		resize: {
-			width: 100 || null,
-			height: 100 || null, // { width: number, height: number }
+			width: 100,
+			height: 100, // { width: number, height: number }
 			widthErrorMessage: null,
 			heightErrorMessage: null,
 			unit: 'percentage', // or 'pixels'

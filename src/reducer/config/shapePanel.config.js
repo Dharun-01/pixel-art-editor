@@ -1,5 +1,3 @@
-import { BRUSH_VALUES } from './brushPanel.config';
-
 export const shapeToggleMap = {
 	SET_SHAPE: {
 		activePath: 'drawingTools.active',

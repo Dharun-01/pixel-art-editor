@@ -182,9 +182,6 @@ export class ImageSelectController {
 					isPreview: false,
 				});
 			});
-			flippedPicture = ImageSelectFlipService.flipVertical(
-				this.state.drawing.picture,
-			);
 		} else {
 			this.animateFlip('horizontal', () => {
 				let flippedPicture = ImageSelectFlipService.flipHorizontal(
@@ -197,9 +194,6 @@ export class ImageSelectController {
 					isPreview: false,
 				});
 			});
-			flippedPicture = ImageSelectFlipService.flipHorizontal(
-				this.state.drawing.picture,
-			);
 		}
 	}
 

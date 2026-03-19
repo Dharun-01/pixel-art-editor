@@ -335,7 +335,7 @@ export class headerBarCalculationServices {
 			const item = new ClipboardItem({ [blob.type]: blob });
 			await navigator.clipboard.write([item]);
 			alert('Image copied to clip board- paste it anywhere to share!');
-		} catch (err) {
+		} catch {
 			alert('Clipboard failed Press "ok" to download the file');
 			// clipboard failed — last resort is download
 			const url = URL.createObjectURL(blob);
@@ -471,7 +471,6 @@ export class headerBarUiUpdateServices {
 	}
 
 	static getThumbPosition(slider, value, min, max) {
-		const rect = slider.getBoundingClientRect();
 		const ratio = (value - min) / (max - min);
 		let thumbWidth = 15;
 		const x = ratio * slider.offsetWidth - thumbWidth / 2;
