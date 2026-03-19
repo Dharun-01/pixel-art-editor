@@ -1,6 +1,13 @@
 @import 'tailwindcss';
+@import url('https://fonts.googleapis.com/css2?family=DotGothic16&family=Press+Start+2P&family=Silkscreen&family=VT323&display=swap');
 
 @theme {
+	/* ADD YOUR FONTS HERE (v4 syntax) */
+	--font-pixel: 'DotGothic16', sans-serif;
+	--font-arcade: 'Press Start 2P', cursive;
+	--font-screen: 'Silkscreen', cursive;
+	--font-terminal: 'VT323', monospace;
+
 	--color-custom-black: #202020;
 	--color-custom-gray: #272727;
 	--color-custom-tooltip-gray: #2c2c2c;
@@ -11,13 +18,22 @@
 	--color-custom-glass-black: rgba(255, 255, 255, 0.08);
 
 	/* home page colors */
-	--color-home-bg: #1a0f0a;
+	--color-home-bg: #020208; /*0a0a1a, 0a0b1a*/
 	--color-home-card: #2d1f17;
-	--color-home-text: #f5ecd7;
-	--color-home-muted: #a89880;
+	--color-home-text: #9eb0da;
+	--color-home-muted: #aeafb3;
 	--color-home-subtle: #6b5744;
 	--color-home-highlight: #4da3ff;
 	--color-home-caption: #6b5744;
+
+	@keyframes shine {
+		from {
+			background-position: -200% 0;
+		}
+		to {
+			background-position: 200% 0;
+		}
+	}
 }
 
 /* Global Foundation */
@@ -528,5 +544,25 @@
 	.disabled-ui {
 		pointer-events: none;
 		opacity: 0.4;
+	}
+
+	.animation-shine {
+		background: linear-gradient(
+			90deg,
+			var(--color-home-text) 0%,
+			#ffffff 50%,
+			var(--color-home-text) 100%
+		);
+		background-size: 200% auto;
+		background-clip: text;
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		animation: shine 3s linear infinite;
+	}
+
+	.wood-glitter {
+		background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+		filter: contrast(150%) brightness(1000%);
+		mix-blend-mode: overlay;
 	}
 }

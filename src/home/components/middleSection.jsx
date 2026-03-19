@@ -1,7 +1,17 @@
+import { useAnimation } from 'framer-motion';
 import { getAssetPath } from '../../utils';
+
 import Card from './card';
 export default function MiddleSection() {
+	const buttonControls = useAnimation();
+
 	function handleStartDrawing() {
+		buttonControls.start({
+			scale: 1.1,
+			y: -20,
+			transition: { duration: 0.2 },
+		});
+
 		window.location.href = './editor.html';
 	}
 
@@ -10,11 +20,11 @@ export default function MiddleSection() {
 			<div className='w-full bg-home-bg pt-20 pl-25'>
 				<div className='flex flex-col gap-y-5'>
 					<h1
-						className='text-3xl'
+						className='text-6xl font-medium p-5'
 						style={{
 							backgroundImage: 'linear-gradient(to right, #4da3ff, #6fb7ff)',
 							WebkitBackgroundClip: 'text',
-							webkitTextFillColor: 'transparent',
+							WebkitTextFillColor: 'transparent',
 						}}
 					>
 						Features
@@ -69,7 +79,7 @@ button anxiety.'
 
 				<div className='flex flex-col gap-x-5 gap-y-5 py-10'>
 					<h1
-						className='text-3xl'
+						className='text-6xl p-5 font-medium'
 						style={{
 							backgroundImage: 'linear-gradient(to right, #4da3ff, #6fb7ff)',
 							WebkitBackgroundClip: 'text',
@@ -79,49 +89,50 @@ button anxiety.'
 						What people are making
 					</h1>
 					<div className='flex flex-row flex-wrap gap-x-10 gap-y-10 mt-5'>
-						<div className='flex flex-col flex-wrap hover:scale-105 transition-transform gap-x-10 justify-center items-center mt-5  max-w-72 p-3 space-y-2 rounded-md z-50 bg-blue-800 backdrop-blur-2xl ring ring-custom-blue'>
+						<div className='flex flex-col flex-wrap hover:scale-105 transition-transform gap-x-10 justify-center items-center mt-5  max-w-72 p-3 space-y-2 rounded-md z-50 bg-blue-950 backdrop-blur-2xl ring ring-custom-blue'>
 							<img
 								src={getAssetPath('/icons/MyPicture.png')}
 								className='w-76 h-56 rounded-md'
 							/>
-							<p className='text-blue-100 text-lg'>
-								I don&apos;t know what this is... but it looks beautiful.
-								<span className='font-semibold'> -Anand </span>
+							<p className='text-blue-200 text-lg'>
+								{`"I don't know what this is... but it looks beautiful."`}
+								<span className='font-semibold'> -Yogesh </span>
 							</p>
 						</div>
-						<div className='flex flex-col hover:scale-105 transition-transform flex-wrap gap-x-10 justify-center items-center mt-5  max-w-72 p-3 space-y-2 rounded-md z-50 bg-blue-800 backdrop-blur-2xl ring ring-custom-blue'>
+						<div className='flex flex-col hover:scale-105 transition-transform flex-wrap gap-x-10 justify-center items-center mt-5  max-w-72 p-3 space-y-2 rounded-md z-50 bg-blue-950 backdrop-blur-2xl ring ring-custom-blue'>
 							<img
 								src={getAssetPath('/icons/My Picture(2).png')}
 								className='w-76 h-56 rounded-md'
 							/>
-							<p className='text-blue-100 text-lg'>
-								Had fun drawing these hearts.{' '}
-								<span className='font-semibold'> -Haneena </span>
+							<p className='text-blue-200 text-lg'>
+								{`"Had fun drawing these hearts."`}
+								<span className='font-semibold'> -Anand </span>
 							</p>
 						</div>
 
-						<div className='flex flex-col flex-wrap gap-x-10 justify-center hover:scale-105 transition-transform items-center mt-5  max-w-72 p-3 space-y-2 rounded-md z-50 bg-blue-800 backdrop-blur-2xl ring ring-custom-blue'>
+						<div className='flex flex-col flex-wrap gap-x-10 justify-center hover:scale-105 transition-transform items-center mt-5  max-w-72 p-3 space-y-2 rounded-md z-50 bg-blue-950 backdrop-blur-2xl ring ring-custom-blue'>
 							<img
 								src={getAssetPath('/icons/Human.png')}
 								className='w-76 h-56 rounded-md'
 							/>
-							<p className='text-blue-100 text-lg'>
-								Love the editor, it helps me think creatively.
-								<span className='font-semibold'> -Alona </span>
+							<p className='text-blue-200 text-lg'>
+								{`"Love the editor, it helps me think creatively."`}
+								<span className='font-semibold'> -Peter </span>
 							</p>
 						</div>
 					</div>
 				</div>
 
 				<div className='text-lg flex flex-col gap-y-5 text-home-muted'>
-					<h1 className='text-6xl text-home-text'>
+					<h1 className='text-6xl text-home-text font-terminal animate-pulse'>
 						Your canvas is one click away
 					</h1>
 					<p>
-						No account. No download. No setup. Just you, the tools, and whatever
-						you feel like making today.
+						<span className='font-semibold text-2xl text-blue-300 pr-3'>
+							No account. No download. No setup.
+						</span>
+						Just you, the tools, and whatever you feel like making today.
 					</p>
-
 					<button
 						onClick={handleStartDrawing}
 						className='bg-blue-700  hover:bg-blue-600 px-2 py-2 w-[90%] text-nowrap rounded-md text-blue-100'

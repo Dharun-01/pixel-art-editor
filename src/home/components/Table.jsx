@@ -40,13 +40,27 @@ export default function Table() {
 				initial={{ opacity: 0, y: 60 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.8, ease: 'easeOut' }}
-				className='relative w-[700px] h-[420px] rounded-2xl shadow-2xl'
+				className='relative w-[700px] h-[420px] rounded-2xl  shadow-[0_50px_100px_-20px_rgba(0,0,0,0.8)] overflow-hidden border-t border-white/10'
 				style={{
-					background: 'linear-gradient(135deg, #8B4513, #6B3410)',
+					background: 'linear-gradient(160deg, #3d1f11 0%, #1a0f0a 100%)',
 					rotateX: '15deg',
 					transformStyle: 'preserve-3d',
 				}}
 			>
+				{/* Layer 1: The Wood Grain Texture (Subtle Noise) */}
+				<div
+					className='absolute inset-0 opacity-20 pointer-events-none'
+					style={{
+						backgroundImage: `url("https://www.transparenttextures.com/patterns/wood-pattern.png")`,
+					}}
+				></div>
+
+				{/* Layer 2: The "Glitter" / Polished Specular Highlight */}
+				<div className='absolute wood-glitter inset-0 bg-linear-to-tr from-transparent via-white/5 to-white/10 pointer-events-none'></div>
+
+				{/* Layer 3: The Edge Lighting (Makes it look thick) */}
+				<div className='absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/30 to-transparent'></div>
+
 				{/* table surface shine */}
 				<div
 					className='absolute inset-0 rounded-2xl opacity-20'
@@ -89,10 +103,10 @@ export default function Table() {
 							className='w-12 h-12 border-2 border-white/60 
                                         rounded-sm grid grid-cols-2 gap-0.5 p-1'
 						>
-							<div className='bg-red-400 rounded-[1px]' />
 							<div className='bg-blue-400 rounded-[1px]' />
-							<div className='bg-yellow-400 rounded-[1px]' />
+							<div className='bg-red-400 rounded-[1px]' />
 							<div className='bg-green-400 rounded-[1px]' />
+							<div className='bg-yellow-400 rounded-[1px]' />
 						</div>
 						<p
 							className='text-white text-xs font-bold text-center 
@@ -100,7 +114,7 @@ export default function Table() {
 						>
 							PIXEL ART
 						</p>
-						<p className='text-white/60 text-[10px] text-center'>
+						<p className='text-white/70 text-[18px]  animate-bounce text-center'>
 							Click to start
 						</p>
 					</div>
@@ -188,10 +202,10 @@ export default function Table() {
 				initial={{ opacity: 0 }}
 				animate={{ opacity: 1 }}
 				transition={{ delay: 1, duration: 0.6 }}
-				className='absolute bottom-12 text-white/40 text-sm 
+				className='absolute bottom-12 text-white/90 text-md font-screen  
                            tracking-widest'
 			>
-				Click the art book to start drawing
+				Click the art book to start drawing!
 			</motion.p>
 
 			{/* ── Zoom overlay (white flash on navigate) ────────── */}
