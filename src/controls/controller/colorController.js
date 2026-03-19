@@ -230,6 +230,9 @@ export class ColorSelectController {
 			this.view.references[slot].classList.remove('active-color-slot');
 		});
 
+		this.view.references[color.activeSlot].style.background = rgbToHex(
+			Array.from(newState.tools.color),
+		);
 		// then highlight only the active one
 		if (color.activeSlot) {
 			this.view.references[color.activeSlot].classList.add('active-color-slot');
