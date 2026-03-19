@@ -7,6 +7,7 @@ import {
 	ImageSelectPercentageService,
 	ImageSelectResizeService,
 } from '../services/ImageControlServices';
+import { getAssetPath } from '../../utils.js';
 
 export class ImageSelectController {
 	constructor(state, { dispatch, canvasEl }) {
@@ -360,8 +361,12 @@ export class ImageSelectController {
 
 				if (linkEl)
 					linkEl.src = !linked
-						? '../../assets/link_off_16dp_E3E3E3_FILL0_wght400_GRAD0_opsz20.svg'
-						: '../../assets/link_16dp_202020_FILL0_wght400_GRAD0_opsz20.svg';
+						? getAssetPath(
+								'/icons/link_off_16dp_E3E3E3_FILL0_wght400_GRAD0_opsz20.svg',
+							)
+						: getAssetPath(
+								'/icons/link_16dp_202020_FILL0_wght400_GRAD0_opsz20.svg',
+							);
 
 				linkEl.classList.toggle('link-icon-highlight-style', !!linked);
 
