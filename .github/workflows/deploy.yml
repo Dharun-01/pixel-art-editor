@@ -18,7 +18,10 @@ jobs:
         run: npm install
 
       - name: Lint Code 🔍
-        run: npm run lint # Move this ABOVE build
+        run: npm run lint
+
+      - name: Test
+        run: npm run test -- --run
 
       - name: Build Project 🏗️
         run: npm run build

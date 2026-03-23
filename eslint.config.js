@@ -1,7 +1,7 @@
 import js from '@eslint/js';
 import globals from 'globals';
 import pluginReact from 'eslint-plugin-react';
-
+import vitest from '@vitest/eslint-plugin';
 export default [
 	// 1. Tell ESLint what to IGNORE (This replaces .eslintignore)
 	{
@@ -49,6 +49,18 @@ export default [
 			'no-undef': 'error',
 			'no-constant-condition': 'warn',
 			'no-empty': 'warn',
+		},
+	},
+	// To tell eslint that the test and expect function exist globally given by vitest, no need to say it is undefined
+	{
+		files: ['**/*.test.js', '**/*.test.jsx'],
+		plugins: {
+			vitest,
+		},
+		languageOptions: {
+			globals: {
+				...vitest.environments.env.globals,
+			},
 		},
 	},
 ];
