@@ -4,6 +4,7 @@ import { HeaderController } from '../headerBar/headerBarController';
 import { SideControlsController } from '../sidecontrols/sidecontrolsController';
 import { StatusbarController } from '../statusbar/statusbarController';
 import '../input.css';
+import { SelectActivePictureService } from './services/selectActivePicture';
 
 export class AppController {
 	constructor(state, config) {
@@ -67,10 +68,7 @@ export class AppController {
 
 	syncState(newState) {
 		this.state = newState;
-		const isPreview = !!newState.drawing.previewPicture;
-		const pic = isPreview
-			? newState.drawing.previewPicture
-			: newState.drawing.picture;
+		const pic = SelectActivePictureService.selectActivePicture(newState);
 		this.headerbarController.syncState(this.state);
 		this.canvasController.syncState(pic, this.state);
 		this.statusbarController.syncState(this.state);
