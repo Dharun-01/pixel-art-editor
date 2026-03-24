@@ -175,29 +175,57 @@ export function pointerPosition(pos, domNode, state) {
 	};
 }
 
+/* ELT HELPERS */
+function appendDomElements(dom, child) {
+	dom.appendChild(child);
+}
+
+function appendStringToDom(dom, child) {
+	dom.appendChild(document.createTextNode(child));
+}
+
+function createElement(type) {
+	return document.createElement(type);
+}
+
+function createElementNS(type) {
+	return document.createElementNS('http://www.w3.org/2000/svg', type);
+}
+function setAttribute(dom, key, value) {
+	dom.setAttribute(key, value);
+}
+
+function assignProps(dom, props) {
+	Object.assign(dom, props);
+}
+
+export function isDataAttribute(key) {
+	return key.startsWith('data-');
+}
+/* ELT HELPERS */
 export function elt(type, props, ...children) {
 	let dom;
 	let svgElements = ['svg', 'path'];
 	if (!svgElements.includes(type)) {
-		dom = document.createElement(type);
+		dom = createElement(type);
 		if (props) {
 			Object.entries(props).forEach(([key, value]) => {
-				if (key.startsWith('data-')) {
-					dom.setAttribute(key, value);
+				if (isDataAttribute(key)) {
+					setAttribute(dom, key, value);
 				}
-				Object.assign(dom, props);
+				assignProps(dom, props);
 			});
 		} else {
-			dom = document.createElementNS('http://www.w3.org/2000/svg', type);
+			dom = createElementNS(type);
 			for (let [key, value] of Object.entries(props)) {
-				dom.setAttribute(key, value);
+				setAttribute(dom, key, value);
 			}
 		}
 	}
 
 	for (let child of children) {
-		if (typeof child != 'string') dom.appendChild(child);
-		else dom.appendChild(document.createTextNode(child));
+		if (typeof child != 'string') appendDomElements(dom, child);
+		else appendStringToDom(dom, child);
 	}
 	return dom;
 }

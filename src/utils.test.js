@@ -1,3 +1,4 @@
+import { test } from 'vitest';
 import {
 	calculateStampSpacing,
 	hexToRgb,
@@ -6,6 +7,7 @@ import {
 	pointerPosition,
 	rgbToHex,
 	rgbToHsv,
+	isDataAttribute,
 } from './utils';
 
 /* || TEST FOR HEX_TO_RGB and RGB_TO_HEX FUNCTIONS */
@@ -161,3 +163,17 @@ describe('pointerPosition', () => {
 	});
 });
 /* !-- TEST FOR POINTER POSITION FUNCTION --! */
+
+/* || TEST FOR ELT FUNCTION */
+describe('elt function', () => {
+	test('returns true if it is a data attribute', () => {
+		const result = isDataAttribute('data-');
+		expect(result).toBe(true);
+	});
+
+	test('returns false if data attribute is false', () => {
+		const result = isDataAttribute('width');
+		expect(result).toBe(false);
+	});
+});
+/* !-- TEST FOR ELT FUNCTION --! */
