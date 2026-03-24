@@ -1,5 +1,7 @@
 export class SideControlsCalculationService {
 	static getPercentageValue(value, min, max) {
+		if (value <= 0 || isNaN(value)) value = min;
+		if (value > max) value = max;
 		return ((value - min) / (max - min)) * 100;
 	}
 
@@ -12,6 +14,8 @@ export class SideControlsCalculationService {
 	}
 
 	static getThumbsPosition(slider, value, min, max) {
+		if (value <= 0 || isNaN(value)) value = min;
+		if (value > max) value = max;
 		const ratio = (value - min) / (max - min);
 		const x = ratio * slider.offsetWidth;
 		const y = 82;
