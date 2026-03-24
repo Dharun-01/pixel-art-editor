@@ -3,6 +3,7 @@ import {
 	hexToRgb,
 	interpolateCircleStampPosition,
 	interpolateStampPosition,
+	pointerPosition,
 	rgbToHex,
 	rgbToHsv,
 } from './utils';
@@ -38,41 +39,28 @@ describe('returns hsv value', () => {
 
 /* || TEST FOR CALCULATE STAMP SPACING FUNCTION */
 describe('returns stamp space', () => {
-	test('selectedBrush route test', () => {
-		let state = {
+	let createState = (selectedBrush, selectedShapeBrush, brushSize) => {
+		return {
 			tools: {
-				selectedBrush: 'OIL_BRUSH',
-				selectedShapeBrush: null,
-				brushSize: 10,
+				selectedBrush: selectedBrush,
+				selectedShapeBrush: selectedShapeBrush,
+				brushSize: brushSize,
 			},
 		};
-		const result = calculateStampSpacing(state);
+	};
+
+	test('selectedBrush route test', () => {
+		const result = calculateStampSpacing(createState('OIL_BRUSH', null, 10));
 		expect(result).toBe(4);
 	});
 
 	test('selectedShapeBrush route test', () => {
-		let state = {
-			tools: {
-				selectedBrush: null,
-				selectedShapeBrush: 'OIL_BRUSH',
-				brushSize: 10,
-			},
-		};
-
-		const result = calculateStampSpacing(state);
+		const result = calculateStampSpacing(createState(null, 'OIL_BRUSH', 10));
 		expect(result).toBe(4);
 	});
 
 	test('default setting test', () => {
-		let state = {
-			tools: {
-				selectedBrush: null,
-				selectedShapeBrush: null,
-				brushSize: 10,
-			},
-		};
-
-		const result = calculateStampSpacing(state);
+		const result = calculateStampSpacing(createState(null, null, 10));
 		expect(result).toBe(2.5);
 	});
 });
@@ -134,3 +122,42 @@ describe('Interpolate circle stamp position', () => {
 	});
 });
 /* !-- TEST FOR INTERPOLATE CIRCLE STAMP POSITION --!*/
+
+/* || TEST FOR POINTER POSITION FUNCTION */
+describe('pointerPosition', () => {
+	let fakeCanvas;
+
+	let createState = (zoomLevel) => {
+		return { drawing: { zoomLevel: zoomLevel } };
+	};
+
+	beforeEach(() => {
+		fakeCanvas = {
+			getBoundingClientRect: () => {
+				return { left: 100, top: 50 };
+			},
+		};
+	});
+	test('returns x,y coords when zoom level equals 0 or null', () => {
+		const result = pointerPosition(
+			{ clientX: 300, clientY: 150 },
+			fakeCanvas,
+			createState(null),
+		);
+
+		expect(result.x).toBe(200);
+		expect(result.y).toBe(100);
+	});
+
+	test('returns x, y coords when zoom > 0', () => {
+		const result = pointerPosition(
+			{ clientX: 300, clientY: 150 },
+			fakeCanvas,
+			createState(10),
+		);
+
+		expect(result.x).toBe(20);
+		expect(result.y).toBe(10);
+	});
+});
+/* !-- TEST FOR POINTER POSITION FUNCTION --! */
