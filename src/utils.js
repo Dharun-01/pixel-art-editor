@@ -1,4 +1,3 @@
-import { Picture } from './picture.js';
 import { STAMP } from './stamps.js';
 
 const REPO_NAME = '/pixel-art-editor';
@@ -25,6 +24,10 @@ export function hexToRgb(hex) {
 		parseInt(hexWithoutHash.slice(2, 4), 16),
 		parseInt(hexWithoutHash.slice(4, 6), 16),
 	]);
+}
+
+export function rgbToHex([r, g, b]) {
+	return '#' + [r, g, b].map((n) => n.toString(16).padStart(2, '0')).join('');
 }
 
 export function rgbToHsv(r, g, b) {
@@ -150,10 +153,6 @@ export function drawAxisLines(cx, startX, startY, endX, endY, axis) {
 	cx.imageSmoothingEnabled = false;
 
 	axisDrawers[axis]?.(cx, startX, endX, startY, endY);
-}
-
-export function rgbToHex([r, g, b]) {
-	return '#' + [r, g, b].map((n) => n.toString(16).padStart(2, '0')).join('');
 }
 
 export function pointerPosition(pos, domNode, state) {
@@ -294,7 +293,7 @@ export function interpolateCircleStampPosition(center, end, spacing) {
 	let radius = Math.sqrt((end.x - center.x) ** 2 + (end.y - center.y) ** 2);
 	let radiusC = Math.ceil(radius);
 	let circumference = 2 * Math.PI * radiusC;
-	let numPoints = Math.max(8, Math.ceil(circumference / spacing));
+	let numPoints = Math.max(1, Math.ceil(circumference / spacing));
 	let angleStep = (2 * Math.PI) / numPoints;
 	const circlePositions = [];
 	for (let i = 0; i < numPoints; i++) {
@@ -305,43 +304,6 @@ export function interpolateCircleStampPosition(center, end, spacing) {
 	}
 
 	return circlePositions;
-}
-
-export function iconDownloader(...iconProps) {
-	let svgProperties = {
-		xmlns: iconProps[0],
-		height: iconProps[1],
-		viewBox: iconProps[2],
-		width: iconProps[3],
-		fill: iconProps[4],
-	};
-	return svgProperties;
-}
-
-export function customName(link) {
-	let imageName = prompt('Save as');
-	if (!imageName) {
-		alert('Please Enter a Name');
-		link.remove();
-	} else return imageName;
-}
-
-export function applySize(points, state) {
-	if (!state.tools.brushSize) return points;
-	let result = [];
-	for (let p of points) {
-		for (let dx = 0; dx < state.tools.brushSize; dx++) {
-			for (let dy = 0; dy < state.tools.brushSize; dy++) {
-				result.push({
-					x: p.x + dx,
-					y: p.y + dy,
-					color: p.color,
-					opacity: p.opacity,
-				});
-			}
-		}
-	}
-	return result;
 }
 
 export function calculateStampSpacing(state) {
@@ -471,116 +433,6 @@ export function getStampedPoints(brushedPoints, stamp, state) {
 	return stampedPoints;
 }
 
-export function rotateLeft(state) {
-	let { width, height, pixels } = state.picture;
-	let newWidth = height;
-	let newHeight = width;
-
-	let newPixels = new Uint8ClampedArray(newWidth * newHeight * 4);
-
-	for (let y = 0; y < height; y++) {
-		for (let x = 0; x < width; x++) {
-			let src = (y * width + x) * 4;
-			let newX = y;
-			let newY = width - 1 - x;
-			let dst = (newY * newWidth + newX) * 4;
-
-			newPixels[dst] = pixels[src];
-			newPixels[dst + 1] = pixels[src + 1];
-			newPixels[dst + 2] = pixels[src + 2];
-			newPixels[dst + 3] = pixels[src + 3];
-		}
-	}
-	return new Picture(newWidth, newHeight, newPixels);
-}
-
-export function rotateRight(state) {
-	let { width, height, pixels } = state.picture;
-	let newWidth = height;
-	let newHeight = width;
-
-	let newPixels = new Uint8ClampedArray(newWidth * newHeight * 4);
-
-	for (let y = 0; y < height; y++) {
-		for (let x = 0; x < width; x++) {
-			let src = (y * width + x) * 4;
-			let newX = height - 1 - y;
-			let newY = x;
-			let dst = (newY * newWidth + newX) * 4;
-
-			newPixels[dst] = pixels[src];
-			newPixels[dst + 1] = pixels[src + 1];
-			newPixels[dst + 2] = pixels[src + 2];
-			newPixels[dst + 3] = pixels[src + 3];
-		}
-	}
-	return new Picture(newWidth, newHeight, newPixels);
-}
-
-export function rotate180(state) {
-	let { width, height, pixels } = state.picture;
-	let newWidth = width;
-	let newHeight = height;
-
-	let newPixels = new Uint8ClampedArray(newWidth * newHeight * 4);
-
-	for (let y = 0; y < height; y++) {
-		for (let x = 0; x < width; x++) {
-			let src = (y * width + x) * 4;
-			let newX = width - 1 - x;
-			let newY = height - 1 - y;
-			let dst = (newY * newWidth + newX) * 4;
-
-			newPixels[dst] = pixels[src];
-			newPixels[dst + 1] = pixels[src + 1];
-			newPixels[dst + 2] = pixels[src + 2];
-			newPixels[dst + 3] = pixels[src + 3];
-		}
-	}
-	return new Picture(newWidth, newHeight, newPixels);
-}
-
-export function flipVertical(state) {
-	let { width, height, pixels } = state.picture;
-	let newWidth = width;
-	let newHeight = height;
-	let newPixels = new Uint8ClampedArray(newWidth * newHeight * 4);
-	for (let y = 0; y < height; y++) {
-		for (let x = 0; x < width; x++) {
-			let src = (y * width + x) * 4;
-			let newX = width - 1 - x;
-			let newY = y;
-			let dst = (newY * newWidth + newX) * 4;
-			newPixels[dst] = pixels[src];
-			newPixels[dst + 1] = pixels[src + 1];
-			newPixels[dst + 2] = pixels[src + 2];
-			newPixels[dst + 3] = pixels[src + 3];
-		}
-	}
-	return new Picture(newWidth, newHeight, newPixels);
-}
-
-export function flipHorizontal(state) {
-	let { width, height, pixels } = state.picture;
-	let newWidth = width;
-	let newHeight = height;
-	let newPixels = new Uint8ClampedArray(newWidth * newHeight * 4);
-
-	for (let x = 0; x < width; x++) {
-		for (let y = 0; y < height; y++) {
-			let src = (y * width + x) * 4;
-			let newX = x;
-			let newY = height - 1 - y;
-			let dst = (newY * newWidth + newX) * 4;
-			newPixels[dst] = pixels[src];
-			newPixels[dst + 1] = pixels[src + 1];
-			newPixels[dst + 2] = pixels[src + 2];
-			newPixels[dst + 3] = pixels[src + 3];
-		}
-	}
-	return new Picture(newWidth, newHeight, newPixels);
-}
-
 export function reflectSelect(selectName, dispatch) {
 	const splitName = selectName.split(' ');
 	const reflectCheckbox = elt('input', {
@@ -694,23 +546,4 @@ export function applyMirror(points, state) {
 	const mirroredPoints = points.flatMap((p) => mirrorFn(state, p));
 	result = [...mirroredPoints];
 	return result;
-}
-
-export function resizePicture(state, newWidth, newHeight) {
-	let newPicture = Picture.empty(newWidth, newHeight, hexToRgb('#ffffff'));
-	let minWidth = Math.min(state.picture.width, newWidth);
-	let minHeight = Math.min(state.picture.height, newHeight);
-	for (let y = 0; y < minHeight; y++) {
-		for (let x = 0; x < minWidth; x++) {
-			let src = (y * state.picture.width + x) * 4;
-			let dst = (y * newWidth + x) * 4;
-
-			newPicture.pixels[dst] = state.picture.pixels[src];
-			newPicture.pixels[dst + 1] = state.picture.pixels[src + 1];
-			newPicture.pixels[dst + 2] = state.picture.pixels[src + 2];
-			newPicture.pixels[dst + 3] = state.picture.pixels[src + 3];
-		}
-	}
-
-	return newPicture;
 }

@@ -336,7 +336,7 @@
 
 	.opacity-control-slider-style,
 	.size-control-slider-style {
-		@apply w-48 appearance-none bg-white/60 h-[3px] rounded-lg;
+		@apply w-48 appearance-none bg-white/60 h-[3px] rounded-lg hover:cursor-n-resize;
 	}
 
 	.side-control-dom-style {
