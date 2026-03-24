@@ -1,4 +1,3 @@
-import { test } from 'vitest';
 import {
 	calculateStampSpacing,
 	hexToRgb,
@@ -8,6 +7,12 @@ import {
 	rgbToHex,
 	rgbToHsv,
 	isDataAttribute,
+	applyStampAtPosition,
+	verticalMirrorType,
+	horizontalMirrorType,
+	mainDiagonalMirrorType,
+	offDiagonalMirrorType,
+	applyMirror,
 } from './utils';
 
 /* || TEST FOR HEX_TO_RGB and RGB_TO_HEX FUNCTIONS */
@@ -177,3 +182,227 @@ describe('elt function', () => {
 	});
 });
 /* !-- TEST FOR ELT FUNCTION --! */
+
+/* || TEST FOR APPLY STAMP AT POSITION FUNCTION */
+
+describe('Apply stamp at position', () => {
+	let state, color;
+
+	let createStamp = (dx, dy, opacity) => {
+		return [{ dx: dx, dy: dy, opacity: opacity }];
+	};
+
+	let createStampPos = (x, y) => {
+		return { x: x, y: y };
+	};
+
+	beforeEach(() => {
+		color = new Uint8ClampedArray([255, 0, 0]);
+		state = {
+			drawing: {
+				picture: {
+					width: 1000,
+					height: 400,
+				},
+			},
+		};
+	});
+
+	test('returns stamp points when stamp is inside canvas', () => {
+		const result = applyStampAtPosition(
+			createStampPos(20, 20),
+			createStamp(0, 0, 1.0),
+			color,
+			50, // normal opacity
+			state,
+		);
+		expect(result.length).toBe(1);
+		expect(result[0].x).toBe(20);
+		expect(result[0].y).toBe(20);
+		expect(result[0].color).toBe(color);
+	});
+
+	test('returns stamp points when opacity is zero or null', () => {
+		const result = applyStampAtPosition(
+			createStampPos(20, 20),
+			createStamp(0, 0, 1.0),
+			color,
+			0,
+			state,
+		);
+		expect(result[0].opacity).toBe(1.0);
+	});
+
+	test('returns no points when stampPos or stamp is outside the canvas', () => {
+		const result = applyStampAtPosition(
+			createStampPos(-20, -20),
+			createStamp(0, 0, 1.0),
+			color,
+			0.5,
+			state,
+		);
+
+		expect(result.length).toBe(0);
+	});
+
+	test('returns only points inside canvas bounds', () => {
+		// stamp with two points — one inside, one outside
+		const stamp = [
+			{ dx: 0, dy: 0, opacity: 1.0 },
+			{ dx: -25, dy: -25, opacity: 1.0 },
+		];
+		const result = applyStampAtPosition(
+			createStampPos(20, 20),
+			stamp,
+			color,
+			50,
+			state,
+		);
+		expect(result.length).toBe(1); // only one point returned
+	});
+});
+/* !-- TEST FOR APPLY STAMP AT POSITION FUNCTION --! */
+
+/* || TEST FOR MIRROR FUNCTIONS */
+describe('Mirror utilities', () => {
+	let color;
+	beforeEach(() => {
+		color = new Uint8ClampedArray([255, 0, 0]);
+	});
+
+	let createState = (height, width) => {
+		return {
+			drawing: {
+				picture: {
+					width: width,
+					height: height,
+				},
+			},
+		};
+	};
+	test('returns vertically mirrored points', () => {
+		const result = verticalMirrorType(createState(400, 100), {
+			x: 20,
+			y: 30,
+			color: color,
+			opacity: 1.0,
+		});
+
+		// coords check
+		expect(result[0].x).toBe(79);
+		expect(result[0].y).toBe(30);
+
+		//color and opacity check
+		expect(result[0].color).toBe(color);
+		expect(result[0].opacity).toBe(1.0);
+	});
+
+	test('returns horizontally mirrored points', () => {
+		const result = horizontalMirrorType(createState(400, 100), {
+			x: 20,
+			y: 30,
+			color: color,
+			opacity: 1.0,
+		});
+
+		// coords check
+		expect(result[0].x).toBe(20);
+		expect(result[0].y).toBe(369);
+
+		//color and opacity check
+		expect(result[0].color).toBe(color);
+		expect(result[0].opacity).toBe(1.0);
+	});
+
+	test('returns main diagonal points', () => {
+		const result = mainDiagonalMirrorType(createState(100, 100), {
+			x: 20,
+			y: 30,
+			color: color,
+			opacity: 1.0,
+		});
+
+		// coords check
+		expect(result[0].x).toBe(30);
+		expect(result[0].y).toBe(20);
+
+		// color and opacity check
+		expect(result[0].color).toBe(color);
+		expect(result[0].opacity).toBe(1.0);
+	});
+
+	test('returns off diagonal points', () => {
+		const result = offDiagonalMirrorType(createState(100, 100), {
+			x: 20,
+			y: 30,
+			color: color,
+			opacity: 1.0,
+		});
+
+		// coords check
+		expect(result[0].x).toBe(70);
+		expect(result[0].y).toBe(80);
+
+		// color and opacity check
+		expect(result[0].color).toBe(color);
+		expect(result[0].opacity).toBe(1.0);
+	});
+});
+
+describe('Apply mirror function', () => {
+	let color;
+	beforeEach(() => {
+		color = new Uint8ClampedArray([255, 0, 0]);
+	});
+
+	let createState = (axis, width, height) => {
+		return {
+			drawing: {
+				picture: {
+					width: width,
+					height: height,
+				},
+			},
+			ui: {
+				transform: {
+					mirror: {
+						axis: axis,
+					},
+				},
+			},
+		};
+	};
+
+	test('returns nothing when axis equals 0 or null', () => {
+		const result = applyMirror(
+			[
+				{
+					x: 20,
+					y: 30,
+					color: color,
+					opacity: 1.0,
+				},
+			],
+			createState(null),
+		);
+
+		expect(result.length).toBe(0);
+	});
+
+	test('returns mirrored points when given right points', () => {
+		const result = applyMirror(
+			[
+				{
+					x: 20,
+					y: 30,
+					color: color,
+					opacity: 1.0,
+				},
+			],
+			createState('vertical', 100, 100),
+		); // took vertical axis as an example no need for this test case because I tested the mirror utilities already.
+
+		expect(result[0].x).toBe(79);
+	});
+});
+/* !-- TEST FOR MIRROR FUNCTIONS --!*/

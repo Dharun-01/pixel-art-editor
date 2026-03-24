@@ -444,78 +444,18 @@ export function getBrushStamp(state) {
 	return stamp;
 }
 
-export function getStampedPoints(brushedPoints, stamp, state) {
-	let stampedPoints = [];
-	for (let point of brushedPoints) {
-		for (let { dx, dy, opacity } of stamp) {
-			let x = point.x + dx;
-			let y = point.y + dy;
-			stampedPoints.push({
-				x: x,
-				y: y,
-				color: point.color,
-				opacity: state.tools.opacity / 100 || opacity,
-			});
-		}
-	}
-	return stampedPoints;
-}
-
-export function reflectSelect(selectName, dispatch) {
-	const splitName = selectName.split(' ');
-	const reflectCheckbox = elt('input', {
-		type: 'checkbox',
-		id: selectName,
-		onclick: (event) => {
-			event.stopPropagation();
-			dispatch({
-				[`mirror${splitName[1]}`]: event.target.checked,
-				toggleMirror: false,
-			});
-		},
-	});
-
-	const reflectOption = elt(
-		'label',
-		{ htmlFor: selectName },
-		elt(
-			'p',
-			{
-				className: 'p-1 min-w-52 hover:bg-custom-glass-black rounded-md',
-			},
-			elt(
-				'div',
-				{
-					className: 'flex flex-row items-center justify-between',
-				},
-				selectName,
-				elt(
-					'label',
-					{
-						className: 'switch ',
-					},
-					reflectCheckbox,
-					elt('span', { className: 'slider round' }),
-				),
-			),
-		),
-	);
-
-	return { reflectCheckbox, reflectOption };
-}
-
 /* MIRROR UTILITIES */
-function verticalMirrorType(state, p) {
+export function verticalMirrorType(state, p) {
 	let mirroredX = state.drawing.picture.width - 1 - p.x;
 	return [{ x: mirroredX, y: p.y, color: p.color, opacity: p.opacity }];
 }
 
-function horizontalMirrorType(state, p) {
+export function horizontalMirrorType(state, p) {
 	let mirroredY = state.drawing.picture.height - 1 - p.y;
 	return [{ x: p.x, y: mirroredY, color: p.color, opacity: p.opacity }];
 }
 
-function mainDiagonalMirrorType(state, p) {
+export function mainDiagonalMirrorType(state, p) {
 	let normalizedX = p.x / state.drawing.picture.width;
 	let normalizedY = p.y / state.drawing.picture.height;
 	let mirroredX = Math.round(normalizedY * state.drawing.picture.width);
@@ -529,7 +469,7 @@ function mainDiagonalMirrorType(state, p) {
 	return [{ x: mirroredX, y: mirroredY, color: p.color, opacity: p.opacity }];
 }
 
-function offDiagonalMirrorType(state, p) {
+export function offDiagonalMirrorType(state, p) {
 	let normalizedX = p.x / state.drawing.picture.width;
 	let normalizedY = p.y / state.drawing.picture.height;
 	let mirroredX = Math.round((1 - normalizedY) * state.drawing.picture.width);
@@ -542,11 +482,11 @@ function offDiagonalMirrorType(state, p) {
 	return [{ x: mirroredX, y: mirroredY, color: p.color, opacity: p.opacity }];
 }
 
-function orthogonalMirrorType(state, p) {
+export function orthogonalMirrorType(state, p) {
 	return [...verticalMirrorType(state, p), ...horizontalMirrorType(state, p)];
 }
 
-function diagonalMirrorType(state, p) {
+export function diagonalMirrorType(state, p) {
 	return [
 		...mainDiagonalMirrorType(state, p),
 		...offDiagonalMirrorType(state, p),
