@@ -216,7 +216,7 @@ export class StatusbarView {
 
 		this.zoomRange = createInput(
 			'range',
-			'zoom-slider h-[3px] w-48 appearance-none bg-white/10 rounded-lg hover:cursor-ew-resize',
+			'zoom-slider w-48 appearance-none bg-white/10 rounded-lg hover:cursor-ew-resize',
 			null,
 			'zoomRange',
 			(value) => this.handlers.onZoomRangeChange(value),

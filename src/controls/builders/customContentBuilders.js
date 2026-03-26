@@ -531,7 +531,7 @@ export function createExportContent(handlers) {
 	const qualityLabel = createLabel('qualityRange', 'Quality:', 'text-gray-300');
 	const qualityRange = createInput(
 		'range',
-		'quality-slider h-[3px] w-48 appearance-none bg-white/10 rounded-lg',
+		'quality-slider w-48 appearance-none bg-white/10 rounded-lg hover:cursor-ew-resize',
 		3,
 		'qualityRange',
 		(value) => handlers.onQualityRangeChange(value),

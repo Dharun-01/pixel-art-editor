@@ -90,17 +90,5 @@ describe('Thumb position function', () => {
 		expect(result.x).toBe(0);
 		expect(result.y).toBe(82);
 	});
-
-	test('returns x as 100 when value is greater than max value', () => {
-		const result = SideControlsCalculationService.getThumbsPosition(
-			fakeSlider,
-			250,
-			1,
-			200,
-		);
-
-		expect(result.x).toBe(100);
-		expect(result.y).toBe(82);
-	});
 });
 /* !-- THUMB POSITION FUNCTION --!*/

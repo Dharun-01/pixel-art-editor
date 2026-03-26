@@ -158,7 +158,24 @@
 
 	.zoom-slider,
 	.quality-slider {
-		transition: background 150ms linear;
+		-webkit-appearance: none;
+		appearance: none;
+		transition:
+			height 0.15s ease,
+			background 150ms linear;
+		height: 3px;
+		border-radius: 2px;
+		outline: none;
+		box-shadow: 0 0 0 0.5px honeydew;
+		--thumb-scale: 1;
+		--thumb-shadow: none;
+	}
+
+	.zoom-slider:hover,
+	.quality-slider:hover {
+		height: 5px;
+		--thumb-scale: 1.25;
+		--thumb-shadow: 0 0 3px 0.5px #4da3ff80;
 	}
 
 	.zoom-slider::-webkit-slider-thumb,
@@ -169,9 +186,14 @@
 		appearance: none;
 		outline: none;
 		background-color: #4da3ff; /* cyan */
-		transition: transform 0.2s ease;
+		transition:
+			box-shadow 0.2s ease,
+			transform 0.2s ease;
+		transform: scale(var(--thumb-scale));
 		border-radius: 50%;
+		box-shadow: var(--thumb-shadow);
 	}
+
 	.zoom-slider::-webkit-slider-thumb:hover,
 	.quality-slider::-webkit-slider-thumb:hover {
 		transform: scale(1.25);
@@ -187,10 +209,12 @@
 		outline: none;
 		background-color: #4da3ff;
 		transition: transform 0.2s ease;
+		box-shadow: var(--thumb-shadow);
 	}
+
 	.zoom-slider:focus-visible::-moz-range-thumb,
 	.quality-slider:focus-visible::-moz-range-thumb {
-		box-shadow: 0 0 0 3px #4da3ff;
+		box-shadow: var(--thumb-shadow);
 	}
 
 	.zoom-slider:hover::-moz-range-thumb,
